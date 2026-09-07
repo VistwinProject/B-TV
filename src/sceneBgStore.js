@@ -2,9 +2,10 @@
 //   beam   Z  待機頁那條弧線,顏色吃當頁主色
 //   logo   X  滿版 ANLB,顏色吃當頁主色(淡)
 //   invert C  反轉:底鋪當頁主色,ANLB 是白色
+//   vlines V  深藍底 + 交錯光束(主視覺那張)
 // 只在情境頁(scene / loop)有作用;存 localStorage,重整不會掉。
 const KEY = 'sceneBg'
-export const SCENE_BG_MODES = ['beam', 'logo', 'invert']
+export const SCENE_BG_MODES = ['beam', 'logo', 'invert', 'vlines']
 const DEFAULT = 'beam'
 
 let mode = (() => {

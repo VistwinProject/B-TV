@@ -8,6 +8,7 @@ import Icon from '../components/icons.jsx'
 import PersonaIcon from '../components/PersonaIcon.jsx'
 import LayoutEditor from '../components/LayoutEditor.jsx'
 import IdleBeam from '../components/IdleBeam.jsx'
+import SceneBeams from '../components/SceneBeams.jsx'
 import { getSceneBg, subscribeSceneBg } from '../sceneBgStore.js'
 import { DIMENSION_ORDER, DIMENSION_META, SCENES } from '../scenes.js'
 import { PERSONA_ORDER } from '../personas.js'
@@ -235,7 +236,8 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
       {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
           interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
       {bg === 'beam' && <IdleBeam interactive={false} className="scene-beam" />}
-      {bg !== 'beam' && (
+      {bg === 'vlines' && <SceneBeams />}
+      {(bg === 'logo' || bg === 'invert') && (
         <div
           className="scene-bg-logo"
           role="img"
