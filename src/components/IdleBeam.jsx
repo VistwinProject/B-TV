@@ -26,9 +26,11 @@ function ribbon(pts, up, lo) {
   return `${a.join('')}${b.join('')}Z`
 }
 
-export default function IdleBeam() {
+// interactive=false:只畫光,不顯示三個造型點(情境牆當背景用,拖點只該在待機頁做)
+export default function IdleBeam({ interactive = true, className = '' }) {
   const beam = useSyncExternalStore(subscribeBeam, getBeam)
-  const editing = useSyncExternalStore(subscribeBeam, getEditing)
+  const editingRaw = useSyncExternalStore(subscribeBeam, getEditing)
+  const editing = interactive && editingRaw
   const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   const svgRef = useRef(null)
   const dragRef = useRef(null)
@@ -98,7 +100,7 @@ export default function IdleBeam() {
   return (
     <svg
       ref={svgRef}
-      className={`idlebeam${editing ? ' idlebeam--edit' : ''}`}
+      className={`idlebeam${editing ? ' idlebeam--edit' : ''}${className ? ` ${className}` : ''}`}
       viewBox={`0 0 ${W} ${H}`} width={W} height={H}
     >
       {layers.map((l, i) => (

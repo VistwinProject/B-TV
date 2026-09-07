@@ -7,6 +7,7 @@ import DonutTile from './DonutTile.jsx'
 import Icon from '../components/icons.jsx'
 import PersonaIcon from '../components/PersonaIcon.jsx'
 import LayoutEditor from '../components/LayoutEditor.jsx'
+import IdleBeam from '../components/IdleBeam.jsx'
 import { DIMENSION_ORDER, DIMENSION_META, SCENES } from '../scenes.js'
 import { PERSONA_ORDER } from '../personas.js'
 
@@ -227,25 +228,9 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
 
   return (
     <div className="scene-cols">
-      {/* 背景光:待機頁那道藍色漸層弧線,橫跨整面牆、鋪在卡片底下 */}
-      <svg className="scene-beam" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="sceneBeam" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="var(--beam-glow)"  stopOpacity="0" />
-            <stop offset="18%"  stopColor="var(--beam-glow)"  stopOpacity="0.55" />
-            <stop offset="54%"  stopColor="var(--beam-inner)" stopOpacity="1" />
-            <stop offset="88%"  stopColor="var(--beam-glow)"  stopOpacity="0.45" />
-            <stop offset="100%" stopColor="var(--beam-glow)"  stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {/* 三層:外暈 → 內暈 → 亮核,線寬都不隨拉伸變形 */}
-        <path className="scene-beam__l3" d="M-20 545 Q 470 300 1020 78" fill="none"
-          stroke="url(#sceneBeam)" strokeWidth="44" vectorEffect="non-scaling-stroke" />
-        <path className="scene-beam__l2" d="M-20 545 Q 470 300 1020 78" fill="none"
-          stroke="url(#sceneBeam)" strokeWidth="15" vectorEffect="non-scaling-stroke" />
-        <path className="scene-beam__l1" d="M-20 545 Q 470 300 1020 78" fill="none"
-          stroke="url(#sceneBeam)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-      </svg>
+      {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
+          interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
+      <IdleBeam interactive={false} className="scene-beam" />
 
       {/* 左欄:當前維度 3 張相關卡。key 帶 persona.id → 換角色重掛載、重播進場 */}
       <div className="scene-col scene-col--l">
