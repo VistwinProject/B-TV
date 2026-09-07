@@ -4,7 +4,7 @@ import { getLayout, subscribeLayout, setLayout, resetLayout } from '../layoutSto
 import { getSceneColors, getEditContext, subscribeSceneColors, setSceneColor, resetSceneColors, SLOTS, slotColor,
   BENTO_PANELS, getBentoColors, setBentoColor, resetBentoColors,
   getBentoBeam, toggleBentoBeam, resetBentoBeam } from '../sceneColorStore.js'
-import { PERSONAS } from '../personas.js'
+import { PERSONAS, PERSONA_ORDER } from '../personas.js'
 
 // ── 待機頁配色編輯器(開發/佈展調色用,按 E 開關)──────────────────────────────
 // 面板直接改 :root 的 CSS 變數 → 畫面即時變;值存 localStorage,重整不會掉。
@@ -168,14 +168,26 @@ export default function StyleTuner() {
     try {
       const layJs = `export const LAYOUT_DEFAULT = {\n  colL: ${lay.colL}, colM: ${lay.colM}, colR: ${lay.colR},\n  heroH: ${lay.heroH},\n` +
         `  bentoCols: [${lay.bentoCols.join(', ')}],\n  bentoRows: [${lay.bentoRows.join(', ')}],\n}`
-      // 情境參考配色的選擇 → 貼回 personas.js 的 accent2 / accent3
-      const picked = Object.entries(sceneSel).map(([id, v]) => {
-        const per = PERSONAS[id]
-        return `  ${/^[a-z]+$/.test(id) ? id : `'${id}'`}: accent2: ${v.a || per.accent2}  accent3: ${v.b || per.accent3}`
-      }).join('\n')
+      // 1-5 各格的顏色 → 輸出可直接貼回 sceneColorStore.js 的 SCENE_DEFAULTS。
+      // 輸出的是「目前生效值」= 程式碼預設 + 這台瀏覽器挑過的覆寫;貼回原始碼之後
+      // 換任何一台電腦都會長一樣(localStorage 只是這台機器的暫時覆寫,不會跟著走)。
+      const q = (v) => (v ? `'${v}'` : 'null')
+      const kq = (id) => (/^[a-z]+$/.test(id) ? id : `'${id}'`)
+      const sceneJs = `export const SCENE_DEFAULTS = {\n` +
+        PERSONA_ORDER.map((id) => {
+          const per = PERSONAS[id]
+          const cells = SLOTS.map((sl) => `${sl.key}: ${q(slotColor(per, sl.key))}`).join(', ')
+          return `  ${kq(id)}: { ${cells} },`
+        }).join('\n') + `\n}`
+      // 房屋資訊牆的色碼與光邊開關(同樣只存在這台瀏覽器)
+      const hasBento = Object.keys(bentoSel).length > 0 || Object.keys(bentoBeam).length > 0
+      const bentoJs = hasBento
+        ? `\n/* → src/sceneColorStore.js(房屋資訊牆)*/\nconst bentoColors = ${JSON.stringify(bentoSel)}\n` +
+          `const bentoBeam = ${JSON.stringify(bentoBeam)}\n`
+        : ''
       await navigator.clipboard.writeText(
         `/* → src/style.css 的 :root */\n:root {\n${css}\n}\n\n/* → src/beamStore.js */\n${geoJs}\n\n/* → src/layoutStore.js */\n${layJs}\n` +
-        (picked ? `\n/* → src/personas.js(情境參考配色的選擇)*/\n${picked}\n` : ''))
+        `\n/* → src/sceneColorStore.js(1-5 各格顏色)*/\n${sceneJs}\n` + bentoJs)
       setCopied(true)
     } catch { setCopied(false) }
   }
