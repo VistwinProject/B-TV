@@ -15,16 +15,30 @@ export const SLOTS = [
   { key: 'l3',       label: '左欄第 3 張',               kind: 'fill' },
 ]
 
-// 預設:數據強調與右欄兩張用 accent2、左欄第二張用 accent3,其餘不平塗
-export const slotDefault = (per, key) => ({
-  data: per.accent2,
-  pain: per.accent2,
-  solution: per.accent2,
-  score: null,
-  l1: null,
-  l2: per.accent3,
-  l3: null,
-}[key])
+// ── 1-5 各格的顏色「正式記錄」──────────────────────────────────────────────────
+// 這一份就是隨程式碼走的定案值:任何一台電腦、清空 localStorage、重新 clone 都一樣。
+// 編輯模式(E)挑的色只存在該台瀏覽器的 localStorage,是現場微調用的暫時覆寫;
+// 要固化就把值抄進這張表(面板的「複製 CSS」會把目前挑的色一起輸出)。
+// null = 不平塗(保持半透明,讓背後的光透出來)。
+export const SCENE_DEFAULTS = {
+  // 居家抗老:accent2 #fa864d(橘)· accent3 #17ab54(綠)
+  'anti-aging': { data: '#fa864d', pain: '#fa864d', solution: '#fa864d', score: null, l1: null, l2: '#17ab54', l3: null },
+  // 兒童免疫:accent2 #e04b64(紅)· accent3 #549a60(綠)
+  child:        { data: '#e04b64', pain: '#e04b64', solution: '#e04b64', score: null, l1: null, l2: '#549a60', l3: null },
+  // 在宅樂齡:accent2 #bfd71b(黃綠)· accent3 #f96224(橘紅)
+  elder:        { data: '#bfd71b', pain: '#bfd71b', solution: '#bfd71b', score: null, l1: null, l2: '#f96224', l3: null },
+  // 孕婦照護:accent2 #628e6b(墨綠)· accent3 #5040ee(藍紫)
+  pregnancy:    { data: '#628e6b', pain: '#628e6b', solution: '#628e6b', score: null, l1: null, l2: '#5040ee', l3: null },
+  // 數位遊牧:accent2 #7cc8f0(天藍)· accent3 #3cb3a7(藍綠)
+  nomad:        { data: '#7cc8f0', pain: '#7cc8f0', solution: '#7cc8f0', score: null, l1: null, l2: '#3cb3a7', l3: null },
+}
+
+export const slotDefault = (per, key) => {
+  const row = SCENE_DEFAULTS[per.id]
+  // 表裡沒有這個角色(新增情境時)→ 退回 personas.js 的 accent2 / accent3
+  if (!row) return { data: per.accent2, pain: per.accent2, solution: per.accent2, l2: per.accent3 }[key] ?? null
+  return row[key] ?? null
+}
 
 const load = () => {
   try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
