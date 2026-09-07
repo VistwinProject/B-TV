@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { asset } from '../assetUrl.js'
 
 // 待機吸引畫面。導覽人員按下開始(i / Enter,或 server override 'intro')→ 進入前言。
 // 無互動元件,純氛圍。
@@ -40,7 +41,7 @@ export default function Idle() {
         className="idle__logo"
         role="img"
         aria-label="ANLB inside"
-        style={{ '--logo-src': `url(${import.meta.env.BASE_URL}icons/anlb.png)` }}
+        style={{ '--logo-src': `url(${asset('icons/anlb.png')})` }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.95 }}
         transition={{ duration: 1.2, delay: 0.8 }}

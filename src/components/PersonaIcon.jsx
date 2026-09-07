@@ -1,8 +1,9 @@
 // ── 情境角色圖標 ──────────────────────────────────────────────────────────────
+import { asset } from '../assetUrl.js'
 // 直接用設計端提供的 CI 圖檔(白色線稿、透明底),不再手繪 SVG。
 // 五個 icon 在同一張長條圖裡(public/icons/personas.png,2051×173),
 // 下面的 box 是用 canvas 掃 alpha 通道實測出來的每個 icon 邊界,再換算成 CSS sprite。
-const SPRITE = { url: `${import.meta.env.BASE_URL}icons/personas.png`, w: 2051, h: 173 }
+const SPRITE = { url: asset('icons/personas.png'), w: 2051, h: 173 }
 const BOX = {
   pregnancy:    { x: 0,    y: 1, w: 165, h: 169 },   // 孕婦照護
   'anti-aging': { x: 470,  y: 0, w: 172, h: 169 },   // 居家抗老

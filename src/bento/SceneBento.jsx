@@ -9,6 +9,7 @@ import PersonaIcon from '../components/PersonaIcon.jsx'
 import LayoutEditor from '../components/LayoutEditor.jsx'
 import { DIMENSION_ORDER, DIMENSION_META, SCENES } from '../scenes.js'
 import { PERSONA_ORDER } from '../personas.js'
+import { asset } from '../assetUrl.js'
 
 // 情境解方牆 — 3 欄,以「當前維度」主時鐘同步:
 //   ▍左欄 = 當前維度的「3 張相關卡」(同一維度、不同呈現:大數字 / 圖表 / 視覺化)
@@ -233,7 +234,7 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
       <div className="scene-bgimg-wrap">
         <div
           className="scene-bgimg scene-bgimg--inv"
-          style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
+          style={{ '--bg-src': `url(${asset('bg/anlb-key.jpg')})` }}
         />
       </div>
 
@@ -280,7 +281,7 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
           className="scene-foot__logo"
           role="img"
           aria-label="ANLB inside"
-          style={{ '--logo-src': `url(${import.meta.env.BASE_URL}icons/anlb.png)` }}
+          style={{ '--logo-src': `url(${asset('icons/anlb.png')})` }}
         />
       </motion.div>
 

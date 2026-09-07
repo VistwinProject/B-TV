@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import BentoTile from './BentoTile.jsx'
+import { asset } from '../assetUrl.js'
 
 // 影片格 — 房屋資訊牆右上那格,循環播放樣品屋影片(無聲、貼齊滿格)。
 // kiosk 用途:muted + playsInline 才能自動播放(瀏覽器政策);頁面切回前景時補一次 play()。
 // 影片載不到時只留標題不留黑塊,版面不會破。
-const VIDEO_URL = `${import.meta.env.BASE_URL}video/house-tour.mp4`
+const VIDEO_URL = asset('video/house-tour.mp4')
 
 export default function VideoTile({ style, delay = 0, className = '', title = '你的未來居家', sub = 'Walkthrough' }) {
   const ref = useRef(null)
