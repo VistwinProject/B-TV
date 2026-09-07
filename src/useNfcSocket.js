@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef } from 'react'
 // VITE_WS_URL 覆寫。
 const WS_URL       = import.meta.env.VITE_WS_URL || 'ws://localhost:8788'
 const RECONNECT_MS = 3000
+export const DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1'
 
 // onMessage 收到 server 原始訊息物件(已 JSON.parse)。
 // onStatus 收到 'connecting' | 'connected' | 'disconnected'。
@@ -23,6 +24,11 @@ export function useNfcSocket(onMessage, onStatus) {
   statusRef.current = onStatus
 
   useEffect(() => {
+    // 純本機預覽：不建立連線，send 回傳 false，沿用呼叫端的離線模擬。
+    if (DEMO_MODE) {
+      statusRef.current?.('disconnected')
+      return
+    }
     let alive = true
     let timer = null
 

@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useCallback, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion'
 import { PERSONAS, PERSONA_ORDER } from './personas.js'
-import { useNfcSocket } from './useNfcSocket.js'
+import { useNfcSocket, DEMO_MODE } from './useNfcSocket.js'
+import NfcControls from './components/NfcControls.jsx'
 import { getSceneColors, subscribeSceneColors, setEditContext, slotColor, fillColor, glassFill, getGlass } from './sceneColorStore.js'
 import { setLayoutTarget } from './layoutStore.js'
 
@@ -119,6 +120,7 @@ export default function App() {
   }, [])
   const onStatus = useCallback((status) => dispatch({ type: 'ws-status', status }), [])
   const { send } = useNfcSocket(onMessage, onStatus)
+  const relay = useCallback((obj) => { if (!send(obj)) onMessage(obj) }, [send, onMessage])
 
   // ── 結語播完自動回待機(結語為展務員觸發;前言/房屋資訊不自動續播、無無人逾時)──────
   useEffect(() => {
@@ -139,10 +141,9 @@ export default function App() {
   //   NFC 模擬與 reset/intro/outro 走 server 廣播(`send`),讓桌面 + 電視同步;
   //   未連線時 fallback 成本機處理(純電視測試)。n/advance 為電視本機流程,不廣播。
   useEffect(() => {
-    const relay = (obj) => { if (!send(obj)) onMessage(obj) }
     const onKey = (e) => {
       // 在配色面板(E)的輸入框裡打字時,不要觸發流程快捷鍵
-      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return
+      if (e.defaultPrevented || e.target.closest?.('button, input, textarea, select, a, summary, [contenteditable], [role="button"]')) return
       const k = e.key
       if (k === 'i' || k === 'I' || k === 'Enter')      relay({ type: 'intro' })
       else if (k === 'n' || k === 'N' || k === 'ArrowRight') dispatch({ type: 'op-advance' })
@@ -154,7 +155,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onMessage, send])
+  }, [relay])
 
   // 編輯模式挑過的參考配色(沒挑過就用 personas.js 的預設)
   const sceneSel = useSyncExternalStore(subscribeSceneColors, getSceneColors)
@@ -225,7 +226,8 @@ export default function App() {
         />
       )}
 
-      <StatusDot wsStatus={s.wsStatus} connected={s.connected} phase={s.phase} />
+      <StatusDot wsStatus={s.wsStatus} connected={s.connected} phase={s.phase} demo={DEMO_MODE} />
+      <NfcControls state={s} relay={relay} onAdvance={() => dispatch({ type: 'op-advance' })} demo={DEMO_MODE} />
 
       {/* 佈展調色用:按 E 開關(關閉時完全不渲染,不影響 kiosk)*/}
       <StyleTuner />

@@ -4,9 +4,9 @@ const PHASE_LABEL = {
   character: '等待角色', scene: '解方展演', loop: '情境體驗', outro: '結語',
 }
 
-export default function StatusDot({ wsStatus, connected, phase }) {
+export default function StatusDot({ wsStatus, connected, phase, demo = false }) {
   const ok    = wsStatus === 'connected'
-  const label = !ok ? '連線中' : connected ? '讀卡機就緒' : '等待讀卡機'
+  const label = demo ? '本機模擬' : !ok ? '連線中' : connected ? '讀卡機就緒' : '等待讀卡機'
   const tone  = !ok ? 'down' : connected ? 'live' : 'idle'
   return (
     <div className={`statusdot statusdot--${tone}`} title={`${wsStatus} · reader:${connected} · ${phase}`}>
