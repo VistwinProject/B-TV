@@ -513,53 +513,14 @@
   pointer-events: none;
 }
 .scene-foot__logo { justify-self: center; }
-/* 待機頁那道光當情境牆的背景:元件本身是 position:absolute inset:0,
-   放在 .scene-cols 第一個子元素 → 卡片(position:relative、DOM 在後)自動疊在上面。
-   .scene-cols 有 padding,所以這裡用負 margin 把光還原成滿版對齊待機頁的座標。 */
-.scene-beam {
-  inset: calc(-1 * clamp(10px, 1.4vw, 22px)) !important;
-  opacity: 0.85;
-}
-/* ── 情境牆背景:三種樣式,按 Z / X / C 切換(見 sceneBgStore.js)──────────────
-   X  滿版 ANLB:PNG alpha 當遮罩,顏色吃當頁主色,壓淡當浮水印
-   C  反轉:底鋪當頁主色(回到原本的角色色鋪底),商標改白色 */
-.scene-bg-logo {
-  position: absolute;
-  inset: calc(-1 * clamp(10px, 1.4vw, 22px));
-  pointer-events: none;
-  background: var(--scene-accent);
-  -webkit-mask: var(--logo-src) center / 100% auto no-repeat;
-  mask: var(--logo-src) center / 100% auto no-repeat;
-  opacity: 0.16;
-}
-/* C:底有色 → 商標翻白,不透明度給高一點才讀得到 */
-.scene-cols--bg-invert {
-  /* 再淡一階(38/50/62 → 20/30/42),方向改成由上到下:上方近白、往下帶出主色 */
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--scene-accent) 20%, #ffffff) 0%,
-    color-mix(in srgb, var(--scene-accent) 30%, #ffffff) 46%,
-    color-mix(in srgb, var(--scene-accent) 42%, #ffffff) 100%);
-}
-/* V:深藍底 + 交錯光束(依主視覺那張)。底色是固定的深藍,不隨角色變 ——
-   那張圖的味道就在「navy + 青白光」的對比上,換成暖色系會整個走掉。 */
-.scene-cols--bg-vlines {
-  --vline-glow: #2e9aff;
-  --vline-mid:  #8ad2ff;
-  --vline-core: #ffffff;
-  background: linear-gradient(168deg, #16295e 0%, #12235c 44%, #0c1a44 100%);
-}
-/* V:直接鋪主視覺原圖。原圖是直式(1920×2659),landscape 畫面用 cover 置中裁切
-   → 看到的是中段那組交錯光束;底下的 navy 漸層當載入前/載入失敗的底。 */
-.scene-bgimg {
-  position: absolute; inset: 0; pointer-events: none;
-  background: var(--bg-src) center / cover no-repeat;
-}
 /* B:只有白色與當頁主色 —— 不做影像反轉,改成「白底 + 一層主色,用原圖的明暗當遮罩」。
    原圖是深藍底 + 亮光束 → 以亮度當遮罩(mask-mode: luminance)時,亮的光束變成不透明、
    深藍底變透明,於是光束吃主色、底完全是白的,整張圖不會出現任何深色。
    (先前用 filter invert + 混色的版本,深色只是換了色相、明暗還在,所以還是有深色。) */
 .scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; }
 .scene-bgimg--inv {
+  position: absolute;
+  inset: calc(-1 * clamp(10px, 1.4vw, 22px));   /* 抵掉 .scene-cols 的 padding → 真正滿版 */
   /* CI 主色本身偏灰(#7394a5 / #c5b192 這類),直接鋪就是「髒」的來源 →
      先摻 42% 白提亮,再配 0.8 不透明度,整體變淺但還看得出是哪個角色 */
   background: color-mix(in srgb, var(--scene-accent) 58%, #ffffff);
@@ -569,28 +530,10 @@
   mask-mode: luminance;                  /* 標準寫法:用亮度當遮罩,不是 alpha */
   opacity: 0.8;
 }
-/* 反轉版的底是淺色 → 牆底與底部字標都回到淺色版設定(不吃 vlines 那組深底覆寫) */
-.scene-cols--bg-vinv {
-  /* 底要真的是白:原本收到 #dce9fb(帶藍灰),跟主色光束疊在一起就顯得濁 */
+/* 牆底:白就是白 —— 帶藍灰的底(#dce9fb 那類)跟主色光束疊在一起會顯得濁 */
+.scene-cols {
   background: linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fafcff 100%);
 }
-.scene-vlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.scene-vlines__glow { filter: blur(22px); opacity: 0.34; }
-.scene-vlines__mid  { filter: blur(7px);  opacity: 0.55; }
-.scene-vlines__core { opacity: 0.92; }
-/* 深底 → 底部字標要翻亮,不然 #1b3f8f 在 navy 上看不見 */
-.scene-cols--bg-vlines .scene-foot__mark b { color: #dcefff; }
-.scene-cols--bg-vlines .scene-foot__mark i { color: #9dc4f5; }
-
-.scene-cols--bg-invert .scene-bg-logo {
-  /* 底淡了,白商標要再濃一點才讀得到 */
-  background: #ffffff;
-  opacity: 0.5;
-}
-/* 那道光在 1-5 換成各自的主色:只在 .scene-cols 這一層覆寫 --beam-* 四個變數
-   (IdleBeam 的四層分別吃 glow / edge / inner / core),待機頁的藍不受影響。
-   越外層越飽和、越內層越白 —— IdleBeam 外暈只有 20% 不透明度,不夠濃就看不見;
-   亮核是 100%,太濃會變成一條實色線而不是光。 */
 /* 關鍵:卡片原本有 backdrop-filter: blur(14px) —— 背後的光會被糊成一片均勻的暈,
    看起來就「沒有透」。白底這一版把它關掉,光才會以原本的形狀穿過卡片。 */
 .scene-cols .tile {
@@ -608,12 +551,6 @@
 .scene-cols .scene-col--l .reel-page > *:nth-child(2) { background: color-mix(in srgb, var(--fill-l2) 72%, transparent); }
 .scene-cols .scene-col--l .reel-page > *:nth-child(3) { background: color-mix(in srgb, var(--fill-l3) 72%, transparent); }
 
-.scene-cols {
-  --beam-glow:  var(--scene-accent);
-  --beam-edge:  color-mix(in srgb, var(--scene-accent) 88%, #ffffff);
-  --beam-inner: color-mix(in srgb, var(--scene-accent) 46%, #ffffff);
-  --beam-core:  color-mix(in srgb, var(--scene-accent) 12%, #ffffff);
-}
 .scene-foot__mark { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 18px); }
 /* 大標:與待機頁同字體(Chiron Hei HK,字身 1:1),只是縮到 footer 尺度 */
 .scene-foot__mark b {

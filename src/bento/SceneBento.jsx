@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import CountUp from './CountUp.jsx'
 import VideoTile from './VideoTile.jsx'
@@ -7,9 +7,6 @@ import DonutTile from './DonutTile.jsx'
 import Icon from '../components/icons.jsx'
 import PersonaIcon from '../components/PersonaIcon.jsx'
 import LayoutEditor from '../components/LayoutEditor.jsx'
-import IdleBeam from '../components/IdleBeam.jsx'
-import SceneBeams from '../components/SceneBeams.jsx'
-import { getSceneBg, subscribeSceneBg } from '../sceneBgStore.js'
 import { DIMENSION_ORDER, DIMENSION_META, SCENES } from '../scenes.js'
 import { PERSONA_ORDER } from '../personas.js'
 
@@ -171,9 +168,6 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
     return () => clearInterval(id)
   }, [])
 
-  // 背景樣式:Z 弧線 / X 滿版 ANLB / C 反轉(底有色、商標白)
-  const bg = useSyncExternalStore(subscribeSceneBg, getSceneBg)
-
   const order = DIMENSION_ORDER
   const beat = Math.max(0, Math.floor((performance.now() - startRef.current) / BEAT_MS)) // 每拍鏡位移動
   const dim = Math.floor(beat / BEATS_PER_DIM) % order.length  // 維度每 2 拍換一次(卡片節奏)
@@ -232,28 +226,16 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
   const scoreCard = { kind: 'stat', icon: 'gauge', color: houseScoreColor, eyebrow: '全健築指數', value: SCORE[persona.id] || 90, unit: '/100', foot: 'WELL Building Standard' }
 
   return (
-    <div className={`scene-cols scene-cols--bg-${bg}`}>
+    <div className="scene-cols">
       {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
           interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
-      {bg === 'beam' && <IdleBeam interactive={false} className="scene-beam" />}
-      {/* V:直接鋪主視覺原圖(SceneBeams.jsx 那個 SVG 版本留在 repo 裡,要換回來把
-          這一段改成 <SceneBeams /> 即可)。 */}
-      {(bg === 'vlines' || bg === 'vinv') && (
-        <div className="scene-bgimg-wrap">
-          <div
-            className={`scene-bgimg${bg === 'vinv' ? ' scene-bgimg--inv' : ''}`}
-            style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
-          />
-        </div>
-      )}
-      {(bg === 'logo' || bg === 'invert') && (
+      {/* 背景:主視覺原圖當亮度遮罩,鋪一層當頁主色 → 白底 + 主色光束,沒有深色 */}
+      <div className="scene-bgimg-wrap">
         <div
-          className="scene-bg-logo"
-          role="img"
-          aria-label="ANLB inside"
-          style={{ '--logo-src': `url(${import.meta.env.BASE_URL}icons/anlb.png)` }}
+          className="scene-bgimg scene-bgimg--inv"
+          style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
         />
-      )}
+      </div>
 
       {/* 左欄:當前維度 3 張相關卡。key 帶 persona.id → 換角色重掛載、重播進場 */}
       <div className="scene-col scene-col--l">
