@@ -524,15 +524,22 @@
    (IdleBeam 的四層分別吃 glow / edge / inner / core),待機頁的藍不受影響。
    越外層越飽和、越內層越白 —— IdleBeam 外暈只有 20% 不透明度,不夠濃就看不見;
    亮核是 100%,太濃會變成一條實色線而不是光。 */
+/* 關鍵:卡片原本有 backdrop-filter: blur(14px) —— 背後的光會被糊成一片均勻的暈,
+   看起來就「沒有透」。白底這一版把它關掉,光才會以原本的形狀穿過卡片。 */
+.scene-cols .tile {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 /* 卡片帶一點透明度:背後那道光會透出來,平塗色塊不再是完全實色的一塊。
    用 color-mix 把 JS 算好的實色 --fill-* 摻進 transparent 取得 alpha,
    不必動 fillColor() → 房屋資訊牆的面板色不受影響。 */
-.scene-cols .scene-col--r .col-anchor--hero      { background: color-mix(in srgb, var(--fill-pain) 85%, transparent); }
-.scene-cols .scene-col--r .reel-page > .col-card { background: color-mix(in srgb, var(--fill-solution) 85%, transparent); }
-.scene-cols .scene-col--m > .col-card            { background: color-mix(in srgb, var(--fill-score) 85%, transparent); }
-.scene-cols .scene-col--l .reel-page > *:nth-child(1) { background: color-mix(in srgb, var(--fill-l1) 85%, transparent); }
-.scene-cols .scene-col--l .reel-page > *:nth-child(2) { background: color-mix(in srgb, var(--fill-l2) 85%, transparent); }
-.scene-cols .scene-col--l .reel-page > *:nth-child(3) { background: color-mix(in srgb, var(--fill-l3) 85%, transparent); }
+.scene-cols .scene-col--r .col-anchor--hero      { background: color-mix(in srgb, var(--fill-pain) 72%, transparent); }
+.scene-cols .scene-col--r .reel-page > .col-card { background: color-mix(in srgb, var(--fill-solution) 72%, transparent); }
+.scene-cols .scene-col--m > .col-card            { background: color-mix(in srgb, var(--fill-score) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(1) { background: color-mix(in srgb, var(--fill-l1) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(2) { background: color-mix(in srgb, var(--fill-l2) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(3) { background: color-mix(in srgb, var(--fill-l3) 72%, transparent); }
 
 .scene-cols {
   --beam-glow:  var(--scene-accent);
