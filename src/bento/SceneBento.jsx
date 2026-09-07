@@ -236,7 +236,14 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
       {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
           interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
       {bg === 'beam' && <IdleBeam interactive={false} className="scene-beam" />}
-      {bg === 'vlines' && <SceneBeams />}
+      {/* V:直接鋪主視覺原圖(SceneBeams.jsx 那個 SVG 版本留在 repo 裡,要換回來把
+          這一段改成 <SceneBeams /> 即可)。 */}
+      {bg === 'vlines' && (
+        <div
+          className="scene-bgimg"
+          style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
+        />
+      )}
       {(bg === 'logo' || bg === 'invert') && (
         <div
           className="scene-bg-logo"

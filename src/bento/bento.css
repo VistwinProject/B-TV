@@ -548,6 +548,12 @@
   --vline-core: #ffffff;
   background: linear-gradient(168deg, #16295e 0%, #12235c 44%, #0c1a44 100%);
 }
+/* V:直接鋪主視覺原圖。原圖是直式(1920×2659),landscape 畫面用 cover 置中裁切
+   → 看到的是中段那組交錯光束;底下的 navy 漸層當載入前/載入失敗的底。 */
+.scene-bgimg {
+  position: absolute; inset: 0; pointer-events: none;
+  background: var(--bg-src) center / cover no-repeat;
+}
 .scene-vlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .scene-vlines__glow { filter: blur(22px); opacity: 0.34; }
 .scene-vlines__mid  { filter: blur(7px);  opacity: 0.55; }
