@@ -239,10 +239,15 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
       {/* V:直接鋪主視覺原圖(SceneBeams.jsx 那個 SVG 版本留在 repo 裡,要換回來把
           這一段改成 <SceneBeams /> 即可)。 */}
       {(bg === 'vlines' || bg === 'vinv') && (
-        <div
-          className={`scene-bgimg${bg === 'vinv' ? ' scene-bgimg--inv' : ''}`}
-          style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
-        />
+        <div className="scene-bgimg-wrap">
+          <div
+            className={`scene-bgimg${bg === 'vinv' ? ' scene-bgimg--inv' : ''}`}
+            style={{ '--bg-src': `url(${import.meta.env.BASE_URL}bg/anlb-key.jpg)` }}
+          />
+          {/* 反轉版:用當頁主色重新上色(mix-blend-mode: color 只換色相、保留明暗)。
+              一定要放在做 filter 的那層「外面」,不然連色都會被一起反轉。 */}
+          {bg === 'vinv' && <span className="scene-bgimg__tint" />}
+        </div>
       )}
       {(bg === 'logo' || bg === 'invert') && (
         <div

@@ -554,9 +554,20 @@
   position: absolute; inset: 0; pointer-events: none;
   background: var(--bg-src) center / cover no-repeat;
 }
-/* B:同一張圖做藍白反轉。invert(1) 之後色相會跑到暖色(navy → 米黃),
-   再 hue-rotate(180deg) 把色相轉回藍系 → 只翻明暗、不換色系:淺底 + 藍色光束。 */
-.scene-bgimg--inv { filter: invert(1) hue-rotate(180deg) saturate(1.2) brightness(1.02); }
+/* B:同一張圖做藍白反轉,深色的部分再換成當頁主色。
+   ① invert(1) 之後色相會跑到暖色(navy → 米黃),hue-rotate(180deg) 轉回原色系;
+      brightness/contrast 把反轉後偏重的光束提亮一階(原本太深)。
+   ② 主色上色靠 mix-blend-mode: color —— 取主色的色相與彩度、保留圖的明暗,
+      所以深的地方變成「深的主色」而不是深藍。
+   ③ tint 必須在做 filter 的那層外面:filter 會作用在整個群組上,
+      放在裡面的話連 tint 也會被反轉。外層 isolation: isolate 把混色關在這一層內。 */
+.scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; isolation: isolate; }
+.scene-bgimg--inv { filter: invert(1) hue-rotate(180deg) saturate(1.05) brightness(1.12) contrast(0.92); }
+.scene-bgimg__tint {
+  position: absolute; inset: 0;
+  background: var(--scene-accent);
+  mix-blend-mode: color;
+}
 /* 反轉版的底是淺色 → 牆底與底部字標都回到淺色版設定(不吃 vlines 那組深底覆寫) */
 .scene-cols--bg-vinv {
   background: linear-gradient(180deg, #ffffff 0%, #eef5ff 46%, #dce9fb 100%);
