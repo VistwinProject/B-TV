@@ -554,19 +554,18 @@
   position: absolute; inset: 0; pointer-events: none;
   background: var(--bg-src) center / cover no-repeat;
 }
-/* B:同一張圖做藍白反轉,深色的部分再換成當頁主色。
-   ① invert(1) 之後色相會跑到暖色(navy → 米黃),hue-rotate(180deg) 轉回原色系;
-      brightness/contrast 把反轉後偏重的光束提亮一階(原本太深)。
-   ② 主色上色靠 mix-blend-mode: color —— 取主色的色相與彩度、保留圖的明暗,
-      所以深的地方變成「深的主色」而不是深藍。
-   ③ tint 必須在做 filter 的那層外面:filter 會作用在整個群組上,
-      放在裡面的話連 tint 也會被反轉。外層 isolation: isolate 把混色關在這一層內。 */
-.scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; isolation: isolate; }
-.scene-bgimg--inv { filter: invert(1) hue-rotate(180deg) saturate(1.05) brightness(1.12) contrast(0.92); }
-.scene-bgimg__tint {
-  position: absolute; inset: 0;
+/* B:只有白色與當頁主色 —— 不做影像反轉,改成「白底 + 一層主色,用原圖的明暗當遮罩」。
+   原圖是深藍底 + 亮光束 → 以亮度當遮罩(mask-mode: luminance)時,亮的光束變成不透明、
+   深藍底變透明,於是光束吃主色、底完全是白的,整張圖不會出現任何深色。
+   (先前用 filter invert + 混色的版本,深色只是換了色相、明暗還在,所以還是有深色。) */
+.scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; }
+.scene-bgimg--inv {
   background: var(--scene-accent);
-  mix-blend-mode: color;
+  -webkit-mask: var(--bg-src) center / cover no-repeat;
+  mask: var(--bg-src) center / cover no-repeat;
+  -webkit-mask-source-type: luminance;   /* 舊版 Chrome */
+  mask-mode: luminance;                  /* 標準寫法:用亮度當遮罩,不是 alpha */
+  opacity: 0.92;
 }
 /* 反轉版的底是淺色 → 牆底與底部字標都回到淺色版設定(不吃 vlines 那組深底覆寫) */
 .scene-cols--bg-vinv {
