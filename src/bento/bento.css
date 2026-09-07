@@ -513,6 +513,13 @@
   pointer-events: none;
 }
 .scene-foot__logo { justify-self: center; }
+/* 待機頁那條藍色漸層光,鋪在情境頁底部(在字標與商標底下) */
+.scene-foot__beam {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  width: 100%; height: calc(var(--foot-h) * 1.25);
+  pointer-events: none; overflow: visible;
+}
+.scene-foot__beam-glow { filter: blur(5px); opacity: 0.6; }
 .scene-foot__mark { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 18px); }
 /* 大標:與待機頁同字體(Chiron Hei HK,字身 1:1),只是縮到 footer 尺度 */
 .scene-foot__mark b {

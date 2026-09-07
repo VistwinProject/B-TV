@@ -262,6 +262,23 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+        {/* 待機頁那條光:淺弧線 + 一層模糊的光暈,顏色吃 --beam-* token */}
+        <svg className="scene-foot__beam" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="sceneFootBeam" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="var(--beam-glow)"  stopOpacity="0" />
+              <stop offset="16%"  stopColor="var(--beam-glow)"  stopOpacity="0.5" />
+              <stop offset="52%"  stopColor="var(--beam-inner)" stopOpacity="1" />
+              <stop offset="86%"  stopColor="var(--beam-glow)"  stopOpacity="0.45" />
+              <stop offset="100%" stopColor="var(--beam-glow)"  stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path className="scene-foot__beam-glow" d="M0 54 Q 520 6 1000 34" fill="none"
+            stroke="url(#sceneFootBeam)" strokeWidth="10" vectorEffect="non-scaling-stroke" />
+          <path d="M0 54 Q 520 6 1000 34" fill="none"
+            stroke="url(#sceneFootBeam)" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+        </svg>
+
         <span className="scene-foot__mark">
           <b>感應光寓</b>
           <i>SENSING RESIDENCE</i>
