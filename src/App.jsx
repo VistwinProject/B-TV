@@ -2,7 +2,8 @@ import { useEffect, useReducer, useCallback, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion'
 import { PERSONAS, PERSONA_ORDER } from './personas.js'
 import { useNfcSocket } from './useNfcSocket.js'
-import { getSceneColors, subscribeSceneColors, setEditContext, slotColor, fillColor } from './sceneColorStore.js'
+import { getSceneColors, subscribeSceneColors, setEditContext, slotColor, fillColor, glassFill, getGlass } from './sceneColorStore.js'
+import { setLayoutTarget } from './layoutStore.js'
 
 import Idle from './components/Idle.jsx'
 import Intro from './components/Intro.jsx'
@@ -157,10 +158,15 @@ export default function App() {
 
   // 編輯模式挑過的參考配色(沒挑過就用 personas.js 的預設)
   const sceneSel = useSyncExternalStore(subscribeSceneColors, getSceneColors)
+  const glass = useSyncExternalStore(subscribeSceneColors, getGlass)
   const persona = s.character ? PERSONAS[s.character] : null
   const inScene = s.phase === 'scene' || s.phase === 'loop'
   // 告訴編輯面板現在在哪一頁 → 面板只顯示該頁能編輯的項目
-  useEffect(() => { setEditContext(s.phase, inScene ? s.character : null) }, [s.phase, inScene, s.character])
+  // 同時把版面切到該情境:五個情境各有自己的欄寬 / 痛點卡高(展演中也生效,不只編輯模式)
+  useEffect(() => {
+    setEditContext(s.phase, inScene ? s.character : null)
+    setLayoutTarget(inScene ? s.character : null)
+  }, [s.phase, inScene, s.character])
   // 場景 / loop 用 persona 主色;其餘畫面回到品牌 teal。
   const accent = (s.phase === 'scene' || s.phase === 'loop') && persona ? persona.accent : null
 
@@ -179,6 +185,16 @@ export default function App() {
         '--fill-l1':       fillColor(slotColor(persona, 'l1')),
         '--fill-l2':       fillColor(slotColor(persona, 'l2')),
         '--fill-l3':       fillColor(slotColor(persona, 'l3')),
+        // 同一組選色的「淺色玻璃」版本,只有 panel:'glass' 的 CSS 會去讀
+        '--glass-pain':     glassFill(slotColor(persona, 'pain'), glass.alpha),
+        '--glass-solution': glassFill(slotColor(persona, 'solution'), glass.alpha),
+        '--glass-score':    glassFill(slotColor(persona, 'score'), glass.alpha),
+        '--glass-l1':       glassFill(slotColor(persona, 'l1'), glass.alpha),
+        '--glass-l2':       glassFill(slotColor(persona, 'l2'), glass.alpha),
+        '--glass-l3':       glassFill(slotColor(persona, 'l3'), glass.alpha),
+        '--scene-bg-wash':  glass.wash,
+        '--glass-blur':     `${glass.blur}px`,
+        '--glass-gloss':    glass.gloss,
       } : undefined}
     >
       <div className="stage__vignette" />

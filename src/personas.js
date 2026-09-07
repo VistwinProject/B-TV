@@ -17,6 +17,7 @@ export const PERSONAS = {
     labelEn: 'Anti-aging prevention',
     name: '生理逆齡',
     title: '成年人 — 抗衰老',
+    photo: 'scene/anti-aging.jpg',   // 情境牆中欄「你的未來居家」卡的照片(缺省 → 退回導覽影片)
     accent: '#7394a5',
     accent2: '#fa864d',  // 參考配色 A(右欄平塗 + 數據強調)
     accent3: '#17ab54',  // 參考配色 B(左欄其中一張平塗)
@@ -33,6 +34,7 @@ export const PERSONAS = {
     labelEn: 'Child Safety',
     name: '原生健康',
     title: '兒童 — 提高免疫力',
+    photo: 'scene/child.jpg',   // 情境牆中欄「你的未來居家」卡的照片(缺省 → 退回導覽影片)
     accent: '#8ba78d',
     accent2: '#e04b64',  // 參考配色 A(右欄平塗 + 數據強調)
     accent3: '#549a60',  // 參考配色 B(左欄其中一張平塗)
@@ -49,6 +51,7 @@ export const PERSONAS = {
     labelEn: 'Aging Well at Home',
     name: '安全守護',
     title: '老人 — 在宅終老',
+    photo: 'scene/elder.jpg',   // 情境牆中欄「你的未來居家」卡的照片(缺省 → 退回導覽影片)
     accent: '#c47f75',
     accent2: '#bfd71b',  // 參考配色 A(右欄平塗 + 數據強調)
     accent3: '#f96224',  // 參考配色 B(左欄其中一張平塗)
@@ -81,6 +84,7 @@ export const PERSONAS = {
     labelEn: 'Digital Nomad',
     name: '數位遊牧',
     title: '高效 — 在家辦公',
+    photo: 'scene/nomad.jpg',   // 情境牆中欄「你的未來居家」卡的照片(缺省 → 退回導覽影片)
     accent: '#3a446f',
     accent2: '#7cc8f0',  // 參考配色 A(右欄平塗 + 數據強調)
     accent3: '#3cb3a7',  // 參考配色 B(左欄其中一張平塗)

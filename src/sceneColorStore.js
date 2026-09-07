@@ -78,6 +78,63 @@ export function fillColor(hex) {
   return `rgb(${r}, ${g}, ${b})`
 }
 
+// ── 淺色玻璃面板(情境牆疊在樣品屋影片背景上時用這個)────────────────────────
+// 參考配色原值飽和度高,直接當半透明膜會把影片壓成濁色 → 先混 62% 白拉明度、降飽和,
+// 再留 alpha 讓影片透出來當「玻璃後面的景」。配色仍吃 slotColor()(= SCENE_DEFAULTS
+// 與現場挑色),只是呈現方式從實色平塗換成玻璃。null(沒選色)→ 中性白玻璃。
+export function glassFill(hex, alpha = glass.alpha) {
+  // 沒選色的面板再透一點:它本來就只是襯底,不該比有顏色的卡還搶
+  if (!hex) return `rgba(255, 255, 255, ${+(alpha * 0.84).toFixed(3)})`
+  const n = parseInt(hex.slice(1), 16)
+  const w = (c) => Math.round(c * 0.38 + 255 * 0.62)
+  return `rgba(${w((n >> 16) & 255)}, ${w((n >> 8) & 255)}, ${w(n & 255)}, ${alpha})`
+}
+
+// ── 情境牆玻璃質感(整面牆共用一組,不分情境)──────────────────────────────────
+// 定位是「背景才是主角,玻璃面板只是資訊輔助」→ 三個值都往下調就會越來越像
+// 一層薄薄的資訊底。編輯模式(E)在情境牆可即時拉,存 localStorage。
+//   alpha 面板不透明度(越低背景越清楚)· wash 背景柔光(越低影片越清楚)
+//   blur  玻璃霧化(0 = 完全清透)· gloss 光澤(0 = 完全平面)
+//   refract 邊緣折射,三段可比較(Chromium 限定、最耗效能 → 預設關):
+//     'off' 關 · 'warp' 自寫 feTurbulence 擾動(尺寸無關、便宜)
+//     'real' vendor/liquid-glass.js(MIT),每張面板產一張對應尺寸的位移圖
+//   panel 面板樣式:'flat' = main 既有的 72% 平塗色塊(預設,不動現有視覺)
+//         'glass' = 淺色玻璃(backdrop-filter + 高光 + 描邊 + 深藍字)。
+//     ⚠ main 是刻意把 tile 的 backdrop-filter 拿掉的(見 bento.css 尾段註解:
+//       背後那道主色光會被糊成一片均勻的暈)→ 玻璃模式會把那道光糊掉,是取捨。
+//   bg 牆面背景:'key' = main 既有的主視覺遮罩光束(預設)
+//      'white' 全白 · 'video' 樣品屋影片鋪滿整面牆
+const GKEY = 'sceneGlass'
+export const REFRACT_MODES = ['off', 'warp', 'real']
+export const WALL_BG_MODES = ['key', 'white', 'video']
+export const PANEL_MODES = ['flat', 'glass']
+export const GLASS_DEFAULT = { alpha: 0.48, wash: 0, blur: 0, gloss: 0.5, refract: 'off', bg: 'key', panel: 'flat' }
+
+let glass = (() => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(GKEY) || 'null')
+    const v = raw ? { ...GLASS_DEFAULT, ...raw } : { ...GLASS_DEFAULT }
+    // refract 曾經是 boolean → 舊存檔要接住,否則面板會拿到 true/false
+    if (typeof v.refract === 'boolean') v.refract = v.refract ? 'real' : 'off'
+    if (!REFRACT_MODES.includes(v.refract)) v.refract = 'off'
+    if (!WALL_BG_MODES.includes(v.bg)) v.bg = 'key'
+    if (!PANEL_MODES.includes(v.panel)) v.panel = 'flat'
+    return v
+  } catch { return { ...GLASS_DEFAULT } }
+})()
+
+export const getGlass = () => glass
+export function setGlass(patch) {
+  glass = { ...glass, ...patch }
+  try { localStorage.setItem(GKEY, JSON.stringify(glass)) } catch { /* 無痕模式 */ }
+  emit()
+}
+export function resetGlass() {
+  glass = { ...GLASS_DEFAULT }
+  try { localStorage.removeItem(GKEY) } catch { /* ignore */ }
+  emit()
+}
+
 // ── 房屋資訊牆(bento)的面板顏色 ─────────────────────────────────────────────
 // 這頁還沒有參考色卡 → 編輯模式直接輸入色碼;null / 空 = 不平塗(維持半透明)。
 const BKEY = 'bentoColors'
