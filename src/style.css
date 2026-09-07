@@ -238,6 +238,28 @@ body.editing .tuner input { cursor: pointer; }
 }
 .tuner__tip { margin: 0 0 6px; font-size: 11px; line-height: 1.5; opacity: 0.6; }
 .tuner__tip b { color: #9fd4ff; font-weight: 600; }
+/* 版面段落標題右側的小徽章:這個情境是自己的版面,還是沿用共用底版 */
+.tuner__badge {
+  float: right; font-style: normal; letter-spacing: 0.04em; text-transform: none;
+  padding: 1px 6px; border-radius: 999px; font-size: 10px;
+  background: rgba(90, 150, 255, 0.18); color: #bcd9ff;
+}
+/* 版面段落下方的兩顆小動作鈕(套到全部 / 回共用底版)*/
+.tuner__acts { display: flex; gap: 6px; margin: 8px 0 2px; }
+.tuner__acts button {
+  flex: 1; padding: 5px 0;
+  background: rgba(90, 150, 255, 0.14); color: #dbe7ff;
+  border: 1px solid rgba(140, 180, 255, 0.26); border-radius: 6px;
+  font-family: var(--font-hud); font-size: 11px; cursor: pointer;
+}
+.tuner__acts button:hover:not(:disabled) { background: rgba(90, 150, 255, 0.26); }
+.tuner__acts button:disabled { opacity: 0.35; cursor: default; }
+/* 三段切換(關 / 擾動 / 真折射):連成一條,選中的那段亮起 */
+.tuner__acts--seg { gap: 3px; }
+.tuner__acts button.is-on {
+  background: rgba(120, 190, 255, 0.34);
+  border-color: rgba(160, 210, 255, 0.6); color: #eaf4ff;
+}
 .tuner .tuner__sl--geo { height: 26px; }
 .tuner .tuner__sl--geo i { width: 104px; flex: none; font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tuner .tuner__sl--geo u { width: 46px; flex: none; }

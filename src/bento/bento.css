@@ -496,7 +496,173 @@
     color-mix(in srgb, var(--beam-glow) 64%, transparent) 100%);
   filter: blur(clamp(3px, 0.36vw, 7px));
 }
-/* 情境牆 1-5:只換底色(卡片、字色、配色邏輯都不動) */
+/* ══ 情境牆 1-5:樣品屋影片當底 + 六張淺色玻璃面板 ═════════════════════════════
+   影片鋪滿整面牆(見 bento/SceneVideoBg.jsx),六張卡改成半透明玻璃浮在上面。
+   配色沿用編輯模式(E)挑好的那組:App 把同一組選色算成 --glass-*(見
+   sceneColorStore.js 的 glassFill()),所以換色的操作方式完全沒變。
+   要調影片露出多少,改 --scene-bg-wash(0 = 影片全開,1 = 幾乎全被柔光蓋掉)。
+   ══════════════════════════════════════════════════════════════════════════ */
 .scene-cols {
+  /* 極細顆粒:大面積半透明漸層在 TV 上會走色帶,疊一層雜訊就消失,
+     順便讓玻璃有材質感而不是一片純色塑膠。整面牆共用同一張,只寫這一次。 */
+  --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  /* --scene-bg-wash(柔光濃度)與 --glass-blur(霧化)由編輯模式(E)控制,
+     App 設在 .stage 上繼承下來 → 這裡「不能」再宣告,否則會蓋掉面板調的值。
+     預設值寫在下面各 var() 的第二參數;要改死值請改 sceneColorStore 的 GLASS_DEFAULT。 */
+  /* 注意:不要在這裡寫 position —— 上面 .bento/.scene-cols 共用規則的
+     position:absolute + inset:0 才是這面牆撐滿 .screen 的原因(.screen 是
+     place-items:center 的 grid,改成 relative 會讓整面牆縮成內容大小)。
+     absolute 本身就已經是 .scene-bg 的定位基準了。 */
+  overflow: hidden;
+  /* 牆面預設全白(情境影像改放進中欄的資訊卡)。
+     切成「情境影像」牆時才換成淡藍漸層 —— 那是影片載不到時的保底底色。 */
+  background: #ffffff;
+}
+.scene-cols.is-bg-video {
   background: linear-gradient(158deg, #ffffff 0%, #f2f7ff 45%, #e4eefc 100%);
 }
+.scene-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.scene-bg__v {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  /* 微散焦 + 稍微放大:背景不跟前景卡片搶細節,放大是為了蓋掉模糊的邊 */
+  filter: blur(2px) saturate(1.06);
+  transform: scale(1.04);
+}
+.scene-bg__wash {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 0%,
+      rgba(255,255,255,calc(var(--scene-bg-wash, 0.58) * 0.55)) 0%, transparent 62%),
+    linear-gradient(158deg,
+      rgba(255,255,255, calc(var(--scene-bg-wash, 0.58) * 1.18)) 0%,
+      rgba(238,245,255, var(--scene-bg-wash, 0.58)) 45%,
+      rgba(216,231,250, calc(var(--scene-bg-wash, 0.58) * 1.06)) 100%);
+}
+/* 三欄與編輯用分隔線都要浮在影片之上 */
+.scene-cols .scene-col { position: relative; z-index: 1; }
+.scene-cols .ledit { z-index: 50; }
+
+/* ── 玻璃面板本體 ─────────────────────────────────────────────────────────────
+   分四層疊出厚玻璃:
+     1. 面板本身 = 半透明底色 + backdrop-filter(模糊 / 飽和 / 微提亮)+ 極細顆粒
+     2. ::before  = 斜掠高光(受光面)
+     3. ::after   = 漸層描邊(用 mask-composite 只留 1px 外框 → 玻璃的切邊)
+     4. box-shadow = 內緣受光 + 內部環境光 + 外部柔影(面板離開牆面的距離感)
+   顆粒(feTurbulence 的 data URI)是關鍵:大面積半透明漸層在 TV 上會出現色帶,
+   疊一層 3% 的雜訊就完全消失,也讓玻璃看起來有材質而不是純色塑膠片。
+   ── 各面板顏色走 --tile-fill 而不是直接寫 background:縮寫會清掉顆粒圖層。 */
+.scene-cols .tile {
+  color: #17357a;                                   /* 淺玻璃 → 深藍字 */
+  --tile-fill: rgba(255, 255, 255, 0.52);
+  background-color: var(--tile-fill);
+  background-image: var(--glass-noise);
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 14px)) saturate(1.6) brightness(1.03);
+  backdrop-filter: blur(var(--glass-blur, 14px)) saturate(1.6) brightness(1.03);
+  border: none;
+  box-shadow:
+    /* 內緣受光:上亮下暗 = 玻璃的厚度 */
+    inset 0 1px 1px rgba(255, 255, 255, calc(0.92 * var(--glass-gloss, 1))),
+    inset 0 -1px 1px rgba(86, 126, 190, calc(0.22 * var(--glass-gloss, 1))),
+    /* 內部環境光:從邊緣往內收的一圈柔光 */
+    inset 0 0 26px rgba(255, 255, 255, calc(0.30 * var(--glass-gloss, 1))),
+    /* 外部:近距離接觸影 + 遠距離柔影,兩段才有懸浮感 */
+    0 2px 6px rgba(20, 50, 110, 0.07),
+    0 16px 40px rgba(20, 50, 110, 0.11);
+  text-shadow: none;
+}
+/* 六塊面板各自的玻璃色(= E 面板挑的那組色,只是換成玻璃呈現)*/
+.scene-cols .scene-col--r .col-anchor--hero           { --tile-fill: var(--glass-pain); }
+.scene-cols .scene-col--r .reel-page > .col-card      { --tile-fill: var(--glass-solution); }
+.scene-cols .scene-col--m > .col-card                 { --tile-fill: var(--glass-score); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(1) { --tile-fill: var(--glass-l1); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(2) { --tile-fill: var(--glass-l2); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(3) { --tile-fill: var(--glass-l3); }
+/* 上面六條只設變數,壓不過深色版同名選擇器的 `background: var(--fill-*)` 縮寫
+   (同權重、但那是唯一一條 background 宣告)→ 這裡用「同樣的選擇器」再宣告一次,
+   靠後出現獲勝,才會真的吃到半透明玻璃色 + 顆粒。改選擇器時兩邊要一起改。 */
+.scene-cols .scene-col--r .col-anchor--hero,
+.scene-cols .scene-col--r .reel-page > .col-card,
+.scene-cols .scene-col--m > .col-card,
+.scene-cols .scene-col--l .reel-page > *:nth-child(1),
+.scene-cols .scene-col--l .reel-page > *:nth-child(2),
+.scene-cols .scene-col--l .reel-page > *:nth-child(3) {
+  background-color: var(--tile-fill);
+  background-image: var(--glass-noise);
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+
+/* 2. 斜掠高光 —— 左上受光最強,右下留一道回光(玻璃兩面都會反射)*/
+.scene-cols .tile::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  border-radius: inherit; pointer-events: none;
+  background: linear-gradient(125deg,
+    rgba(255,255,255,0.58) 0%,
+    rgba(255,255,255,0.13) 18%,
+    rgba(255,255,255,0) 36%,
+    rgba(255,255,255,0) 66%,
+    rgba(255,255,255,0.09) 84%,
+    rgba(255,255,255,0.26) 100%);
+  opacity: var(--glass-gloss, 1);
+}
+/* 3. 漸層描邊 —— padding + mask-composite 的標準做法:只保留 1px 的外圈 */
+/* z-index 3 = 壓在卡片內容之上:影像卡的影片是滿格 absolute 子元素(z-index 2),
+   描邊若留在內容之下會被影片整片蓋掉,那張卡就沒有玻璃切邊了。 */
+.scene-cols .tile::after {
+  content: ''; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; pointer-events: none;
+  padding: 1px;
+  background: linear-gradient(140deg,
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,255,255,0.34) 26%,
+    rgba(150,185,235,0.16) 52%,
+    rgba(255,255,255,0.30) 74%,
+    rgba(255,255,255,0.80) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: calc(0.55 + 0.45 * var(--glass-gloss, 1));
+}
+/* 卡片內容要壓在高光之上。
+   只給 z-index、不要動 position —— .tile 是 flex 容器,flex item 即使 position:static
+   也吃 z-index。之前這裡寫了 position:relative,權重(0,2,0)壓過 .house-tile__cap
+   的 absolute(0,1,0),影像卡的字幕就從「釘在左下」變成參與排版而被裁掉。 */
+.scene-cols .tile > * { z-index: 2; }
+
+/* 4-a. 擾動模式(自寫)—— backdrop-filter 串接一張尺寸無關的 feTurbulence 位移濾鏡。
+        只有 Chromium 支援 url();Safari 會忽略它、只剩後面的模糊,不會壞版。
+        4-b 真折射模式由 vendor/liquid-glass.js 直接寫 inline backdrop-filter,
+        權重高過這裡,不需要 CSS 規則。 */
+.scene-cols.is-warp .tile {
+  -webkit-backdrop-filter: url(#glass-refract) blur(var(--glass-blur, 14px)) saturate(1.6) brightness(1.03);
+  backdrop-filter: url(#glass-refract) blur(var(--glass-blur, 14px)) saturate(1.6) brightness(1.03);
+}
+.glass-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ── 情境牆的影像卡字幕 ───────────────────────────────────────────────────────
+   房屋資訊牆那格很大,字級用 1.8vw 剛好;情境牆這張只有中欄的 16:9,同一個字級
+   會撐出卡片 → 這裡單獨縮一級,並補上 right 讓長標題換行而不是溢出。
+   (只加 .scene-cols 前綴,房屋資訊牆維持原字級不受影響)*/
+.scene-cols .house-tile__cap {
+  right: clamp(12px, 1.2vw, 20px);
+  line-height: 1.2;
+}
+.scene-cols .house-tile__cap b    { font-size: clamp(12px, 1.1vw, 19px); }
+.scene-cols .house-tile__cap span { font-size: clamp(8px, 0.62vw, 11px); letter-spacing: 0.1em; }
+
+/* ── 字色翻成深藍(原本是壓在實色平塗上的白字)──────────────────────────── */
+.scene-cols .t-eyebrow,
+.scene-cols .t-foot,
+.scene-cols .narr__detail,
+.scene-cols .viz__labels,
+.scene-cols .cbar__label { color: rgba(23, 53, 122, 0.70); }
+.scene-cols .hero__label { color: #17357a; }
+.scene-cols .hero__short { color: rgba(23, 53, 122, 0.70); }
+/* 軌道底色原本吃 currentColor(白)→ 白底玻璃上會消失,改成藍灰 */
+.scene-cols .cbar__track,
+.scene-cols .range__track { background: rgba(23, 53, 122, 0.13); }
+.scene-cols .cbar__fill   { background: rgba(23, 53, 122, 0.30); }
