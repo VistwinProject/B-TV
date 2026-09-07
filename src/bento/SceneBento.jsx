@@ -228,15 +228,9 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
 
   return (
     <div className="scene-cols">
-      {/* 背景:滿版 ANLB 商標(PNG alpha 當遮罩,顏色吃當頁主色)。
-          要換回待機頁那條弧線的話,把這一段換成:
-          <IdleBeam interactive={false} className="scene-beam" /> */}
-      <div
-        className="scene-bg-logo"
-        role="img"
-        aria-label="ANLB inside"
-        style={{ '--logo-src': `url(${import.meta.env.BASE_URL}icons/anlb.png)` }}
-      />
+      {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
+          interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
+      <IdleBeam interactive={false} className="scene-beam" />
 
       {/* 左欄:當前維度 3 張相關卡。key 帶 persona.id → 換角色重掛載、重播進場 */}
       <div className="scene-col scene-col--l">
