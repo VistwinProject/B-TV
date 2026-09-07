@@ -560,16 +560,19 @@
    (先前用 filter invert + 混色的版本,深色只是換了色相、明暗還在,所以還是有深色。) */
 .scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; }
 .scene-bgimg--inv {
-  background: var(--scene-accent);
+  /* CI 主色本身偏灰(#7394a5 / #c5b192 這類),直接鋪就是「髒」的來源 →
+     先摻 42% 白提亮,再配 0.8 不透明度,整體變淺但還看得出是哪個角色 */
+  background: color-mix(in srgb, var(--scene-accent) 58%, #ffffff);
   -webkit-mask: var(--bg-src) center / cover no-repeat;
   mask: var(--bg-src) center / cover no-repeat;
   -webkit-mask-source-type: luminance;   /* 舊版 Chrome */
   mask-mode: luminance;                  /* 標準寫法:用亮度當遮罩,不是 alpha */
-  opacity: 0.92;
+  opacity: 0.8;
 }
 /* 反轉版的底是淺色 → 牆底與底部字標都回到淺色版設定(不吃 vlines 那組深底覆寫) */
 .scene-cols--bg-vinv {
-  background: linear-gradient(180deg, #ffffff 0%, #eef5ff 46%, #dce9fb 100%);
+  /* 底要真的是白:原本收到 #dce9fb(帶藍灰),跟主色光束疊在一起就顯得濁 */
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fafcff 100%);
 }
 .scene-vlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .scene-vlines__glow { filter: blur(22px); opacity: 0.34; }
