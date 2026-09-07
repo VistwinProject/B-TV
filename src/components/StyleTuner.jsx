@@ -70,12 +70,27 @@ function hslToHex({ h, s, l }) {
   return `#${to(seg[0])}${to(seg[1])}${to(seg[2])}`
 }
 
-const loadSaved = () => {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}') } catch { return {} }
-}
 // 預設值以 style.css 的 :root 為準(不要在這裡再複製一份,否則會蓋掉 CSS 的值)
 const cssValue = (key, fallback) =>
   getComputedStyle(document.documentElement).getPropertyValue(key).trim() || fallback
+
+// 主題簽章 = 目前 CSS 預設值的組合。存檔時一起寫進去,載入時比對:
+// 對不上(= style.css 換過主題)就整包丟掉,讓新的 CSS 預設值生效。
+// 沒有這道檢查的話,舊主題調過的顏色會被寫回 :root 的 inline style
+// (權重高過樣式表)→ 換了主題但畫面看起來沒變 / 顏色跑掉。
+// 只在第一次呼叫時算(那時還沒套用任何 inline 覆寫 → 讀到的就是 CSS 的預設值)。
+// 之後存檔時再算的話會讀到「已經被覆寫的值」,簽章就永遠對不上、每次載入都被清掉。
+let BASE_SIG = null
+const themeSig = () => (BASE_SIG ??= VARS.map((v) => cssValue(v.key, v.def)).join('|'))
+
+const loadSaved = () => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}')
+    if (!raw || !raw.vals) return {}                    // 舊格式(沒有簽章)→ 不採用
+    if (raw.sig !== themeSig()) { localStorage.removeItem(LS_KEY); return {} }
+    return raw.vals
+  } catch { return {} }
+}
 
 export default function StyleTuner() {
   const [open, setOpen] = useState(false)
@@ -125,7 +140,7 @@ export default function StyleTuner() {
     setVals((prev) => {
       const next = { ...prev, [key]: hex }
       document.documentElement.style.setProperty(key, hex)
-      try { localStorage.setItem(LS_KEY, JSON.stringify(next)) } catch { /* 無痕模式 */ }
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ sig: themeSig(), vals: next })) } catch { /* 無痕模式 */ }
       return next
     })
     setCopied(false)
