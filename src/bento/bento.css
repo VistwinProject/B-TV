@@ -520,6 +520,16 @@
   inset: calc(-1 * clamp(10px, 1.4vw, 22px)) !important;
   opacity: 0.85;
 }
+/* 那道光在 1-5 換成各自的主色:只在 .scene-cols 這一層覆寫 --beam-* 四個變數
+   (IdleBeam 的四層分別吃 glow / edge / inner / core),待機頁的藍不受影響。
+   越外層越飽和、越內層越白 —— IdleBeam 外暈只有 20% 不透明度,不夠濃就看不見;
+   亮核是 100%,太濃會變成一條實色線而不是光。 */
+.scene-cols {
+  --beam-glow:  var(--scene-accent);
+  --beam-edge:  color-mix(in srgb, var(--scene-accent) 88%, #ffffff);
+  --beam-inner: color-mix(in srgb, var(--scene-accent) 46%, #ffffff);
+  --beam-core:  color-mix(in srgb, var(--scene-accent) 12%, #ffffff);
+}
 .scene-foot__mark { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 18px); }
 /* 大標:與待機頁同字體(Chiron Hei HK,字身 1:1),只是縮到 footer 尺度 */
 .scene-foot__mark b {
@@ -535,11 +545,8 @@
 }
 .scene-foot__logo {
   height: 62%; aspect-ratio: 227 / 46; flex: none;
-  background: linear-gradient(148deg,
-    #6fb4ff 0%,
-    #2f8dfb 26%,
-    var(--idle-title, #1b3f8f) 62%,
-    color-mix(in srgb, var(--idle-title, #1b3f8f) 88%, #08214f) 100%);
+  /* 情境頁的商標:全白(遮罩不變,只換塗的顏色) */
+  background: #ffffff;
   -webkit-mask: var(--logo-src) center / contain no-repeat;
   mask: var(--logo-src) center / contain no-repeat;
 }
