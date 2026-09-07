@@ -1,0 +1,52 @@
+# 把 TV 主顯示建置成 GitHub Pages 靜態站台(給遠端看畫面 / 對外 demo 用)。
+#
+# base 用 --base=./(相對路徑),配合 src/assetUrl.js 的 asset() 在執行期以
+# document.baseURI 解成絕對 URL → 掛在 /B-TV/ 子路徑下也不會歪。
+# 不在 vite.config.js 寫死 base:現場 kiosk 是 npm run build + npm run preview
+# 後開根路徑 http://localhost:5274/(見 啟動-機位設定工具.bat),寫死會讓展場 404。
+#
+# 注意:Pages 站台沒有 NFC server(ws://localhost:8788),感應卡不會有反應,
+# 右下角狀態燈會停在「連線中」。用鍵盤:i 前言 · c 房屋資訊 · 1-5 情境 ·
+# o 結語 · r 重置 · e 編輯面板。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Build (相對路徑,供子路徑部署)
+        run: npm run build -- --base=./
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import CountUp from './CountUp.jsx'
 import VideoTile from './VideoTile.jsx'
@@ -10,6 +10,10 @@ import LayoutEditor from '../components/LayoutEditor.jsx'
 import { DIMENSION_ORDER, DIMENSION_META, SCENES } from '../scenes.js'
 import { PERSONA_ORDER } from '../personas.js'
 import { asset } from '../assetUrl.js'
+import { getGlass, subscribeSceneColors } from '../sceneColorStore.js'
+import SceneVideoBg from './SceneVideoBg.jsx'
+import GlassFilter from './GlassFilter.jsx'
+import LiquidGlassPanels from './LiquidGlassPanels.jsx'
 
 // 情境解方牆 — 3 欄,以「當前維度」主時鐘同步:
 //   ▍左欄 = 當前維度的「3 張相關卡」(同一維度、不同呈現:大數字 / 圖表 / 視覺化)
@@ -157,6 +161,8 @@ function Reel({ pageKey, children, enter }) {
 
 export default function SceneBento({ persona, mode = 'play', onComplete }) {
   const data = SCENES[persona.id]
+  // 面板樣式 / 牆面背景 / 邊緣折射(編輯模式 E 可切;預設值 = main 既有視覺)
+  const glass = useSyncExternalStore(subscribeSceneColors, getGlass)
   // 拍子時鐘:用「經過時間」推導 beat(idempotent,免疫 StrictMode/重複 interval 造成的加倍)。
   // 換角色時 SceneBento 不再 remount(房子要保活),所以 startRef 必須在「render 當下」就重置,
   // 否則第一幀會用到舊角色的 beat → reel 會多滑一下(換角色屬性變化時重置 state 的標準做法)。
@@ -227,16 +233,27 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
   const scoreCard = { kind: 'stat', icon: 'gauge', color: houseScoreColor, eyebrow: '全健築指數', value: SCORE[persona.id] || 90, unit: '/100', foot: 'WELL Building Standard' }
 
   return (
-    <div className="scene-cols">
-      {/* 背景光:直接用待機頁那條弧線(同一個元件、同一份幾何 beamStore)。
-          interactive={false} → 不顯示三個造型點,拖點還是只在待機頁做。 */}
-      {/* 背景:主視覺原圖當亮度遮罩,鋪一層當頁主色 → 白底 + 主色光束,沒有深色 */}
-      <div className="scene-bgimg-wrap">
-        <div
-          className="scene-bgimg scene-bgimg--inv"
-          style={{ '--bg-src': `url(${asset('bg/anlb-key.jpg')})` }}
-        />
-      </div>
+    <div className={`scene-cols${glass.panel === 'glass' ? ' is-glass' : ''}`
+      + `${glass.refract === 'warp' ? ' is-warp' : ''} is-bg-${glass.bg}`}>
+      {/* 牆面背景(E 可切三段):
+          'key'   主視覺原圖當亮度遮罩,鋪一層當頁主色 → 白底 + 主色光束(預設,原本的做法)
+          'white' 全白
+          'video' 樣品屋影片鋪滿整面牆 */}
+      {glass.bg === 'key' && (
+        <div className="scene-bgimg-wrap">
+          <div
+            className="scene-bgimg scene-bgimg--inv"
+            style={{ '--bg-src': `url(${asset('bg/anlb-key.jpg')})` }}
+          />
+        </div>
+      )}
+      {glass.bg === 'video' && <SceneVideoBg />}
+      {/* 邊緣折射:'warp' 用自寫的 SVG 濾鏡;'real' 用第三方 liquid-glass.js */}
+      {glass.panel === 'glass' && glass.refract === 'warp' && <GlassFilter />}
+      <LiquidGlassPanels
+        enabled={glass.panel === 'glass' && glass.refract === 'real'}
+        scale={-112} chroma={6} saturate={1.6} blur={glass.blur}
+      />
 
       {/* 左欄:當前維度 3 張相關卡。key 帶 persona.id → 換角色重掛載、重播進場 */}
       <div className="scene-col scene-col--l">
@@ -247,7 +264,14 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
 
       {/* 中欄:樣品屋影片(佔原本 3D 房子那格)+ 全健築指數 */}
       <div className="scene-col scene-col--m">
-        <VideoTile className="col-anchor col-anchor--house" delay={0.14} />
+        {/* persona.photo 有值就放該情境的照片;孕婦照護沒設 → 退回導覽影片。
+            key 帶 persona.id → 換情境時重掛載,照片才會跟著換(否則 img 不重載)。*/}
+        <VideoTile
+          key={`v-${persona.id}`}
+          className="col-anchor col-anchor--house"
+          delay={0.14}
+          photo={persona.photo}
+        />
         <CardFace key={`s-${persona.id}`} card={scoreCard} enter={ENTER(0.2)} />
       </div>
 

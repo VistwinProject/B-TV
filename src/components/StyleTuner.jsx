@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { getBeam, subscribeBeam, setBeam, resetBeam, setEditing, BEAM_DEFAULT } from '../beamStore.js'
-import { getLayout, subscribeLayout, setLayout, resetLayout } from '../layoutStore.js'
+import { getLayout, subscribeLayout, setLayout, resetLayout,
+  getSceneLayouts, sceneLayoutSource, copySceneLayoutToAll, resetSceneLayout, SCENE_KEYS } from '../layoutStore.js'
 import { getSceneColors, getEditContext, subscribeSceneColors, setSceneColor, resetSceneColors, SLOTS, slotColor,
   BENTO_PANELS, getBentoColors, setBentoColor, resetBentoColors,
   getBentoBeam, toggleBentoBeam, resetBentoBeam } from '../sceneColorStore.js'
+import { getGlass, setGlass, resetGlass } from '../sceneColorStore.js'
 import { PERSONAS, PERSONA_ORDER } from '../personas.js'
 
 // ── 待機頁配色編輯器(開發/佈展調色用,按 E 開關)──────────────────────────────
@@ -34,6 +36,14 @@ const GEO = [
   { key: 'w2',   label: '頭寬(右上)', min: 2,   max: 90, step: 1,    unit: 'px' },
   { key: 'glow', label: '上緣光暈',    min: 0.2, max: 3,  step: 0.05, unit: '×' },
   { key: 'edge', label: '下緣收邊',    min: 0.2, max: 3,  step: 0.05, unit: '×' },
+]
+
+// 情境牆玻璃質感(只有面板樣式切到「玻璃」時才看得出效果)
+const GLASS = [
+  { key: 'alpha', label: '面板不透明度', min: 0.04, max: 0.92, step: 0.02, unit: '' },
+  { key: 'wash',  label: '背景柔光',     min: 0,    max: 1,    step: 0.02, unit: '' },
+  { key: 'blur',  label: '玻璃霧化',     min: 0,    max: 40,   step: 1,    unit: 'px' },
+  { key: 'gloss', label: '玻璃光澤',     min: 0,    max: 1.6,  step: 0.05, unit: '×' },
 ]
 
 // 情境牆(1-5)欄位版面;畫面上也可直接拖分隔線
@@ -107,6 +117,7 @@ export default function StyleTuner() {
   const isHouse = ctx.phase === 'house'
   const bentoSel = useSyncExternalStore(subscribeSceneColors, getBentoColors)
   const bentoBeam = useSyncExternalStore(subscribeSceneColors, getBentoBeam)
+  const glass = useSyncExternalStore(subscribeSceneColors, getGlass)
   const [copied, setCopied] = useState(false)
   // 面板位置(可拖曳,免得擋住畫面上的造型點)
   const [pos, setPos] = useState({ x: Math.max(16, window.innerWidth - 346), y: 16 })
@@ -152,7 +163,7 @@ export default function StyleTuner() {
   const reset = () => {
     for (const { key } of VARS) document.documentElement.style.removeProperty(key)
     setVals(Object.fromEntries(VARS.map((v) => [v.key, cssValue(v.key, v.def)])))
-    resetBeam(); resetLayout(); resetSceneColors(); resetBentoColors(); resetBentoBeam()
+    resetBeam(); resetLayout(); resetSceneColors(); resetBentoColors(); resetBentoBeam(); resetGlass()
     try { localStorage.removeItem(LS_KEY) } catch { /* ignore */ }
     setCopied(false)
   }
@@ -166,6 +177,15 @@ export default function StyleTuner() {
       `  w0: ${beam.w0}, w1: ${beam.w1}, w2: ${beam.w2},\n` +
       `  glow: ${beam.glow}, edge: ${beam.edge},\n}`
     try {
+      // 每情境版面 → 貼回 layoutStore.js 的 SCENE_LAYOUTS(一次輸出五個情境)
+      const perLay = getSceneLayouts()
+      const sceneLayJs = `export const SCENE_LAYOUTS = {\n` + PERSONA_ORDER.filter((id) => perLay[id]).map((id) => {
+        const v = perLay[id]
+        return `  '${id}': { ${SCENE_KEYS.map((k) => `${k}: ${v[k]}`).join(', ')} },  // ${PERSONAS[id].label}`
+      }).join('\n') + `\n}`
+      const glassJs = `export const GLASS_DEFAULT = { alpha: ${glass.alpha}, wash: ${glass.wash}, `
+        + `blur: ${glass.blur}, gloss: ${glass.gloss}, refract: '${glass.refract}', `
+        + `bg: '${glass.bg}', panel: '${glass.panel}' }`
       const layJs = `export const LAYOUT_DEFAULT = {\n  colL: ${lay.colL}, colM: ${lay.colM}, colR: ${lay.colR},\n  heroH: ${lay.heroH},\n` +
         `  bentoCols: [${lay.bentoCols.join(', ')}],\n  bentoRows: [${lay.bentoRows.join(', ')}],\n}`
       // 1-5 各格的顏色 → 輸出可直接貼回 sceneColorStore.js 的 SCENE_DEFAULTS。
@@ -187,6 +207,8 @@ export default function StyleTuner() {
         : ''
       await navigator.clipboard.writeText(
         `/* → src/style.css 的 :root */\n:root {\n${css}\n}\n\n/* → src/beamStore.js */\n${geoJs}\n\n/* → src/layoutStore.js */\n${layJs}\n` +
+        `\n/* → src/layoutStore.js(每情境版面)*/\n${sceneLayJs}\n` +
+        `\n/* → src/sceneColorStore.js(情境牆玻璃質感)*/\n${glassJs}\n` +
         `\n/* → src/sceneColorStore.js(1-5 各格顏色)*/\n${sceneJs}\n` + bentoJs)
       setCopied(true)
     } catch { setCopied(false) }
@@ -271,8 +293,58 @@ export default function StyleTuner() {
           </label>
         ))}
 
-        {curId && <div className="tuner__group">欄位版面</div>}
-        {curId && <p className="tuner__tip">也可以直接拖畫面上的<b> 藍色分隔線 </b>調欄寬與卡片高度</p>}
+        {curId && <div className="tuner__group">牆面背景<em className="tuner__badge">五個情境共用</em></div>}
+        {curId && (
+          <div className="tuner__acts tuner__acts--seg">
+            {[{ v: 'key', t: '主視覺光束' }, { v: 'white', t: '全白' }, { v: 'video', t: '情境影片' }].map((m) => (
+              <button key={m.v} className={glass.bg === m.v ? 'is-on' : ''}
+                onClick={() => { setGlass({ bg: m.v }); setCopied(false) }}>{m.t}</button>
+            ))}
+          </div>
+        )}
+
+        {curId && <div className="tuner__group">面板樣式<em className="tuner__badge">五個情境共用</em></div>}
+        {curId && (
+          <div className="tuner__acts tuner__acts--seg">
+            {[
+              { v: 'flat',  t: '平塗色塊', hint: '目前的做法:72% 平塗 + 白字,背後那道主色光透得最清楚' },
+              { v: 'glass', t: '淺色玻璃', hint: '半透明玻璃 + 高光 + 描邊 + 深藍字。⚠ backdrop-filter 會把背後那道光糊掉' },
+            ].map((m) => (
+              <button key={m.v} className={glass.panel === m.v ? 'is-on' : ''} title={m.hint}
+                onClick={() => { setGlass({ panel: m.v }); setCopied(false) }}>{m.t}</button>
+            ))}
+          </div>
+        )}
+        {curId && glass.panel === 'glass' && GLASS.map((g) => (
+          <label className="tuner__sl tuner__sl--geo" key={g.key}>
+            <i>{g.label}</i>
+            <input type="range" min={g.min} max={g.max} step={g.step} value={glass[g.key]}
+              onChange={(e) => { setGlass({ [g.key]: +e.target.value }); setCopied(false) }} />
+            <u>{glass[g.key]}{g.unit}</u>
+          </label>
+        ))}
+        {curId && glass.panel === 'glass' && (
+          <div className="tuner__acts tuner__acts--seg">
+            {[
+              { v: 'off',  t: '折射關', hint: '只有模糊玻璃,最省效能' },
+              { v: 'warp', t: '擾動',   hint: '自寫 feTurbulence 位移,尺寸無關、便宜' },
+              { v: 'real', t: '真折射', hint: 'liquid-glass.js(MIT):每張面板一張位移圖 + 三通道色散。最貴,Chrome 限定' },
+            ].map((m) => (
+              <button key={m.v} className={glass.refract === m.v ? 'is-on' : ''} title={m.hint}
+                onClick={() => { setGlass({ refract: m.v }); setCopied(false) }}>{m.t}</button>
+            ))}
+          </div>
+        )}
+
+        {curId && (
+          <div className="tuner__group">
+            欄位版面 · {PERSONAS[curId].label}
+            <em className="tuner__badge">
+              {{ local: '已調 · 未存檔', file: '檔案設定', base: '沿用共用底版' }[sceneLayoutSource(curId)]}
+            </em>
+          </div>
+        )}
+        {curId && <p className="tuner__tip">改動<b> 只套用到這個情境 </b>;也可以直接拖畫面上的<b> 藍色分隔線 </b></p>}
         {isHouse && <div className="tuner__group">面板顏色 · 直接輸入色碼</div>}
         {isHouse && <p className="tuner__tip">輸入 <b> #rrggbb </b>即套用;<b> 無 </b>= 半透明;<b> 光邊 </b>= 主視覺那道光的邊(白銳邊 + 藍衰減)</p>}
         {isHouse && BENTO_PANELS.map((b) => {
@@ -315,6 +387,15 @@ export default function StyleTuner() {
             <u>{lay[g.key]}{g.unit}</u>
           </label>
         ))}
+        {curId && (
+          <div className="tuner__acts">
+            <button onClick={() => { copySceneLayoutToAll(PERSONA_ORDER); setCopied(false) }}
+              title="把目前這個情境的欄寬與卡片高度,套到全部五個情境">套到全部情境</button>
+            <button disabled={sceneLayoutSource(curId) !== 'local'}
+              onClick={() => { resetSceneLayout(curId); setCopied(false) }}
+              title="丟掉這個情境「還沒存回檔案」的調整,回到 layoutStore.js 裡的設定">還原此情境</button>
+          </div>
+        )}
 
         {isIdle && <div className="tuner__group">顏色</div>}
         {isIdle && VARS.map((v) => {
