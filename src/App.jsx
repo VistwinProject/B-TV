@@ -1,8 +1,9 @@
-import { useEffect, useReducer, useCallback, useSyncExternalStore } from 'react'
+import { useEffect, useReducer, useCallback, useSyncExternalStore, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { PERSONAS, PERSONA_ORDER } from './personas.js'
 import { useNfcSocket } from './useNfcSocket.js'
 import { getSceneColors, subscribeSceneColors, setEditContext, slotColor, fillColor } from './sceneColorStore.js'
+import { setSceneBg } from './sceneBgStore.js'
 
 import Idle from './components/Idle.jsx'
 import Intro from './components/Intro.jsx'
@@ -137,12 +138,23 @@ export default function App() {
   //   模擬:c 刷邀請卡 · 1-5 刷角色鑰匙圈 · x/Space 拿起 · (對齊 B-Table)
   //   NFC 模擬與 reset/intro/outro 走 server 廣播(`send`),讓桌面 + 電視同步;
   //   未連線時 fallback 成本機處理(純電視測試)。n/advance 為電視本機流程,不廣播。
+  // 給鍵盤 handler 讀「現在是不是情境頁」,避免把 phase 加進 deps 反覆重綁
+  const sceneRef = useRef(false)
+  sceneRef.current = s.phase === 'scene' || s.phase === 'loop'
+
   useEffect(() => {
     const relay = (obj) => { if (!send(obj)) onMessage(obj) }
     const onKey = (e) => {
       // 在配色面板(E)的輸入框裡打字時,不要觸發流程快捷鍵
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return
       const k = e.key
+      // 情境頁(1-5)專用:z 弧線 / x 滿版 ANLB / c 反轉 —— 佈展比稿用。
+      // 只在這兩個 phase 攔截,其他頁面 c(刷卡)、x(拿起)照舊;
+      // 情境頁要模擬「拿起鑰匙圈」按空白鍵,實機是 NFC 自己送 tag-remove。
+      if (sceneRef.current && /^[zxcZXC]$/.test(k)) {
+        setSceneBg({ z: 'beam', x: 'logo', c: 'invert' }[k.toLowerCase()])
+        return
+      }
       if (k === 'i' || k === 'I' || k === 'Enter')      relay({ type: 'intro' })
       else if (k === 'n' || k === 'N' || k === 'ArrowRight') dispatch({ type: 'op-advance' })
       else if (k === 'o' || k === 'O')                  relay({ type: 'outro' })
