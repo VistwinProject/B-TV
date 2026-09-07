@@ -19,3 +19,4 @@ public/voice/*.wav
 # 建置產物(0830 主視覺版 / 藍白版,推 Pages 用,不入 source repo)
 dist-0830
 dist-blue
+dist-white
