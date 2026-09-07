@@ -255,6 +255,25 @@ export default function SceneBento({ persona, mode = 'play', onComplete }) {
         <Reel key={`n-${persona.id}`} pageKey={dim} enter={ENTER(0.26)}><CardFace card={narr} /></Reel>
       </div>
 
+      {/* 底部:待機頁的主頁元素(字標 + ANLB 商標),讓情境頁也帶著展區識別 */}
+      <motion.div
+        className="scene-foot"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span className="scene-foot__mark">
+          <b>感應光寓</b>
+          <i>SENSING RESIDENCE</i>
+        </span>
+        <span
+          className="scene-foot__logo"
+          role="img"
+          aria-label="ANLB inside"
+          style={{ '--logo-src': `url(${import.meta.env.BASE_URL}icons/anlb.png)` }}
+        />
+      </motion.div>
+
       {/* 按 E 時疊上可拖的欄位分隔線(非編輯模式不渲染)*/}
       <LayoutEditor />
     </div>

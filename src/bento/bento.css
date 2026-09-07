@@ -500,3 +500,39 @@
 .scene-cols {
   background: linear-gradient(158deg, #ffffff 0%, #f2f7ff 45%, #e4eefc 100%);
 }
+
+/* ── 情境頁底部:待機頁的主頁元素 ────────────────────────────────────────────
+   字標(感應光寓 / SENSING RESIDENCE)+ ANLB 商標。顏色吃待機頁那組 token,
+   所以換主題會一起走。三欄下方讓出 footer 的高度,卡片不會被壓到。 */
+.scene-cols { padding-bottom: calc(var(--foot-h) + clamp(10px, 1.4vw, 22px)); }
+.scene-cols, .bento { --foot-h: clamp(34px, 4vh, 62px); }
+.scene-foot {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--foot-h);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 clamp(14px, 1.8vw, 30px);
+  pointer-events: none;
+}
+.scene-foot__logo { justify-self: center; }
+.scene-foot__mark { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 18px); }
+/* 大標:與待機頁同字體(Chiron Hei HK,字身 1:1),只是縮到 footer 尺度 */
+.scene-foot__mark b {
+  font-family: 'Chiron Hei HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+  font-weight: 500; font-size: clamp(13px, 1.5vh, 24px);
+  letter-spacing: 0.16em; color: var(--idle-title);
+}
+/* 英文:與待機頁同字體(Barlow Semi Condensed 200,細長) */
+.scene-foot__mark i {
+  font-family: 'Barlow Semi Condensed', 'Barlow Condensed', 'Roboto Condensed', sans-serif;
+  font-style: normal; font-weight: 200; font-size: clamp(9px, 1.05vh, 16px);
+  letter-spacing: 0.32em; color: var(--idle-sub);
+}
+.scene-foot__logo {
+  height: 62%; aspect-ratio: 227 / 46; flex: none;
+  background: linear-gradient(148deg,
+    #6fb4ff 0%,
+    #2f8dfb 26%,
+    var(--idle-title, #1b3f8f) 62%,
+    color-mix(in srgb, var(--idle-title, #1b3f8f) 88%, #08214f) 100%);
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+}
