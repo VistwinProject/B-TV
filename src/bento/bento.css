@@ -527,11 +527,10 @@
   position: absolute;
   inset: calc(-1 * clamp(10px, 1.4vw, 22px));
   pointer-events: none;
-  /* 再深一階:主色本身壓深一點(混 18% 深藍)+ 不透明度 0.16 → 0.28 */
-  background: color-mix(in srgb, var(--scene-accent) 82%, #16305e);
+  background: var(--scene-accent);
   -webkit-mask: var(--logo-src) center / 100% auto no-repeat;
   mask: var(--logo-src) center / 100% auto no-repeat;
-  opacity: 0.28;
+  opacity: 0.16;
 }
 /* 那道光在 1-5 換成各自的主色:只在 .scene-cols 這一層覆寫 --beam-* 四個變數
    (IdleBeam 的四層分別吃 glow / edge / inner / core),待機頁的藍不受影響。
