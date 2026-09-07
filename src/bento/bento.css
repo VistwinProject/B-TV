@@ -534,11 +534,11 @@
 }
 /* C:底有色 → 商標翻白,不透明度給高一點才讀得到 */
 .scene-cols--bg-invert {
-  /* 底色收淡:主色濃度砍掉約一半(74/92/100 → 38/50/62) */
-  background: linear-gradient(158deg,
-    color-mix(in srgb, var(--scene-accent) 38%, #ffffff) 0%,
-    color-mix(in srgb, var(--scene-accent) 50%, #ffffff) 44%,
-    color-mix(in srgb, var(--scene-accent) 62%, #ffffff) 100%);
+  /* 再淡一階(38/50/62 → 20/30/42),方向改成由上到下:上方近白、往下帶出主色 */
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--scene-accent) 20%, #ffffff) 0%,
+    color-mix(in srgb, var(--scene-accent) 30%, #ffffff) 46%,
+    color-mix(in srgb, var(--scene-accent) 42%, #ffffff) 100%);
 }
 .scene-cols--bg-invert .scene-bg-logo {
   /* 底淡了,白商標要再濃一點才讀得到 */
