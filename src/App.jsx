@@ -148,11 +148,11 @@ export default function App() {
       // 在配色面板(E)的輸入框裡打字時,不要觸發流程快捷鍵
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return
       const k = e.key
-      // 情境頁(1-5)專用:z 弧線 / x 滿版 ANLB / c 反轉 / v 交錯光束 —— 佈展比稿用。
+      // 情境頁(1-5)專用:z 弧線 / x 滿版 ANLB / c 反轉 / v 主視覺原圖 / b 原圖藍白反轉。
       // 只在這兩個 phase 攔截,其他頁面 c(刷卡)、x(拿起)照舊;
       // 情境頁要模擬「拿起鑰匙圈」按空白鍵,實機是 NFC 自己送 tag-remove。
-      if (sceneRef.current && /^[zxcvZXCV]$/.test(k)) {
-        setSceneBg({ z: 'beam', x: 'logo', c: 'invert', v: 'vlines' }[k.toLowerCase()])
+      if (sceneRef.current && /^[zxcvbZXCVB]$/.test(k)) {
+        setSceneBg({ z: 'beam', x: 'logo', c: 'invert', v: 'vlines', b: 'vinv' }[k.toLowerCase()])
         return
       }
       if (k === 'i' || k === 'I' || k === 'Enter')      relay({ type: 'intro' })

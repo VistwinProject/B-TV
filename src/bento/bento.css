@@ -554,6 +554,13 @@
   position: absolute; inset: 0; pointer-events: none;
   background: var(--bg-src) center / cover no-repeat;
 }
+/* B:同一張圖做藍白反轉。invert(1) 之後色相會跑到暖色(navy → 米黃),
+   再 hue-rotate(180deg) 把色相轉回藍系 → 只翻明暗、不換色系:淺底 + 藍色光束。 */
+.scene-bgimg--inv { filter: invert(1) hue-rotate(180deg) saturate(1.2) brightness(1.02); }
+/* 反轉版的底是淺色 → 牆底與底部字標都回到淺色版設定(不吃 vlines 那組深底覆寫) */
+.scene-cols--bg-vinv {
+  background: linear-gradient(180deg, #ffffff 0%, #eef5ff 46%, #dce9fb 100%);
+}
 .scene-vlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .scene-vlines__glow { filter: blur(22px); opacity: 0.34; }
 .scene-vlines__mid  { filter: blur(7px);  opacity: 0.55; }
