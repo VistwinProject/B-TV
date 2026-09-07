@@ -520,6 +520,18 @@
   inset: calc(-1 * clamp(10px, 1.4vw, 22px)) !important;
   opacity: 0.85;
 }
+/* 情境牆背景:滿版 ANLB。PNG 的 alpha 當遮罩,顏色由當頁主色決定 →
+   換角色背景跟著換色。壓得很淡,卡片仍是主角(卡片有 28% 透明度會透出來)。
+   遮罩寬度給 100%(商標比例 227:46 → 1920 寬時高約 389px),置中。 */
+.scene-bg-logo {
+  position: absolute;
+  inset: calc(-1 * clamp(10px, 1.4vw, 22px));
+  pointer-events: none;
+  background: var(--scene-accent);
+  -webkit-mask: var(--logo-src) center / 100% auto no-repeat;
+  mask: var(--logo-src) center / 100% auto no-repeat;
+  opacity: 0.16;
+}
 /* 那道光在 1-5 換成各自的主色:只在 .scene-cols 這一層覆寫 --beam-* 四個變數
    (IdleBeam 的四層分別吃 glow / edge / inner / core),待機頁的藍不受影響。
    越外層越飽和、越內層越白 —— IdleBeam 外暈只有 20% 不透明度,不夠濃就看不見;
