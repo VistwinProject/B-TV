@@ -21,16 +21,12 @@ export const SLOTS = [
 // 要固化就把值抄進這張表(面板的「複製 CSS」會把目前挑的色一起輸出)。
 // null = 不平塗(保持半透明,讓背後的光透出來)。
 export const SCENE_DEFAULTS = {
-  // 居家抗老:accent2 #fa864d(橘)· accent3 #17ab54(綠)
-  'anti-aging': { data: '#fa864d', pain: '#fa864d', solution: '#fa864d', score: null, l1: null, l2: '#17ab54', l3: null },
-  // 兒童免疫:accent2 #e04b64(紅)· accent3 #549a60(綠)
-  child:        { data: '#e04b64', pain: '#e04b64', solution: '#e04b64', score: null, l1: null, l2: '#549a60', l3: null },
-  // 在宅樂齡:accent2 #bfd71b(黃綠)· accent3 #f96224(橘紅)
-  elder:        { data: '#bfd71b', pain: '#bfd71b', solution: '#bfd71b', score: null, l1: null, l2: '#f96224', l3: null },
-  // 孕婦照護:accent2 #628e6b(墨綠)· accent3 #5040ee(藍紫)
-  pregnancy:    { data: '#628e6b', pain: '#628e6b', solution: '#628e6b', score: null, l1: null, l2: '#5040ee', l3: null },
-  // 數位遊牧:accent2 #7cc8f0(天藍)· accent3 #3cb3a7(藍綠)
-  nomad:        { data: '#7cc8f0', pain: '#7cc8f0', solution: '#7cc8f0', score: null, l1: null, l2: '#3cb3a7', l3: null },
+  // 每一格都指定了顏色(現場用編輯模式挑完、2026-09-07 匯出固化)
+  'anti-aging': { data: '#b6dbe6', pain: '#7394a5', solution: '#b6dbe6', score: '#b6dbe6', l1: '#fa864d', l2: '#17ab54', l3: '#7394a5' },
+  child:        { data: '#4b9af7', pain: '#8ba78d', solution: '#cfd785', score: '#549a60', l1: '#cfd785', l2: '#4b9af7', l3: '#cfd785' },
+  elder:        { data: '#eff7d6', pain: '#c47f75', solution: '#eff7d6', score: '#eff7d6', l1: '#bfd71b', l2: '#f96224', l3: '#c47f75' },
+  pregnancy:    { data: '#628e6b', pain: '#c3b192', solution: '#628e6b', score: '#628e6b', l1: '#5040ee', l2: '#5f0004', l3: '#c0e797' },
+  nomad:        { data: '#d5bead', pain: '#3a446f', solution: '#d5bead', score: '#d5bead', l1: '#b19857', l2: '#3cb3a7', l3: '#3a446f' },
 }
 
 export const slotDefault = (per, key) => {
@@ -118,7 +114,11 @@ export function resetBentoColors() {
 // ── 光帶格:讓某幾格的底變成主視覺那道斜光(白色核心 + 藍漸層 + 深藍角落 + 顆粒)──
 // 與「輸入色碼」互斥:開了光帶就不吃平塗色(CSS 類別上色,不再給 inline background)。
 const BEAMKEY = 'bentoBeam'
-export const BENTO_BEAM_DEFAULT = { hero: true, weather: true, claim: true }
+export const BENTO_BEAM_DEFAULT = {
+  // 現場設定:8 個數據格都開光邊,標題卡與宣言卡不開(2026-09-07 匯出固化)
+  hero: false, pm25: true, pm25_out: true, co2: true, temp: true,
+  weather: true, sound: true, rh: true, light: true, claim: false,
+}
 
 let bentoBeam = (() => {
   try {
