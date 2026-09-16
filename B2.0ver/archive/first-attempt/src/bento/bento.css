@@ -1,0 +1,701 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Bento 動態資料牆 — 情境展演(房屋即時資訊 + 5 情境解方)
+   參考 reference GIF:飽和平塗色塊 + 巨大 Helvetica 數字 + 數字 count-up + 圖表描繪
+   + 整牆滑入重組。只有「房子」那格是 three.js;其餘 DOM/SVG(文字最銳利)。
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.bento, .scene-cols {
+  /* ── 藍白玻璃調色盤 ──────────────────────────────────────────────────────────
+     原本是飽和平塗色塊;改為「藍白系」的細緻色相變化 —— 每個色名仍存在(JS 動態
+     輪轉不用改),但全部落在淺藍/白玻璃家族,深藍字都讀得清楚,整牆乾淨未來感。 */
+  --b-orange: #e4ecff;   /* 淺藍 */
+  --b-purple: #e7e7ff;   /* 淺長春花 */
+  --b-coral:  #dbe8ff;   /* 淺天青 */
+  --b-green:  #d9eefb;   /* 淺水藍 */
+  --b-yellow: #eef3ff;   /* 近白冷調 */
+  --b-sky:    #d0e4ff;   /* 天藍 */
+  --b-pink:   #eaedff;   /* 淺藍紫 */
+  --b-indigo: #ccdbfb;   /* 中淺藍 */
+  --b-teal:   #d4f0fb;   /* 淺湖藍 */
+  --b-lime:   #e1f0ff;   /* 淺藍 */
+  --b-cream:  #f5f9ff;   /* 冷白(焦點磚)*/
+  --b-ink:    #0b1e40;   /* 深藍玻璃(較深的錨點磚)*/
+  --b-navy:   #12233f;   /* 淺磚上的主文字色(深藍)*/
+  --b-text:   #e9f1ff;   /* 深藍磚上的文字色(淺)*/
+  --b-accent: #2f7bff;   /* 電光藍(重點/高值)*/
+
+  --b-num: 'TASA Orbiter', 'GlowSans TC', 'Helvetica Neue', 'Arial', sans-serif;
+
+  position: absolute; inset: 0;
+  /* 資料牆:純深藍(帶淡淡頂光)*/
+  background:
+    radial-gradient(120% 90% at 50% 4%, rgba(120,165,255,0.12) 0%, rgba(120,165,255,0) 44%),
+    radial-gradient(130% 110% at 50% 40%, #12285a 0%, #0c1d44 44%, #081633 72%, #050e22 100%);
+  padding: clamp(10px, 1.4vw, 22px);
+}
+.bento {
+  display: grid;
+  /* 欄寬 / 列高由編輯模式(E)可調 → 走 CSS 變數,預設等分 */
+  grid-template-columns: var(--bento-cols, repeat(6, 1fr));
+  grid-template-rows: var(--bento-rows, repeat(4, 1fr));
+  gap: clamp(8px, 1vw, 16px);
+}
+
+/* ── 情境牆:3 欄垂直捲軸(一次動一欄,整欄往上捲)──────────────────────────── */
+.scene-cols {
+  display: flex; gap: clamp(10px, 1.1vw, 18px);
+  /* 背景跟隨當前角色主色(--scene-accent 由 App 依 persona 覆寫)→ 換角色變色。
+     不再壓到近黑:改成「情境色本身」的柔和中間調,卡片才浮得出來(霧面玻璃 + 發光邊)。 */
+  /* 底部不壓暗:混深色會讓米棕/磚紅這類暖色情境變濁 → 收在情境色本身 */
+  background:
+    radial-gradient(90% 60% at 50% -6%, rgba(255,255,255,0.26) 0%, transparent 60%),
+    linear-gradient(158deg,
+      color-mix(in srgb, var(--scene-accent) 74%, #ffffff) 0%,
+      color-mix(in srgb, var(--scene-accent) 96%, #ffffff) 42%,
+      var(--scene-accent) 100%);
+  transition: background 0.8s var(--ease);
+}
+.scene-col { flex: var(--col-l, 1) 1 0; min-width: 0; display: flex; flex-direction: column; gap: clamp(10px, 1.1vw, 18px); }
+.scene-col--m { flex: var(--col-m, 1.15) 1 0; }
+.scene-col--r { flex: var(--col-r, 1.2) 1 0; }
+.col-anchor { flex: 0 0 auto; }
+.col-anchor--hero  { flex: 0 0 var(--hero-h, 24%); }
+/* 影片格固定 16:9(與影片來源同比例 → object-fit: cover 不會裁到畫面)。
+   高度由欄寬推導,所以要改影片大小是拖「左/中」「中/右」改欄寬,不是拖高度。 */
+.col-anchor--house { flex: 0 0 auto; aspect-ratio: 16 / 9; position: relative; }
+.hero__q { font-weight: 700; letter-spacing: 0.01em; line-height: 1.25; font-size: clamp(26px, 3.3vw, 58px); }
+.reel { flex: 1 1 auto; position: relative; overflow: hidden; border-radius: clamp(10px, 1vw, 18px); min-height: 0; }
+.reel-page { position: absolute; inset: 0; display: flex; flex-direction: column; gap: clamp(10px, 1.1vw, 18px); }
+.col-card { flex: 1 1 0; min-height: 0; overflow: hidden; padding: clamp(10px, 1.2vw, 20px); }
+
+/* 數據卡:大數字 + icon */
+.stat__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.stat__ico { width: clamp(36px, 4vw, 68px); height: clamp(36px, 4vw, 68px); opacity: 0.82; flex: none; }
+.stat__ico svg { width: 100%; height: 100%; }
+.stat__num { font-family: var(--b-num); font-weight: 700; line-height: 0.84; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; font-size: clamp(50px, 8vw, 156px); white-space: nowrap; }
+.stat__num--long { font-size: clamp(30px, 4.6vw, 92px); }
+.stat__unit { font-size: 0.3em; font-weight: 700; letter-spacing: 0; opacity: 0.66; }
+
+/* 維度視覺化卡 — 底色用 palette(每張不同)、資料用維度色 --dv(有顏色)、
+   軌道/標籤用 currentColor 自動適應(深底→淺、淺底→深)。 */
+.viz__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.viz__ico { width: clamp(36px, 3.8vw, 68px); height: clamp(36px, 3.8vw, 68px); flex: none; opacity: 0.8; color: currentColor; }
+.viz__ico svg { width: 100%; height: 100%; }
+.viz__body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: clamp(10px, 1.4vh, 20px); }
+.viz__labels { display: flex; justify-content: space-between; font-family: var(--b-num); font-size: clamp(14px, 1.5vw, 24px); color: color-mix(in srgb, currentColor 55%, transparent); }
+.viz__hi { color: var(--dv); }
+/* 色溫漸層(藍白光譜,呼應整體調性)*/
+.swatch__bar { height: clamp(40px, 7vh, 100px); border-radius: 12px; background: linear-gradient(90deg, #eaf3ff, #cfe4ff, #9cc2ff, #5b93ff, #2f7bff); }
+/* 情境牆的色溫條改暖色譜(依 mockup)*/
+.scene-cols .swatch__bar { background: linear-gradient(90deg, #f4a04a, #f7c96b, #ecdf8c, #cfe08a, #b7d977); }
+/* 對比長條 */
+.cbars { display: flex; flex-direction: column; gap: clamp(14px, 2vh, 28px); width: 100%; }
+.cbar { display: grid; grid-template-columns: 4.8em 1fr auto; gap: 14px; align-items: center; }
+.cbar__label { font-family: var(--b-num); font-size: clamp(16px, 1.7vw, 28px); white-space: nowrap; color: color-mix(in srgb, currentColor 70%, transparent); }
+.cbar__track { height: clamp(18px, 2.6vh, 34px); background: color-mix(in srgb, currentColor 16%, transparent); border-radius: 999px; overflow: hidden; }
+.cbar__fill { height: 100%; min-width: 10px; border-radius: 999px; background: color-mix(in srgb, currentColor 38%, transparent); }
+.cbar__fill--hi { background: currentColor; }
+.cbar__val { font-family: var(--b-num); font-weight: 700; font-size: clamp(24px, 2.8vw, 48px); }
+/* 舒適區間 */
+.range__value { font-family: var(--b-num); font-weight: 700; text-align: center; font-size: clamp(30px, 3.6vw, 60px); }
+.range__value small { font-size: 0.42em; opacity: 0.7; }
+.range__track { position: relative; height: clamp(20px, 3vh, 36px); background: color-mix(in srgb, currentColor 16%, transparent); border-radius: 999px; }
+.range__zone { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: color-mix(in srgb, var(--b-accent) 72%, transparent); }
+.range__mark { position: absolute; top: -6px; bottom: -6px; width: 6px; border-radius: 3px; background: currentColor; box-shadow: 0 0 8px color-mix(in srgb, currentColor 50%, transparent); transform: translateX(-50%); }
+/* 靜態波形 */
+.wave { display: flex; align-items: center; gap: clamp(4px, 0.6vw, 9px); height: clamp(60px, 10vh, 150px); width: 100%; }
+.wave span { flex: 1; align-self: center; border-radius: 999px; background: color-mix(in srgb, currentColor 80%, transparent); }
+
+/* 解方長句論述卡 */
+.narr { color: var(--b-navy); }
+.narr__tag { display: flex; align-items: center; gap: 10px; }
+.narr__ico { width: clamp(32px, 3.2vw, 58px); height: clamp(32px, 3.2vw, 58px); flex: none; }
+.narr__ico svg { width: 100%; height: 100%; }
+.narr__body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.narr__head { font-weight: 700; color: currentColor; letter-spacing: 0.02em; line-height: 1.16; font-size: clamp(30px, 4.1vw, 66px); }
+.narr__detail { margin-top: 0.5em; color: color-mix(in srgb, currentColor 72%, transparent); line-height: 1.55; font-size: clamp(18px, 1.95vw, 38px); }
+
+/* ── 磚 ────────────────────────────────────────────────────────────────────── */
+.tile {
+  position: relative; overflow: hidden;
+  border-radius: clamp(12px, 1.1vw, 20px);
+  padding: clamp(14px, 1.6vw, 28px);
+  display: flex; flex-direction: column;
+  color: var(--b-navy);
+  /* 淺色玻璃:白玻璃 + 微藍色調,讓底下天空色透出一點 → 通透玻璃感 */
+  background:
+    linear-gradient(150deg, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.56) 55%, rgba(236,244,255,0.62) 100%),
+    color-mix(in srgb, var(--b-tint, var(--b-sky)) 55%, #ffffff);
+  border: 1px solid rgba(255,255,255,0.9);
+  /* 左上反光(內亮邊 + 柔光)+ 右下陰影(內暗邊 + 外投影)*/
+  box-shadow:
+    inset 1.5px 1.5px 0 rgba(255,255,255,0.95),
+    inset -1.5px -1.5px 0 rgba(70,105,165,0.16),
+    12px 16px 30px rgba(35,72,140,0.16),
+    -6px -6px 18px rgba(255,255,255,0.5);
+  transition: background-color 0.6s var(--ease, ease), color 0.6s var(--ease, ease);
+}
+/* 左上角玻璃反光高光 */
+.tile::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background:
+    radial-gradient(130% 120% at 0% 0%, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0) 38%),
+    linear-gradient(155deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 20%);
+}
+.tile--flush { padding: 0; }
+.tile--orange { --b-tint: var(--b-orange); }
+.tile--purple { --b-tint: var(--b-purple); }
+.tile--coral  { --b-tint: var(--b-coral); }
+.tile--green  { --b-tint: var(--b-green); }
+.tile--yellow { --b-tint: var(--b-yellow); }
+.tile--sky    { --b-tint: var(--b-sky); }
+.tile--pink   { --b-tint: var(--b-pink); }
+.tile--indigo { --b-tint: var(--b-indigo); }
+.tile--teal   { --b-tint: var(--b-teal); }
+.tile--lime   { --b-tint: var(--b-lime); }
+.tile--cream  { --b-tint: var(--b-cream); }
+/* 最深藍玻璃磚:更實心的深藍(牆面視覺錨點),同樣左上反光 + 右下陰影 */
+.tile--ink {
+  color: var(--b-text);
+  background: linear-gradient(150deg, rgba(30,62,116,0.72) 0%, rgba(9,22,48,0.82) 60%, rgba(6,15,36,0.9) 100%), #081a3a;
+  border-color: rgba(130,170,255,0.20);
+  box-shadow:
+    inset 1.5px 1.5px 0 rgba(170,200,255,0.22),
+    inset -1.5px -1.5px 0 rgba(3,9,22,0.5),
+    16px 20px 40px rgba(2,7,20,0.5),
+    -6px -6px 20px rgba(120,160,255,0.05);
+}
+.tile--ink::before {
+  background:
+    radial-gradient(130% 120% at 0% 0%, rgba(160,195,255,0.20) 0%, rgba(160,195,255,0) 42%),
+    linear-gradient(155deg, rgba(190,215,255,0.08) 0%, rgba(255,255,255,0) 24%);
+}
+
+.tile--active { box-shadow: inset 0 0 0 2px var(--b-accent), 0 0 44px rgba(77,155,255,0.45); z-index: 2; }
+
+/* ── 情境牆(1-5)專屬:霧光板 · 透光白玻璃磚 ─────────────────────────────────
+   半透明白 + 背景模糊(讓角色主色透出成霧面)+ 角落反光/陰影做立體細節。 */
+/* 霧面玻璃卡:半透明白 + 白字 + 發光細邊(底色透出來 → 卡片跟著情境色變) */
+.scene-cols .tile {
+  color: #ffffff;
+  border-radius: clamp(16px, 1.7vw, 30px);
+  /* 平塗色塊系統(依主視覺 mockup):半透明白底,不要邊框、光暈、投影 */
+  background: rgba(255,255,255,0.13);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05);
+  backdrop-filter: blur(14px) saturate(1.05);
+  border: 0;
+  box-shadow: none;
+}
+/* 六塊面板各自的平塗色,由編輯模式(E)逐塊指定;
+   App 已在 JS 端算好(選了色 → 混 20% 暖灰的實色;沒選 → 半透明白)。 */
+.scene-cols .scene-col--r .col-anchor--hero  { background: var(--fill-pain); }
+.scene-cols .scene-col--r .reel-page > .col-card { background: var(--fill-solution); }
+.scene-cols .scene-col--m > .col-card        { background: var(--fill-score); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(1) { background: var(--fill-l1); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(2) { background: var(--fill-l2); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(3) { background: var(--fill-l3); }
+/* 平塗系統不用光環/呼吸;基礎 .tile 的玻璃高光也關掉 */
+.scene-cols .tile::before { background: none; }
+/* ── 參考配色(--scene-accent-2,由 App 依 persona 帶入)────────────────────────
+   只用在卡片內的「數據強調」上:被強調的長條、體感舒適區間、聲景波形。
+   文字維持白色 → 對比不受影響,但每個情境會多出一個自己的重點色。 */
+.scene-cols .cbar__fill--hi { background: var(--scene-accent-2, currentColor); }
+.scene-cols .range__zone    { background: var(--scene-accent-2, currentColor); }
+.scene-cols .range__mark    { background: var(--scene-accent-2, currentColor);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--scene-accent-2, currentColor) 65%, transparent); }
+.scene-cols .wave span      { background: color-mix(in srgb, var(--scene-accent-2, currentColor) 85%, transparent); }
+
+/* 次要文字統一降透明度,而不是換色 */
+.scene-cols .t-eyebrow,
+.scene-cols .t-foot,
+.scene-cols .narr__detail,
+.scene-cols .viz__labels,
+.scene-cols .cbar__label { color: rgba(255,255,255,0.78); }
+
+/* ── 情境牆(1-5)統一字級系統:4 級字級 × 3 級字重(以「聲音解方」卡為範本)──
+   顏色由上面的 .scene-cols .tile 帶入各場景深色。 */
+/* L1 · 大數字(唯一的展示級大字)*/
+.scene-cols .stat__num        { font-size: clamp(40px, 6vw, 116px); font-weight: 500; }
+/* L2 · 標題級:解方標題 + 主要數值 */
+.scene-cols .narr__head,
+.scene-cols .range__value,
+.scene-cols .cbar__val,
+.scene-cols .stat__num--long  { font-size: clamp(23px, 3.1vw, 50px); font-weight: 500; }
+/* 痛點提問(右上)降一級:原本與解方標題同級,兩行常常撐爆卡片 */
+.scene-cols .hero__q          { font-size: clamp(19px, 2.2vw, 38px); font-weight: 500; line-height: 1.34; }
+/* 痛點卡:情境名稱(大、純白)+ 底下痛點短句 */
+.scene-cols .hero__label {
+  color: #ffffff; font-weight: 700;
+  font-size: clamp(18px, 2vw, 34px); letter-spacing: 0.08em; line-height: 1.2;
+}
+.scene-cols .hero__short {
+  margin-top: 0.25em; color: rgba(255,255,255,0.78);
+  font-size: clamp(12px, 1.4vw, 21px); font-weight: 600; letter-spacing: 0.06em;
+}
+/* 痛點卡:文字 + 角色圖標並排 */
+.hero__row  { display: flex; align-items: center; gap: clamp(10px, 1.4vw, 26px); }
+/* ── 欄位版面編輯(按 E)──────────────────────────────────────────────────── */
+/* inset 必須是 0:分隔線座標是相對 .scene-cols 的 border box 算的,加內距會整組偏移 */
+.ledit { position: absolute; inset: 0; pointer-events: none; z-index: 50; }
+.ledit__bar { position: absolute; pointer-events: auto; }
+.ledit__bar::after {
+  content: ''; position: absolute; background: #8fdcff;
+  box-shadow: 0 0 10px rgba(143,220,255,0.9), 0 0 2px rgba(4,10,28,0.9);
+}
+.ledit__bar--v { width: 22px; margin-left: -11px; cursor: col-resize; }
+.ledit__bar--v::after { left: 9px; width: 4px; top: 0; bottom: 0; border-radius: 2px; }
+.ledit__bar--h { height: 22px; margin-top: -11px; cursor: row-resize; }
+.ledit__bar--h::after { top: 9px; height: 4px; left: 0; right: 0; border-radius: 2px; }
+.ledit__bar:hover::after { background: #ffffff; }
+.ledit__tag {
+  position: absolute; padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+  background: rgba(6,16,38,0.85); color: #dff0ff;
+  font-family: var(--font-hud); font-size: 11px; letter-spacing: 0.06em;
+}
+.ledit__bar--v .ledit__tag { top: 8px; left: 50%; transform: translateX(-50%); }
+.ledit__bar--h .ledit__tag { left: 8px; top: 50%; transform: translateY(-50%); }
+
+/* ── 編輯模式:參考配色色票 ────────────────────────────────────────────────── */
+.tuner__sw { display: flex; align-items: center; gap: 8px; margin: 4px 0 7px; }
+.tuner__sw i { width: 104px; flex: none; font-style: normal; font-size: 11px; opacity: 0.8; }
+.tuner__chips { display: flex; gap: 5px; flex: 1; }
+.tuner__chip {
+  flex: 1; height: 22px; padding: 0; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.28); border-radius: 4px;
+}
+.tuner__chip.is-on {
+  border-color: #ffffff; box-shadow: 0 0 0 2px rgba(255,255,255,0.35), 0 0 8px rgba(160,220,255,0.6);
+}
+.tuner__chip--beam { padding: 0 6px; font-size: 10px; }
+.tuner__chip--beam.is-on {
+  border-color: #cfeaff; color: #06122e;
+  background: linear-gradient(168deg, #1c3a7a 0 30%, #bfe4ff 46%, #2c8cf0 78%, #14295c 100%);
+}
+.tuner__prev {
+  width: 22px; height: 22px; flex: none; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.28);
+}
+.tuner__chip--none {
+  background: rgba(255,255,255,0.07); color: #cfe0ff;
+  font-family: var(--font-hud); font-size: 10px; line-height: 20px;
+}
+
+.picon      { display: block; background-repeat: no-repeat; }
+.hero__icon { flex: none; width: clamp(46px, 5.6vw, 104px); opacity: 0.92; }
+/* L3 · 內文 / 標籤 */
+.scene-cols .narr__detail,
+.scene-cols .viz__labels,
+.scene-cols .cbar__label,
+.scene-cols .chart__title     { font-size: clamp(15px, 1.8vw, 28px); font-weight: 400; }
+/* L4 · 小標 / 註腳 */
+.scene-cols .t-eyebrow,
+.scene-cols .t-foot           { font-size: clamp(12px, 1.4vw, 21px); font-weight: 600; }
+/* 各卡頂列一律頂端對齊 → 每格標題離框頂等距(不再被大 icon 置中往下推)*/
+.scene-cols .stat__top,
+.scene-cols .viz__top,
+.scene-cols .narr__tag        { align-items: flex-start; }
+
+/* 輪替格:固定位置 + 遮罩,讓卡片在格內滑動換頁(GIF 換卡效果)*/
+.bento .slot { position: relative; overflow: hidden; border-radius: clamp(10px, 1vw, 18px); }
+.bento .card-face { position: absolute; inset: 0; }
+
+/* ── 大數字 / 文案 ─────────────────────────────────────────────────────────── */
+.t-eyebrow { font-family: var(--b-num); font-size: clamp(14px, 1.55vw, 26px); font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.7; }
+.t-num {
+  font-family: var(--b-num); font-weight: 700; line-height: 0.9;
+  font-size: clamp(48px, 8vw, 156px); letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.t-num--sm { font-size: clamp(34px, 5vw, 84px); }
+.t-unit { font-size: 0.32em; font-weight: 700; letter-spacing: 0; opacity: 0.7; }
+.t-label { font-family: var(--b-num); font-size: clamp(15px, 1.5vw, 26px); font-weight: 500; line-height: 1.3; }
+.t-label--lg { font-size: clamp(22px, 2.8vw, 48px); font-weight: 600; }
+.t-spacer { flex: 1; }
+.t-foot { font-family: var(--b-num); font-size: clamp(13px, 1.4vw, 24px); font-weight: 500; opacity: 0.68; }
+.t-row { display: flex; align-items: baseline; gap: 0.5ch; }
+.t-icon { width: clamp(22px, 2.4vw, 40px); height: clamp(22px, 2.4vw, 40px); }
+
+/* 角標(維度序號 ①②③④)*/
+.t-badge {
+  position: absolute; top: clamp(10px, 1vw, 18px); right: clamp(12px, 1.1vw, 20px);
+  font-family: var(--b-num); font-weight: 700; font-size: clamp(16px, 1.8vw, 30px); opacity: 0.5;
+}
+
+/* 搜尋列文字(GIF 裡打字進去的小框)*/
+.t-search {
+  margin-top: auto; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.92); color: #14171c;
+  border-radius: 999px; padding: 6px 14px;
+  font-family: var(--b-num); font-size: clamp(11px, 1.05vw, 16px); font-weight: 500;
+  max-width: 100%;
+}
+.t-search svg { width: 14px; height: 14px; flex: none; }
+
+/* ── 房子 canvas 格 ────────────────────────────────────────────────────────── */
+.house-tile { position: relative; }
+.house-canvas { position: absolute; inset: 0; }
+.house-tile__cap {
+  position: absolute; left: clamp(12px, 1.2vw, 20px); bottom: clamp(10px, 1vw, 18px);
+  font-family: var(--b-num); font-weight: 700; letter-spacing: 0.02em; z-index: 1;
+  color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+.house-tile__cap b { display: block; font-size: clamp(16px, 1.8vw, 30px); }
+.house-tile__cap span { font-size: clamp(11px, 1vw, 15px); opacity: 0.8; letter-spacing: 0.12em; text-transform: uppercase; }
+.house-tile__badge {
+  position: absolute; top: clamp(12px, 1.1vw, 20px); right: clamp(12px, 1.1vw, 20px); z-index: 1;
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--b-num); font-size: clamp(10px, 1vw, 14px); font-weight: 700; letter-spacing: 0.14em;
+  color: #fff; text-transform: uppercase; opacity: 0.85;
+}
+.house-tile__badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px #fff; }
+
+/* ── 影片格(房屋資訊牆右上,循環播放樣品屋影片)──────────────────────────── */
+.video-tile { position: relative; overflow: hidden; }
+.video-tile__v {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+/* 底部漸層,讓白色標題壓在畫面上仍讀得清楚 */
+.video-tile__scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(6,14,30,0.62) 0%, rgba(6,14,30,0.18) 26%, transparent 52%);
+}
+
+/* ── 折線/面積圖 ───────────────────────────────────────────────────────────── */
+.chart { display: flex; flex-direction: column; height: 100%; gap: 8px; }
+.chart__title { font-family: var(--b-num); font-size: clamp(12px, 1.2vw, 18px); font-weight: 600; }
+.chart__svg { flex: 1; width: 100%; height: 100%; }
+.chart__grid { stroke: rgba(35,72,140,0.14); stroke-width: 1; }
+
+/* ── 甜甜圈 ────────────────────────────────────────────────────────────────── */
+.donut { display: flex; align-items: center; gap: clamp(10px, 1.2vw, 22px); height: 100%; }
+.donut__svg { height: 100%; max-height: clamp(110px, 16vh, 200px); aspect-ratio: 1; flex: none; }
+.donut__track { fill: none; stroke: rgba(35,72,140,0.12); stroke-width: 16; }
+.donut__c-top { text-anchor: middle; font-family: var(--b-num); font-weight: 700; font-size: 22px; fill: var(--b-navy); }
+.donut__c-sub { text-anchor: middle; font-family: var(--b-num); font-size: 9px; fill: var(--b-navy); opacity: 0.6; }
+.donut__legend { list-style: none; display: flex; flex-direction: column; gap: 6px; font-family: var(--b-num); font-size: clamp(11px, 1.05vw, 16px); }
+.donut__legend li { display: flex; align-items: center; gap: 8px; }
+.donut__sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+
+/* ── 聲音 EQ 條(bento 版)──────────────────────────────────────────────────── */
+.bento-eq { display: flex; align-items: flex-end; gap: clamp(3px, 0.5vw, 8px); flex: 1; min-height: 0; }
+.bento-eq span { flex: 1; border-radius: 999px 999px 0 0; transform-origin: bottom; }
+
+/* 進度點(4 維度)*/
+.dim-dots { display: flex; gap: 8px; margin-top: auto; }
+.dim-dots i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: 0.28; transition: opacity 0.3s, transform 0.3s; }
+.dim-dots i.on { opacity: 1; transform: scale(1.25); }
+
+/* ── 房屋資訊牆(.bento)專屬:透明玻璃框 + 白字 + 字級縮兩級 ──────────────────
+   情境牆(.scene-cols)不受影響;深藍錨點磚(.tile--ink)維持原樣。 */
+.bento .tile:not(.tile--ink) {
+  /* 平塗色塊系統(跟 1-5 一致):不要邊框、光暈、投影 */
+  background: rgba(255,255,255,0.13);
+  color: #ffffff;
+  border: 0;
+  border-radius: clamp(14px, 1.4vw, 26px);
+  box-shadow: none;
+  text-shadow: 0 2px 10px rgba(2,8,22,0.45);
+}
+/* 平塗系統不用光環:基礎 .tile 的玻璃高光關掉 */
+.bento .tile:not(.tile--ink)::before { background: none; }
+
+/* ── 光邊格(.tile--beam)──────────────────────────────────────────────────────
+   參考主視覺那道光的「邊」:銳利白邊 → 往內是青色(cyan)大範圍衰減 → 中央回深藍。
+   青色取自待機頁那道光的色票(--beam-inner / --beam-glow),整館同一道光。
+   純漸層,不加雜訊。逐格由編輯模式(E)開關。 */
+.bento .tile--beam:not(.tile--ink) {
+  /* 把光束色票再往青推一階,才是參考圖那種 cyan,而不是天空藍 */
+  --rim-hue: color-mix(in srgb, var(--beam-glow, #8ad2ff) 55%, #2ee6ff);
+  --rim-1: color-mix(in srgb, var(--beam-inner, #ade5ff) 46%, transparent);  /* 貼邊:近白的青 */
+  --rim-2: color-mix(in srgb, var(--rim-hue) 44%, transparent);              /* 本體:飽和青 */
+  color: #ffffff;
+  background-image: linear-gradient(168deg,
+    var(--rim-1) 0%,
+    var(--rim-2) 13%,
+    rgba(20,44,96,0.10) 44%,
+    rgba(20,44,96,0.10) 58%,
+    var(--rim-2) 88%,
+    var(--rim-1) 100%);
+  border: clamp(1px, 0.085vw, 1.8px) solid rgba(244,253,255,0.94);
+  box-shadow:
+    inset 0 0 clamp(26px, 3vw, 60px) color-mix(in srgb, var(--beam-inner, #ade5ff) 62%, transparent),
+    inset 0 0 clamp(5px, 0.5vw, 10px) rgba(255,255,255,0.5),
+    0 0 clamp(4px, 0.5vw, 10px) color-mix(in srgb, var(--beam-glow, #8ad2ff) 34%, transparent);
+  text-shadow: 0 2px 14px rgba(2,8,22,0.6);
+}
+
+/* 字級取原始與砍半的中間(約 75%);「房子的健康」那格例外,見 .bento-claim */
+.bento .t-num,
+.bento .t-num--sm   { font-size: clamp(30px, 4.5vw, 87px); font-weight: 400; line-height: 0.9; padding-bottom: 0.15em; }   /* L1 大數字 */
+.bento .t-label     { font-size: clamp(11px, 1.35vw, 21px); font-weight: 400; }   /* L3 內文 */
+.bento .t-label--lg { font-size: clamp(17px, 2.33vw, 37px); font-weight: 500; line-height: 1.14; }   /* L2 標題 */
+.bento .t-eyebrow,
+.bento .t-foot      { font-size: clamp(9px, 1.05vw, 16px); font-weight: 600; }    /* L4 小標 */
+/* 「房子的健康,就是你的健康」維持原字級。
+   注意順序:標題同時有 .t-label 與 .t-label--lg 兩個 class、權重相同 →
+   --lg 必須寫在後面才會贏(原始檔也是這個順序)。 */
+.bento .bento-claim .t-label     { font-size: clamp(15px, 1.8vw, 28px); }
+.bento .bento-claim .t-label--lg { font-size: clamp(23px, 3.1vw, 50px); }
+.bento .bento-claim .t-eyebrow,
+.bento .bento-claim .t-foot      { font-size: clamp(12px, 1.4vw, 21px); }
+/* 標題列頂端對齊 → 每格標題離框頂等距(不被 icon 往下推)*/
+.bento .t-row       { align-items: flex-start; }
+/* 文字字距調開一點(大數字維持原本緊排)*/
+.bento .t-label--lg,
+.bento .t-label,
+.bento .t-eyebrow,
+.bento .t-foot      { letter-spacing: 0.1em; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WHITE 版（branch: white）— 底色全白、字轉藍
+   ── 房屋資訊牆(.bento):底色白、面板白、字藍
+   ── 情境牆(.scene-cols):依指示「只換底色」,卡片與白字維持原狀
+   要回深色版把這整段刪掉即可。
+   ══════════════════════════════════════════════════════════════════════════════ */
+.bento {
+  /* 面板底色預設白;既有的兩塊色塊(左上標題卡 / 右下宣言卡)在下面單獨覆寫。
+     用覆寫變數而不是覆寫 background → 不必跟 .tile--beam 那條規則比權重。 */
+  --panel-fill: #ffffff;
+  background:
+    radial-gradient(120% 90% at 50% 4%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 46%),
+    linear-gradient(158deg, #ffffff 0%, #eef5ff 45%, #dce9fb 100%);
+}
+/* 面板:白底藍字(平塗色塊系統不變,只是底色與字色翻過來) */
+.bento .tile:not(.tile--ink) {
+  background: var(--panel-fill);
+  color: #17357a;
+  text-shadow: none;
+}
+/* 既有的色塊:左上標題卡 + 右下宣言卡 → 淺藍 */
+.bento .bento-hero,
+.bento .bento-claim { --panel-fill: #a2d0f8; }
+
+/* 光邊格:漸層從面板內部移到「外面」——面板本身平塗白 + 一條藍邊,
+   藍色漸層改成環在面板外圈(::after 負 inset + 模糊,z-index -1 疊在面板底下)。
+   .tile 預設 overflow:hidden 會把外圈切掉 → 這裡改成 visible。 */
+.bento .tile--beam:not(.tile--ink) {
+  overflow: visible;
+  background: var(--panel-fill);
+  background-image: none;
+  border-color: color-mix(in srgb, var(--beam-glow) 85%, #ffffff);
+  box-shadow: none;
+  text-shadow: none;
+}
+.bento .tile--beam:not(.tile--ink)::after {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  inset: calc(-1 * clamp(3px, 0.32vw, 6px));
+  border-radius: clamp(17px, 1.72vw, 32px);
+  background: linear-gradient(168deg,
+    color-mix(in srgb, var(--beam-glow) 72%, transparent) 0%,
+    color-mix(in srgb, var(--beam-inner) 44%, transparent) 16%,
+    transparent 44%,
+    transparent 58%,
+    color-mix(in srgb, var(--beam-inner) 42%, transparent) 85%,
+    color-mix(in srgb, var(--beam-glow) 64%, transparent) 100%);
+  filter: blur(clamp(3px, 0.36vw, 7px));
+}
+/* 情境牆 1-5:只換底色(卡片、字色、配色邏輯都不動) */
+.scene-cols {
+  background: linear-gradient(158deg, #ffffff 0%, #f2f7ff 45%, #e4eefc 100%);
+}
+
+/* ── 情境頁底部:待機頁的主頁元素 ────────────────────────────────────────────
+   字標(感應光寓 / SENSING RESIDENCE)+ ANLB 商標。顏色吃待機頁那組 token,
+   所以換主題會一起走。三欄下方讓出 footer 的高度,卡片不會被壓到。 */
+.scene-cols { padding-bottom: calc(var(--foot-h) + clamp(10px, 1.4vw, 22px)); }
+.scene-cols, .bento { --foot-h: clamp(34px, 4vh, 62px); }
+.scene-foot {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--foot-h);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 clamp(14px, 1.8vw, 30px);
+  pointer-events: none;
+}
+.scene-foot__logo { justify-self: center; }
+/* B:只有白色與當頁主色 —— 不做影像反轉,改成「白底 + 一層主色,用原圖的明暗當遮罩」。
+   原圖是深藍底 + 亮光束 → 以亮度當遮罩(mask-mode: luminance)時,亮的光束變成不透明、
+   深藍底變透明,於是光束吃主色、底完全是白的,整張圖不會出現任何深色。
+   (先前用 filter invert + 混色的版本,深色只是換了色相、明暗還在,所以還是有深色。) */
+.scene-bgimg-wrap { position: absolute; inset: 0; pointer-events: none; }
+.scene-bgimg--inv {
+  position: absolute;
+  inset: calc(-1 * clamp(10px, 1.4vw, 22px));   /* 抵掉 .scene-cols 的 padding → 真正滿版 */
+  /* CI 主色本身偏灰(#7394a5 / #c5b192 這類),直接鋪就是「髒」的來源 →
+     先摻 42% 白提亮,再配 0.8 不透明度,整體變淺但還看得出是哪個角色 */
+  background: color-mix(in srgb, var(--scene-accent) 58%, #ffffff);
+  -webkit-mask: var(--bg-src) center / cover no-repeat;
+  mask: var(--bg-src) center / cover no-repeat;
+  -webkit-mask-source-type: luminance;   /* 舊版 Chrome */
+  mask-mode: luminance;                  /* 標準寫法:用亮度當遮罩,不是 alpha */
+  opacity: 0.8;
+}
+/* 牆底:白就是白 —— 帶藍灰的底(#dce9fb 那類)跟主色光束疊在一起會顯得濁 */
+.scene-cols {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fafcff 100%);
+}
+/* 關鍵:卡片原本有 backdrop-filter: blur(14px) —— 背後的光會被糊成一片均勻的暈,
+   看起來就「沒有透」。白底這一版把它關掉,光才會以原本的形狀穿過卡片。 */
+.scene-cols .tile {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* 卡片帶一點透明度:背後那道光會透出來,平塗色塊不再是完全實色的一塊。
+   用 color-mix 把 JS 算好的實色 --fill-* 摻進 transparent 取得 alpha,
+   不必動 fillColor() → 房屋資訊牆的面板色不受影響。 */
+.scene-cols .scene-col--r .col-anchor--hero      { background: color-mix(in srgb, var(--fill-pain) 72%, transparent); }
+.scene-cols .scene-col--r .reel-page > .col-card { background: color-mix(in srgb, var(--fill-solution) 72%, transparent); }
+.scene-cols .scene-col--m > .col-card            { background: color-mix(in srgb, var(--fill-score) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(1) { background: color-mix(in srgb, var(--fill-l1) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(2) { background: color-mix(in srgb, var(--fill-l2) 72%, transparent); }
+.scene-cols .scene-col--l .reel-page > *:nth-child(3) { background: color-mix(in srgb, var(--fill-l3) 72%, transparent); }
+
+.scene-foot__mark { display: flex; align-items: baseline; gap: clamp(8px, 1vw, 18px); }
+/* 大標:與待機頁同字體(Chiron Hei HK,字身 1:1),只是縮到 footer 尺度 */
+.scene-foot__mark b {
+  font-family: 'Chiron Hei HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+  font-weight: 500; font-size: clamp(13px, 1.5vh, 24px);
+  letter-spacing: 0.16em; color: var(--idle-title);
+}
+/* 英文:與待機頁同字體(Barlow Semi Condensed 200,細長) */
+.scene-foot__mark i {
+  font-family: 'Barlow Semi Condensed', 'Barlow Condensed', 'Roboto Condensed', sans-serif;
+  font-style: normal; font-weight: 200; font-size: clamp(9px, 1.05vh, 16px);
+  letter-spacing: 0.32em; color: var(--idle-sub);
+}
+.scene-foot__logo {
+  height: 62%; aspect-ratio: 227 / 46; flex: none;
+  /* 情境頁的商標:全白(遮罩不變,只換塗的顏色) */
+  background: #ffffff;
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+}
+
+/* ══ 情境牆:可切換的牆面背景 + 淺色玻璃面板(編輯模式 E)══════════════════════
+   預設維持 main 既有視覺(主視覺遮罩光束 + 72% 平塗色塊 + 白字),
+   下面兩組只有切到對應模式時才生效 —— 不切就完全不影響現況。
+   ⚠ 玻璃模式會把背後那道主色光糊掉(backdrop-filter 的必然結果),這是取捨:
+     要看清楚那道光就留 flat,要玻璃質感就接受光被柔化。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 牆面背景:全白 / 影片 ─────────────────────────────────────────────────── */
+.scene-cols.is-bg-white { background: #ffffff; }
+.scene-cols.is-bg-video { background: linear-gradient(158deg, #ffffff 0%, #f2f7ff 45%, #e4eefc 100%); }
+.scene-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.scene-bg__v {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  /* 微散焦 + 稍微放大:背景不跟前景卡片搶細節,放大是為了蓋掉模糊的邊 */
+  filter: blur(2px) saturate(1.06);
+  transform: scale(1.04);
+}
+.scene-bg__wash {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 0%,
+      rgba(255,255,255,calc(var(--scene-bg-wash, 0.32) * 0.55)) 0%, transparent 62%),
+    linear-gradient(158deg,
+      rgba(255,255,255, calc(var(--scene-bg-wash, 0.32) * 1.18)) 0%,
+      rgba(238,245,255, var(--scene-bg-wash, 0.32)) 45%,
+      rgba(216,231,250, calc(var(--scene-bg-wash, 0.32) * 1.06)) 100%);
+}
+.scene-cols .scene-col { position: relative; z-index: 1; }
+
+/* ── 淺色玻璃面板(panel: 'glass')───────────────────────────────────────────
+   四層疊出厚玻璃:半透明底 + backdrop-filter + 顆粒 / 斜掠高光 / 漸層描邊 /
+   內緣受光 + 外部柔影。顆粒是關鍵:大面積半透明漸層在 TV 上會走色帶。 */
+.scene-cols.is-glass {
+  --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+}
+.scene-cols.is-glass .tile {
+  color: #17357a;                                   /* 淺玻璃 → 深藍字 */
+  --tile-fill: rgba(255, 255, 255, 0.52);
+  background-color: var(--tile-fill);
+  background-image: var(--glass-noise);
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 0px)) saturate(1.6) brightness(1.03);
+  backdrop-filter: blur(var(--glass-blur, 0px)) saturate(1.6) brightness(1.03);
+  border: none;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, calc(0.92 * var(--glass-gloss, 1))),
+    inset 0 -1px 1px rgba(86, 126, 190, calc(0.22 * var(--glass-gloss, 1))),
+    inset 0 0 26px rgba(255, 255, 255, calc(0.30 * var(--glass-gloss, 1))),
+    0 2px 6px rgba(20, 50, 110, 0.07),
+    0 16px 40px rgba(20, 50, 110, 0.11);
+  text-shadow: none;
+}
+/* 六塊面板的玻璃色 = 同一組 slotColor()(SCENE_DEFAULTS + 現場挑色),只是換玻璃呈現。
+   走 --tile-fill 而不是 background 縮寫 —— 縮寫會清掉顆粒圖層。
+   選擇器與上面 flat 版那六條同權重、靠後出現獲勝;改一邊要同時改另一邊。 */
+.scene-cols.is-glass .scene-col--r .col-anchor--hero           { --tile-fill: var(--glass-pain); }
+.scene-cols.is-glass .scene-col--r .reel-page > .col-card      { --tile-fill: var(--glass-solution); }
+.scene-cols.is-glass .scene-col--m > .col-card                 { --tile-fill: var(--glass-score); }
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(1) { --tile-fill: var(--glass-l1); }
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(2) { --tile-fill: var(--glass-l2); }
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(3) { --tile-fill: var(--glass-l3); }
+.scene-cols.is-glass .scene-col--r .col-anchor--hero,
+.scene-cols.is-glass .scene-col--r .reel-page > .col-card,
+.scene-cols.is-glass .scene-col--m > .col-card,
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(1),
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(2),
+.scene-cols.is-glass .scene-col--l .reel-page > *:nth-child(3) {
+  background-color: var(--tile-fill);
+  background-image: var(--glass-noise);
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+/* 斜掠高光(受光面)*/
+.scene-cols.is-glass .tile::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  border-radius: inherit; pointer-events: none;
+  background: linear-gradient(125deg,
+    rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.13) 18%,
+    rgba(255,255,255,0) 36%, rgba(255,255,255,0) 66%,
+    rgba(255,255,255,0.09) 84%, rgba(255,255,255,0.26) 100%);
+  opacity: var(--glass-gloss, 1);
+}
+/* 漸層描邊:padding + mask-composite 只留 1px 外圈 = 玻璃的切邊。
+   z-index 3 壓在內容之上 —— 影像卡的照片是滿格子元素,描邊留在內容之下會被蓋掉。 */
+.scene-cols.is-glass .tile::after {
+  content: ''; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; pointer-events: none;
+  padding: 1px;
+  background: linear-gradient(140deg,
+    rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.34) 26%,
+    rgba(150,185,235,0.16) 52%, rgba(255,255,255,0.30) 74%,
+    rgba(255,255,255,0.80) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: calc(0.55 + 0.45 * var(--glass-gloss, 1));
+}
+/* 只給 z-index、不要動 position —— .tile 是 flex 容器,flex item 即使 static 也吃
+   z-index。寫 position:relative 會壓過 .house-tile__cap 的 absolute,字幕會被裁掉。 */
+.scene-cols.is-glass .tile > * { z-index: 2; }
+/* 字色翻成深藍(原本是壓在實色平塗上的白字)*/
+.scene-cols.is-glass .t-eyebrow,
+.scene-cols.is-glass .t-foot,
+.scene-cols.is-glass .narr__detail,
+.scene-cols.is-glass .viz__labels,
+.scene-cols.is-glass .cbar__label { color: rgba(23, 53, 122, 0.70); }
+.scene-cols.is-glass .hero__label { color: #17357a; }
+.scene-cols.is-glass .hero__short { color: rgba(23, 53, 122, 0.70); }
+/* 軌道底色原本吃 currentColor(白)→ 淺玻璃上會消失,改成藍灰 */
+.scene-cols.is-glass .cbar__track,
+.scene-cols.is-glass .range__track { background: rgba(23, 53, 122, 0.13); }
+.scene-cols.is-glass .cbar__fill   { background: rgba(23, 53, 122, 0.30); }
+/* 邊緣折射(warp):backdrop-filter 串接 SVG 位移濾鏡,只有 Chromium 支援 url() */
+.scene-cols.is-glass.is-warp .tile {
+  -webkit-backdrop-filter: url(#glass-refract) blur(var(--glass-blur, 0px)) saturate(1.6) brightness(1.03);
+  backdrop-filter: url(#glass-refract) blur(var(--glass-blur, 0px)) saturate(1.6) brightness(1.03);
+}
+.glass-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* 情境牆的影像卡字幕:房屋資訊牆那格很大,1.8vw 剛好;情境牆這張只有中欄的 16:9,
+   同字級會撐出卡片 → 單獨縮一級,並補 right 讓長標題換行而不是溢出。 */
+.scene-cols .house-tile__cap { right: clamp(12px, 1.2vw, 20px); line-height: 1.2; }
+.scene-cols .house-tile__cap b    { font-size: clamp(12px, 1.1vw, 19px); }
+.scene-cols .house-tile__cap span { font-size: clamp(8px, 0.62vw, 11px); letter-spacing: 0.1em; }

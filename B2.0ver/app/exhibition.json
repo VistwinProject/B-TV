@@ -1,0 +1,760 @@
+{
+  "people": [
+    {
+      "id": "anti-aging",
+      "title": "居家抗老",
+      "shortName": "生理逆齡",
+      "question": "成年人逆齡衰老？",
+      "pain": "熬夜、壓力與老化，怎麼讓身體回到修復狀態？",
+      "subtitle": "成年人「生理逆齡」抗衰老",
+      "color": "#7394a5",
+      "image": "scene/anti-aging.jpg",
+      "columns": [
+        0.62,
+        1.063,
+        1.069
+      ],
+      "painHeight": 46,
+      "colors": [
+        "#7394a5",
+        "#b6dbe6",
+        "#b6dbe6",
+        "#fa864d",
+        "#17ab54",
+        "#7394a5",
+        "#b6dbe6"
+      ],
+      "dimensions": {
+        "light": {
+          "headline": "校正晝夜節律",
+          "detail": "日間 EML ≥ 250（抑制褪黑激素）；晚間 EML ≤ 50（暖橘光誘導睡眠）",
+          "metrics": [
+            {
+              "value": "250",
+              "unit": "EML",
+              "note": "日間 · 抑制褪黑激素",
+              "icon": "light",
+              "operator": "≥",
+              "lightMode": "day"
+            },
+            {
+              "value": "50",
+              "unit": "EML",
+              "note": "晚間 · 暖橘光誘導睡眠",
+              "icon": "light",
+              "operator": "≤",
+              "lightMode": "warm"
+            },
+            {
+              "kind": "note",
+              "note": "日夜光照切換",
+              "detail": "日間喚醒，晚間暖橘光誘導睡眠",
+              "icon": "light"
+            }
+          ],
+          "lightMode": "cycle"
+        },
+        "air": {
+          "headline": "降低氧化與發炎",
+          "detail": "PM2.5 ≤ 10 µg/m³ 且 TVOC ≤ 0.30 ppm，保護心血管、降低系統性發炎",
+          "metrics": [
+            {
+              "value": "10",
+              "unit": "µg/m³",
+              "note": "PM2.5",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "value": "0.30",
+              "unit": "ppm",
+              "note": "TVOC",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "保護心血管",
+              "detail": "降低系統性發炎",
+              "icon": "air"
+            }
+          ]
+        },
+        "temp": {
+          "headline": "睡眠深層修復",
+          "detail": "睡眠時 22–23°C，相對濕度 50%，助核心體溫下降啟動深層修復",
+          "metrics": [
+            {
+              "value": "22–23",
+              "unit": "°C",
+              "note": "睡眠室溫",
+              "icon": "temp",
+              "operator": ""
+            },
+            {
+              "value": "50",
+              "unit": "%",
+              "note": "相對濕度",
+              "icon": "humid",
+              "operator": ""
+            },
+            {
+              "kind": "note",
+              "note": "核心體溫下降",
+              "detail": "啟動深層修復",
+              "icon": "temp"
+            }
+          ]
+        },
+        "sound": {
+          "headline": "NREM 深睡環境",
+          "detail": "睡眠背景噪音 ≤ 30 dB，確保 NREM 深睡，促進生長激素正常分泌",
+          "metrics": [
+            {
+              "value": "30",
+              "unit": "dB",
+              "note": "睡眠背景噪音",
+              "icon": "sound",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "NREM 深睡",
+              "detail": "確保深層睡眠",
+              "icon": "sound"
+            },
+            {
+              "kind": "note",
+              "note": "正常分泌",
+              "detail": "促進生長激素正常分泌",
+              "icon": "sound"
+            }
+          ]
+        }
+      },
+      "goal": "校正晝夜節律，透過極致環境減少身體氧化應激與慢性發炎"
+    },
+    {
+      "id": "child",
+      "title": "兒童免疫",
+      "shortName": "原生健康",
+      "question": "提高兒童免疫力？",
+      "pain": "怎麼保護發育中的孩子，少生病、長得好？",
+      "subtitle": "兒童「原生健康」提高免疫力",
+      "color": "#8ba78d",
+      "image": "scene/child.jpg",
+      "columns": [
+        0.91,
+        1.36,
+        1.08
+      ],
+      "painHeight": 34,
+      "colors": [
+        "#8ba78d",
+        "#cfd785",
+        "#549a60",
+        "#cfd785",
+        "#4b9af7",
+        "#cfd785",
+        "#4b9af7"
+      ],
+      "dimensions": {
+        "light": {
+          "headline": "全光譜無頻閃",
+          "detail": "學習區照度 ≥ 500 Lux，全光譜無頻閃（FPM < 5%），預防近視",
+          "metrics": [
+            {
+              "value": "500",
+              "unit": "Lux",
+              "note": "學習區照度",
+              "icon": "light",
+              "operator": "≥"
+            },
+            {
+              "value": "5",
+              "unit": "%",
+              "note": "FPM · 無頻閃",
+              "icon": "light",
+              "operator": "<"
+            },
+            {
+              "kind": "note",
+              "note": "全光譜照明",
+              "detail": "預防近視",
+              "icon": "light"
+            }
+          ],
+          "lightMode": "neutral"
+        },
+        "air": {
+          "headline": "保護發育中的肺部",
+          "detail": "CO₂ ≤ 600 ppm，甲醛 ≤ 0.02 ppm；強化爬行層（0.1–0.5m）換氣",
+          "metrics": [
+            {
+              "value": "600",
+              "unit": "ppm",
+              "note": "CO₂",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "value": "0.02",
+              "unit": "ppm",
+              "note": "甲醛",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "value": "0.1–0.5",
+              "unit": "m",
+              "note": "強化爬行層換氣",
+              "icon": "air",
+              "operator": ""
+            }
+          ]
+        },
+        "temp": {
+          "headline": "恆溫恆濕防敏",
+          "detail": "恆溫 24–26°C，垂直溫差 < 2°C；相對濕度 45–55% 抑制塵蟎與病毒",
+          "metrics": [
+            {
+              "value": "24–26",
+              "unit": "°C",
+              "note": "恆溫",
+              "icon": "temp",
+              "operator": ""
+            },
+            {
+              "value": "45–55",
+              "unit": "%",
+              "note": "相對濕度 · 抑制塵蟎與病毒",
+              "icon": "humid",
+              "operator": ""
+            },
+            {
+              "value": "2",
+              "unit": "°C",
+              "note": "垂直溫差",
+              "icon": "temp",
+              "operator": "<"
+            }
+          ]
+        },
+        "sound": {
+          "headline": "保護聽覺與情緒",
+          "detail": "日間背景音 ≤ 40 dB，保護聽覺與情緒發展",
+          "metrics": [
+            {
+              "value": "40",
+              "unit": "dB",
+              "note": "日間背景音",
+              "icon": "sound",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "聽覺保護",
+              "detail": "降低日間背景音干擾",
+              "icon": "sound"
+            },
+            {
+              "kind": "note",
+              "note": "情緒發展",
+              "detail": "保護聽覺與情緒發展",
+              "icon": "sound"
+            }
+          ]
+        }
+      },
+      "goal": "保護發育中肺部與視力，減少過敏原干擾"
+    },
+    {
+      "id": "elder",
+      "title": "在宅樂齡",
+      "shortName": "安全守護",
+      "question": "老年的安全守護？",
+      "pain": "怎麼讓長輩在家安全、安心地終老？",
+      "subtitle": "老人「安全守護」在宅終老",
+      "color": "#c47f75",
+      "image": "scene/elder.jpg",
+      "columns": [
+        0.86,
+        1.287,
+        1.203
+      ],
+      "painHeight": 58,
+      "colors": [
+        "#c47f75",
+        "#eff7d6",
+        "#eff7d6",
+        "#bfd71b",
+        "#f96224",
+        "#c47f75",
+        "#eff7d6"
+      ],
+      "dimensions": {
+        "light": {
+          "headline": "視覺補償照明",
+          "detail": "全區照度 ≥ 800 Lux，CRI ≥ 90，補償水晶體黃化；高色溫預防認知退化",
+          "metrics": [
+            {
+              "value": "800",
+              "unit": "Lux",
+              "note": "全區照度",
+              "icon": "light",
+              "operator": "≥",
+              "lightMode": "cool"
+            },
+            {
+              "value": "90",
+              "unit": "CRI",
+              "note": "補償水晶體黃化",
+              "icon": "light",
+              "operator": "≥",
+              "lightMode": "cool"
+            },
+            {
+              "kind": "note",
+              "note": "高色溫",
+              "detail": "預防認知退化",
+              "icon": "light"
+            }
+          ],
+          "lightMode": "cool"
+        },
+        "air": {
+          "headline": "確保大腦含氧",
+          "detail": "CO₂ ≤ 800 ppm 且 PM2.5 ≤ 10 µg/m³，確保大腦含氧、降低中風風險",
+          "metrics": [
+            {
+              "value": "800",
+              "unit": "ppm",
+              "note": "CO₂",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "value": "10",
+              "unit": "µg/m³",
+              "note": "PM2.5",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "大腦含氧",
+              "detail": "降低中風風險",
+              "icon": "air"
+            }
+          ]
+        },
+        "temp": {
+          "headline": "穩定末梢循環",
+          "detail": "室溫 26–28°C，穩定末梢循環，預防夜間血壓劇烈波動",
+          "metrics": [
+            {
+              "value": "26–28",
+              "unit": "°C",
+              "note": "室溫",
+              "icon": "temp",
+              "operator": ""
+            },
+            {
+              "kind": "note",
+              "note": "末梢循環",
+              "detail": "穩定末梢循環",
+              "icon": "temp"
+            },
+            {
+              "kind": "note",
+              "note": "夜間血壓",
+              "detail": "預防劇烈波動",
+              "icon": "temp"
+            }
+          ]
+        },
+        "sound": {
+          "headline": "維持語音清晰",
+          "detail": "背景噪音 ≤ 45 dB，維持說話頻帶清晰，利於助聽器語音辨識",
+          "metrics": [
+            {
+              "value": "45",
+              "unit": "dB",
+              "note": "背景噪音",
+              "icon": "sound",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "說話頻帶",
+              "detail": "維持語音清晰",
+              "icon": "sound"
+            },
+            {
+              "kind": "note",
+              "note": "助聽器辨識",
+              "detail": "利於助聽器語音辨識",
+              "icon": "sound"
+            }
+          ]
+        }
+      },
+      "goal": "補償視覺退化，預防心血管意外與跌倒"
+    },
+    {
+      "id": "pregnancy",
+      "title": "孕婦照護",
+      "shortName": "極致純淨",
+      "question": "孕婦的安心休養？",
+      "pain": "怎麼給孕媽咪一個零毒害、能好好休養的家？",
+      "subtitle": "孕婦「極致純淨」在家休養",
+      "color": "#c5b192",
+      "image": null,
+      "columns": [
+        0.82,
+        1.35,
+        1.18
+      ],
+      "painHeight": 40,
+      "colors": [
+        "#c3b192",
+        "#628e6b",
+        "#628e6b",
+        "#5040ee",
+        "#5f0004",
+        "#c0e797",
+        "#628e6b"
+      ],
+      "dimensions": {
+        "light": {
+          "headline": "睡前暖黃間接照明",
+          "detail": "間接照明，睡前切換 1800–2700K 暖黃光（EML ≤ 50），放鬆自律神經",
+          "metrics": [
+            {
+              "value": "1800–2700",
+              "unit": "K",
+              "note": "睡前暖黃光",
+              "icon": "light",
+              "operator": "",
+              "kelvin": [
+                1800,
+                2700
+              ]
+            },
+            {
+              "value": "50",
+              "unit": "EML",
+              "note": "睡前間接照明",
+              "icon": "light",
+              "operator": "≤",
+              "kelvin": [
+                1800,
+                2700
+              ]
+            },
+            {
+              "kind": "note",
+              "note": "放鬆自律神經",
+              "detail": "間接暖黃光照明",
+              "icon": "light"
+            }
+          ],
+          "kelvin": [
+            1800,
+            2700
+          ],
+          "lightMode": "warm"
+        },
+        "air": {
+          "headline": "零毒害微環境",
+          "detail": "甲醛 ≤ 0.0135 ppm（GFB進階標準），保護胎兒器官發育不受 VOCs 影響",
+          "metrics": [
+            {
+              "value": "0.0135",
+              "unit": "ppm",
+              "note": "甲醛",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "GFB 進階標準",
+              "detail": "嚴格控制甲醛濃度",
+              "icon": "air"
+            },
+            {
+              "kind": "note",
+              "note": "保護胎兒器官發育",
+              "detail": "不受 VOCs 影響",
+              "icon": "air"
+            }
+          ]
+        },
+        "temp": {
+          "headline": "嚴格控溫與恆濕",
+          "detail": "嚴格控溫 25°C，相對濕度 50%，緩解孕婦呼吸道不適",
+          "metrics": [
+            {
+              "value": "25",
+              "unit": "°C",
+              "note": "嚴格控溫",
+              "icon": "temp",
+              "operator": ""
+            },
+            {
+              "value": "50",
+              "unit": "%",
+              "note": "相對濕度",
+              "icon": "humid",
+              "operator": ""
+            },
+            {
+              "kind": "note",
+              "note": "呼吸道舒適",
+              "detail": "緩解孕婦呼吸道不適",
+              "icon": "humid"
+            }
+          ]
+        },
+        "sound": {
+          "headline": "高品質粉紅噪音",
+          "detail": "高品質粉紅噪音（Pink Noise，~35 dB），遮蔽突發噪音，穩定孕媽情緒",
+          "metrics": [
+            {
+              "value": "35",
+              "unit": "dB",
+              "note": "Pink Noise · 粉紅噪音",
+              "icon": "sound",
+              "operator": "~"
+            },
+            {
+              "kind": "note",
+              "note": "遮蔽突發噪音",
+              "detail": "高品質粉紅噪音",
+              "icon": "sound"
+            },
+            {
+              "kind": "note",
+              "note": "穩定孕媽情緒",
+              "detail": "Pink Noise",
+              "icon": "sound"
+            }
+          ]
+        }
+      },
+      "goal": "零毒害微環境，緩解懷孕後期的身心壓力"
+    },
+    {
+      "id": "nomad",
+      "title": "數位遊牧",
+      "shortName": "數位遊牧",
+      "question": "高效的在宅工作？",
+      "pain": "在家怎麼維持專注，不被環境拖累效率？",
+      "subtitle": "高效「數位遊牧」在家辦公",
+      "color": "#3a446f",
+      "image": "scene/nomad.jpg",
+      "columns": [
+        0.969,
+        1.381,
+        1
+      ],
+      "painHeight": 28,
+      "colors": [
+        "#3a446f",
+        "#d5bead",
+        "#d5bead",
+        "#b19857",
+        "#3cb3a7",
+        "#3a446f",
+        "#d5bead"
+      ],
+      "dimensions": {
+        "light": {
+          "headline": "高色溫專注照明",
+          "detail": "工作桌面 500–1000 Lux；日間 5000–6500K 高色溫，強效抑制褪黑激素",
+          "metrics": [
+            {
+              "value": "500–1000",
+              "unit": "Lux",
+              "note": "工作桌面照度",
+              "icon": "light",
+              "operator": "",
+              "kelvin": [
+                5000,
+                6500
+              ]
+            },
+            {
+              "value": "5000–6500",
+              "unit": "K",
+              "note": "日間高色溫",
+              "icon": "light",
+              "operator": "",
+              "kelvin": [
+                5000,
+                6500
+              ]
+            },
+            {
+              "kind": "note",
+              "note": "高強度專注",
+              "detail": "強效抑制褪黑激素",
+              "icon": "light"
+            }
+          ],
+          "kelvin": [
+            5000,
+            6500
+          ],
+          "lightMode": "cool"
+        },
+        "air": {
+          "headline": "低 CO₂ 高效認知",
+          "detail": "CO₂ ≤ 750 ppm，低 CO₂ 環境提升邏輯推理與資訊處理效能達 2 倍以上",
+          "metrics": [
+            {
+              "value": "750",
+              "unit": "ppm",
+              "note": "CO₂",
+              "icon": "air",
+              "operator": "≤"
+            },
+            {
+              "value": "2",
+              "unit": "倍以上",
+              "note": "邏輯推理與資訊處理效能",
+              "icon": "air",
+              "operator": ""
+            },
+            {
+              "kind": "note",
+              "note": "低 CO₂ 環境",
+              "detail": "提升認知與資訊處理效能",
+              "icon": "air"
+            }
+          ]
+        },
+        "temp": {
+          "headline": "生產力黃金交點",
+          "detail": "23–24°C，大腦生產力黃金交點，搭配適度氣流循環增加新鮮感",
+          "metrics": [
+            {
+              "value": "23–24",
+              "unit": "°C",
+              "note": "工作室溫",
+              "icon": "temp",
+              "operator": ""
+            },
+            {
+              "kind": "note",
+              "note": "適度氣流循環",
+              "detail": "增加新鮮感",
+              "icon": "air"
+            },
+            {
+              "kind": "note",
+              "note": "大腦生產力",
+              "detail": "黃金交點",
+              "icon": "temp"
+            }
+          ]
+        },
+        "sound": {
+          "headline": "深層工作空間",
+          "detail": "背景雜訊 ≤ 35 dB（主動隔音／白噪音），打造「深層工作（Deep Work）」空間",
+          "metrics": [
+            {
+              "value": "35",
+              "unit": "dB",
+              "note": "背景雜訊",
+              "icon": "sound",
+              "operator": "≤"
+            },
+            {
+              "kind": "note",
+              "note": "主動隔音／白噪音",
+              "detail": "降低背景雜訊",
+              "icon": "sound"
+            },
+            {
+              "kind": "note",
+              "note": "Deep Work",
+              "detail": "打造深層工作空間",
+              "icon": "sound"
+            }
+          ]
+        }
+      },
+      "goal": "啟動認知潛能，維持長時間高強度專注"
+    }
+  ],
+  "house": [
+    {
+      "key": "pm25",
+      "icon": "air",
+      "label": "室內 PM2.5",
+      "value": 8,
+      "unit": "µg/m³",
+      "status": "good"
+    },
+    {
+      "key": "pm25_out",
+      "icon": "cloud",
+      "label": "室外 PM2.5",
+      "value": 42,
+      "unit": "µg/m³",
+      "status": "warn"
+    },
+    {
+      "key": "co2",
+      "icon": "co2",
+      "label": "CO₂",
+      "value": 620,
+      "unit": "ppm",
+      "status": "good"
+    },
+    {
+      "key": "temp",
+      "icon": "temp",
+      "label": "室內溫度",
+      "value": 26.2,
+      "unit": "°C",
+      "status": "good",
+      "decimals": 1
+    },
+    {
+      "key": "rh",
+      "icon": "humid",
+      "label": "相對濕度",
+      "value": 58,
+      "unit": "%",
+      "status": "good"
+    },
+    {
+      "key": "weather",
+      "icon": "weather",
+      "label": "天氣預報",
+      "value": 28,
+      "unit": "°C",
+      "status": "info",
+      "text": "多雲時晴"
+    },
+    {
+      "key": "light",
+      "icon": "light",
+      "label": "照度",
+      "value": 420,
+      "unit": "lux",
+      "status": "good"
+    },
+    {
+      "key": "sound",
+      "icon": "sound",
+      "label": "聲學環境",
+      "value": 38,
+      "unit": "dBA",
+      "status": "good"
+    }
+  ],
+  "contentSource": "使用者提供：截圖 2026-09-08 下午2.31.50.png（2026-09-08）"
+}

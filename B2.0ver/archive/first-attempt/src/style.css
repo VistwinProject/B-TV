@@ -1,0 +1,663 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   B 區 感應光寓 · TV 主顯示 — 全域樣式
+   設計 token 與 F 區 / B 桌面投影 (vibenfc) 對齊,主色 teal #009393。
+   尺寸以大尺寸 TV 為前提,全用 clamp(vw/vh) 自適應。
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* 主字型:TASA Orbiter(變體字型,拉丁/數字);中文自動 fallback 到中文字型 */
+@font-face {
+  font-family: 'TASA Orbiter';
+  src: url('./fonts/TASAOrbiter-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* 中文字型:GlowSans TC Condensed(窄體 ≈0.9 字寬)*/
+@font-face { font-family: 'GlowSans TC'; src: url('./fonts/GlowSansTC-Condensed-Light.otf') format('opentype');   font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GlowSans TC'; src: url('./fonts/GlowSansTC-Condensed-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GlowSans TC'; src: url('./fonts/GlowSansTC-Condensed-Medium.otf') format('opentype');  font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GlowSans TC'; src: url('./fonts/GlowSansTC-Condensed-Bold.otf') format('opentype');    font-weight: 700; font-style: normal; font-display: swap; }
+
+:root {
+  /* 藍白玻璃主題:主色由 teal 改為電光藍;底色由近黑改為藍白亮調。 */
+  --accent:      #2f7bff;
+  --accent-2:    #5b9dff;
+  --accent-deep: #1657d6;
+  --accent-glow: rgba(47, 123, 255, 0.28);
+
+  --c-bg:       #050d1f;
+  --c-text:     #eaf1ff;
+  --c-text-dim: #7f96bd;
+
+  --good:  #2f7bff;
+  --warn:  #f59e0b;
+  --info:  #6f8ba0;
+  --down:  #f43f5e;
+
+  --font-cjk:     'TASA Orbiter', 'GlowSans TC', 'Chiron Hei HK', sans-serif;
+  --font-display: 'TASA Orbiter', 'GlowSans TC', 'Space Grotesk', sans-serif;
+  --font-hud:     'TASA Orbiter', 'GlowSans TC', 'JetBrains Mono', monospace;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --scene-accent: var(--accent);  /* 場景 / loop 由 App 以 inline 覆寫 */
+  --dim-tint:     var(--accent);  /* 當前維度主色,由 Scene 覆寫 */
+
+  /* ── 待機頁配色(按 E 開編輯面板可即時調;這裡是預設值)────────────────────
+     StyleTuner 會把調整結果覆寫在 :root inline style,並存進 localStorage。
+     調好後按面板的「複製 CSS」把值貼回這一段固化。 */
+  --idle-bg-1:  #121263;   /* 底色漸層 · 起點(左上)*/
+  --idle-bg-2:  #121c49;   /* 底色漸層 · 中段 */
+  --idle-bg-3:  #000019;   /* 底色漸層 · 終點(右下,近黑)*/
+  --idle-haze:  #308acf;   /* 中央大範圍藍霧 */
+  --beam-core:  #ffffff;   /* 光束核心 */
+  --beam-inner: #ade5ff;   /* 光束內暈 */
+  --beam-glow:  #8ad2ff;   /* 光束中暈 */
+  --beam-edge:  #2e9aff;   /* 光束外暈 */
+  --idle-title: #7ac3ff;   /* 大標 感應光寓(前言/結語的字與聲紋也吃這個)*/
+  --idle-sub:   #7ac3ff;   /* 英文 SENSING RESIDENCE */
+  --idle-hint:  #7ac3ff;   /* 小標 請入座… */
+
+  /* 光束本體改由 SVG 畫(三點造型 + 頭中尾寬度),見 components/IdleBeam.jsx;
+     幾何存 src/beamStore.js,顏色仍吃上面這幾個 --beam-* 變數。 */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { width: 100%; height: 100%; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-cjk);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: none;            /* kiosk — 無指標 */
+}
+
+/* ── Stage ─────────────────────────────────────────────────────────────────── */
+.stage {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  /* 第二頁起(前言 / 房屋資訊 / 選角色 / 結語):與待機頁同一組配色,
+     只差沒有光束。1-5 情境牆由 .scene-cols 自己畫底,不吃這層。 */
+  background:
+    radial-gradient(ellipse 60% 56% at 50% 44%,
+      color-mix(in srgb, var(--scene-accent) 12%, transparent) 0%,
+      color-mix(in srgb, var(--scene-accent) 4%, transparent) 40%,
+      transparent 70%),
+    radial-gradient(120% 90% at 50% 6%,
+      color-mix(in srgb, var(--beam-glow) 9%, transparent) 0%,
+      transparent 46%),
+    radial-gradient(115% 85% at 50% 50%,
+      color-mix(in srgb, var(--idle-haze) 7%, transparent) 0%,
+      color-mix(in srgb, var(--idle-haze) 0%, transparent) 66%),
+    linear-gradient(150deg,
+      var(--idle-bg-1) 0%, var(--idle-bg-2) 45%, var(--idle-bg-3) 100%);
+  transition: background 0.8s var(--ease);
+}
+/* 待機頁(第一頁):深藍夜幕 + 左下→右上斜射光束
+   角度:光束沿 16:9 對角線(60.6deg),漸層方向必須垂直於它 → 150.6deg。
+   疊層由上往下:①四角壓暗 ②光束(白核→淺藍→藍暈)③大範圍藍霧 ④深藍底。 */
+.stage--idle {
+  background:
+    radial-gradient(115% 85% at 50% 50%,
+      color-mix(in srgb, var(--idle-haze) 7%, transparent) 0%,
+      color-mix(in srgb, var(--idle-haze) 0%, transparent) 66%),
+    linear-gradient(150deg,
+      var(--idle-bg-1) 0%, var(--idle-bg-2) 45%, var(--idle-bg-3) 100%);
+}
+.stage__vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(rgba(150,190,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150,190,255,0.045) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 30%, transparent 82%);
+}
+
+/* ── Screen layer ──────────────────────────────────────────────────────────── */
+.screen {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  padding: clamp(28px, 5vh, 80px);
+}
+
+/* ══ Idle ═══════════════════════════════════════════════════════════════════ */
+.idle { position: relative; display: grid; place-items: center; text-align: center; gap: clamp(8px, 1.6vh, 20px); }
+.idle__halo {
+  position: absolute; width: clamp(380px, 60vh, 720px); height: clamp(380px, 60vh, 720px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 62%);
+  z-index: -1;
+}
+.idle__title {
+  /* 不用 GlowSans Condensed(≈0.9 窄體)→ 改 Chiron Hei HK,字身回到 1:1 正比例 */
+  font-family: 'Chiron Hei HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  /* text-indent 補償尾端字距,置中才不會被推左半格(小標/英文同樣處理 → 三行切齊)*/
+  font-size: clamp(56px, 12vh, 150px); letter-spacing: 0.16em; text-indent: 0.16em;
+  /* 不加光暈 / 脈動 → 忠實呈現 #95c1ee 本色 */
+  color: var(--idle-title);
+  /* 糊糊的深藍陰影:上緣很淡,往下逐層加重、擴散變大 */
+  text-shadow:
+    0 -3px 14px rgba(6,16,40,0.16),
+    0 4px 16px rgba(5,13,34,0.42),
+    0 11px 30px rgba(4,11,30,0.55),
+    0 22px 48px rgba(3,9,26,0.40);
+  /* 背景字體反光:往下映一道漸淡倒影 */
+  -webkit-box-reflect: below 0.12em linear-gradient(transparent 52%, rgba(255,255,255,0.22) 100%);
+}
+.idle__sub {
+  /* 細筆畫 + 窄長字身:Barlow Condensed 200,字距拉開;細線條怕糊,光暈只留很淡一層 */
+  font-family: 'Barlow Semi Condensed', 'Barlow Condensed', 'Roboto Condensed', sans-serif;
+  font-weight: 200; font-size: clamp(18px, 2.7vh, 34px);
+  /* 字距收小、單字之間拉開(word-spacing 補回總寬 → 仍與大標切齊)*/
+  letter-spacing: 0.62em; text-indent: 0.62em; word-spacing: 1.92em; color: var(--idle-sub);
+  text-shadow: 0 2px 8px rgba(6,16,38,0.5);
+  -webkit-box-reflect: below 0.3em linear-gradient(transparent 55%, rgba(180,215,255,0.12) 100%);
+}
+.idle__hint {
+  margin-top: clamp(16px, 3vh, 40px);
+  font-size: clamp(15px, 2.2vh, 26px); letter-spacing: 1.061em; text-indent: 1.061em;
+  color: var(--idle-hint);
+  /* 斜射光束會從這行底下穿過 → 墊深藍外暈,壓在光束上仍讀得清楚 */
+  text-shadow:
+    0 0 10px rgba(4,12,30,0.95),
+    0 0 26px rgba(4,12,30,0.85),
+    0 2px 6px rgba(4,12,30,0.9);
+}
+
+/* 商標:置中、靠畫面下緣(比例對齊主視覺:寬約畫面 12%、下緣留 8%)。
+   顏色不吃圖檔:PNG 只當 alpha 遮罩,填色用 --idle-title 家族的漸層 —— 左上亮、
+   右下沉,像被上方那道光帶斜照到。 */
+.idle__logo {
+  position: fixed; left: 50%; bottom: clamp(30px, 8vh, 90px);
+  transform: translateX(-50%);
+  width: clamp(120px, 12vw, 260px); aspect-ratio: 227 / 46;
+  pointer-events: none;
+  background: linear-gradient(148deg,
+    #dcefff 0%,
+    #a9dbff 24%,
+    var(--idle-title, #7ac3ff) 56%,
+    color-mix(in srgb, var(--idle-title, #7ac3ff) 62%, #10315a) 100%);
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+}
+
+/* ── 待機頁光束(SVG;三點造型 + 頭中尾寬度)──────────────────────────────── */
+.idlebeam { position: absolute; inset: 0; pointer-events: none; }
+.idlebeam--edit .idlebeam__handles { pointer-events: auto; }
+/* 編輯模式:文字層讓開,否則它蓋在光束上面會攔截掉造型點的滑鼠事件 */
+body.editing .screen { pointer-events: none; }
+
+/* ══ 配色編輯面板(按 E;僅佈展調色用,kiosk 播放時不出現)═══════════════════ */
+body.editing { cursor: auto; }
+body.editing .tuner input { cursor: pointer; }
+.tuner {
+  position: fixed; top: 16px; right: 16px; z-index: 10000;
+  width: 330px; max-height: calc(100vh - 32px);
+  display: flex; flex-direction: column;
+  background: rgba(8, 14, 34, 0.94);
+  border: 1px solid rgba(140, 180, 255, 0.28);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  font-family: var(--font-hud); color: #dbe7ff;
+  backdrop-filter: blur(8px);
+  user-select: none;
+}
+.tuner__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 11px 13px; border-bottom: 1px solid rgba(140, 180, 255, 0.18);
+  font-size: 13px; letter-spacing: 0.06em;
+  cursor: grab;   /* 拖標題列可搬動面板 */
+}
+.tuner__head:active { cursor: grabbing; }
+.tuner__head span { font-size: 11px; opacity: 0.55; }
+/* flex 直排裡 min-height 預設 auto → 內容變多時這一段不會縮,底部的按鈕列會被推出面板外。
+   flex:1 1 auto + min-height:0 才會讓它自己捲。 */
+.tuner__list { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 13px 4px; }
+.tuner__row { padding: 7px 0; border-bottom: 1px solid rgba(140, 180, 255, 0.1); }
+.tuner__row:last-child { border-bottom: 0; }
+.tuner__top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.tuner__top input[type='color'] {
+  width: 26px; height: 22px; padding: 0; flex: none;
+  background: none; border: 1px solid rgba(160,195,255,0.35); border-radius: 4px;
+}
+.tuner__label { flex: 1; font-size: 12px; letter-spacing: 0.02em; }
+.tuner__hex {
+  width: 74px; flex: none; padding: 3px 5px;
+  background: rgba(255,255,255,0.06); color: #cfe0ff;
+  border: 1px solid rgba(160,195,255,0.22); border-radius: 4px;
+  font-family: var(--font-hud); font-size: 11px; text-align: center;
+}
+.tuner__group {
+  margin: 6px 0 2px; padding-top: 4px;
+  font-size: 11px; letter-spacing: 0.14em; opacity: 0.5; text-transform: uppercase;
+}
+.tuner__tip { margin: 0 0 6px; font-size: 11px; line-height: 1.5; opacity: 0.6; }
+.tuner__tip b { color: #9fd4ff; font-weight: 600; }
+/* 段落標題右側的小徽章(此情境專屬 / 五個情境共用…)*/
+.tuner__badge {
+  float: right; font-style: normal; letter-spacing: 0.04em; text-transform: none;
+  padding: 1px 6px; border-radius: 999px; font-size: 10px;
+  background: rgba(90, 150, 255, 0.18); color: #bcd9ff;
+}
+/* 小動作鈕列;--seg 是連成一條的多段切換 */
+.tuner__acts { display: flex; gap: 6px; margin: 8px 0 2px; }
+.tuner__acts--seg { gap: 3px; }
+.tuner__acts button {
+  flex: 1; padding: 5px 0;
+  background: rgba(90, 150, 255, 0.14); color: #dbe7ff;
+  border: 1px solid rgba(140, 180, 255, 0.26); border-radius: 6px;
+  font-family: var(--font-hud); font-size: 11px; cursor: pointer;
+}
+.tuner__acts button:hover:not(:disabled) { background: rgba(90, 150, 255, 0.26); }
+.tuner__acts button:disabled { opacity: 0.35; cursor: default; }
+.tuner__acts button.is-on {
+  background: rgba(120, 190, 255, 0.34);
+  border-color: rgba(160, 210, 255, 0.6); color: #eaf4ff;
+}
+.tuner .tuner__sl--geo { height: 26px; }
+.tuner .tuner__sl--geo i { width: 104px; flex: none; font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tuner .tuner__sl--geo u { width: 46px; flex: none; }
+.tuner__sl { display: flex; align-items: center; gap: 7px; height: 17px; }
+.tuner__sl i { width: 10px; flex: none; font-style: normal; font-size: 10px; opacity: 0.55; }
+.tuner__sl u { width: 26px; text-align: right; font-size: 10px; opacity: 0.6; text-decoration: none; }
+.tuner__sl input[type='range'] { flex: 1; height: 3px; accent-color: #6fb4ff; }
+.tuner__foot { flex: none; display: flex; gap: 8px; padding: 10px 13px; border-top: 1px solid rgba(140,180,255,0.18); }
+.tuner__foot button {
+  flex: 1; padding: 7px 0;
+  background: rgba(90, 150, 255, 0.16); color: #dbe7ff;
+  border: 1px solid rgba(140, 180, 255, 0.3); border-radius: 6px;
+  font-family: var(--font-hud); font-size: 12px; cursor: pointer;
+}
+.tuner__foot button:hover { background: rgba(90, 150, 255, 0.28); }
+
+/* ══ Intro / Outro (AI 聲紋) ═══════════════════════════════════════════════════ */
+.intro, .outro {
+  position: relative; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  gap: clamp(24px, 4vh, 56px); width: min(1100px, 88vw);
+}
+.intro__eyebrow, .outro__eyebrow {
+  font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 19px);
+  letter-spacing: 0.5em; text-indent: 0.5em; color: var(--accent-2);
+  text-transform: uppercase;
+}
+/* 前言(第二畫面)的「AI 聲紋」字樣改白 */
+.intro__eyebrow, .outro__eyebrow { color: var(--idle-title); text-shadow: 0 1px 10px rgba(11,28,60,0.4); }
+.intro__line {
+  font-size: clamp(22px, 3.6vh, 44px); font-weight: 500; line-height: 1.6;
+  letter-spacing: 0.04em; max-width: 24ch;
+  color: var(--idle-title);
+}
+/* 倒數時的深色遮罩(蓋滿全螢幕,只在 3/2/1 淡入)*/
+.intro__dim {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: rgba(2, 6, 16, 0.55);
+}
+.intro__count {
+  z-index: 2;
+  /* 用 inset+margin auto 置中(不佔用 transform,避免被 framer 的 scale 動畫蓋掉)*/
+  position: absolute; inset: 0; margin: auto;
+  width: fit-content; height: fit-content;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(160px, 36vh, 420px); color: var(--idle-title);
+  /* 白色數字 + 底光(光從下方往外散)*/
+  text-shadow:
+    0 0 24px rgba(255,255,255,0.3),
+    0 22px 55px color-mix(in srgb, var(--accent) 70%, transparent),
+    0 42px 100px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.outro__line {
+  color: var(--idle-title);
+  font-weight: 700; font-size: clamp(34px, 6vh, 76px); letter-spacing: 0.06em;
+  text-shadow: 0 0 40px var(--accent-glow);
+}
+.outro__sub {
+  font-size: clamp(12px, 1.8vh, 20px); letter-spacing: 0.24em; color: var(--idle-title);
+  text-shadow: 0 1px 10px rgba(11,28,60,0.4);
+}
+
+/* ── Voiceprint ────────────────────────────────────────────────────────────── */
+.voiceprint {
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(3px, 0.5vw, 7px); height: clamp(120px, 22vh, 260px);
+  width: min(1000px, 84vw);
+}
+.voiceprint__bar {
+  flex: 1 1 0; min-width: 0; height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--vp-accent) 30%, transparent),
+    var(--vp-accent));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--vp-accent) 50%, transparent);
+  transform-origin: center;
+}
+
+/* ══ Prompt (放置提示) ═══════════════════════════════════════════════════════ */
+.prompt {
+  position: relative; display: grid; place-items: center; text-align: center;
+}
+.prompt__eyebrow {
+  position: absolute; bottom: calc(100% + clamp(28px, 5vh, 64px));
+  left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px);
+  letter-spacing: 0.44em; text-indent: 0.44em; color: var(--c-text-dim);
+  text-transform: uppercase;
+}
+.prompt__text {
+  position: absolute; top: calc(100% + clamp(32px, 5.5vh, 72px));
+  left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(10px, 1.6vh, 20px); width: max-content; max-width: 90vw;
+}
+.prompt__title {
+  font-weight: 700; font-size: clamp(32px, 5.2vh, 64px);
+  letter-spacing: 0.06em; line-height: 1.15;
+}
+.prompt__sub {
+  font-size: clamp(16px, 2.3vh, 28px); color: var(--c-text-dim);
+  letter-spacing: 0.04em; max-width: 32ch;
+}
+
+/* 角色提示(列表版,不用置中 ring 佈局)*/
+.prompt--character {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: clamp(20px, 3.4vh, 44px); width: min(1100px, 90vw);
+}
+.prompt__title--top { position: static; transform: none; }
+.prompt__sub--bottom { position: static; transform: none; }
+.prompt--character .prompt__eyebrow { position: static; transform: none; }
+
+.persona-list {
+  list-style: none; display: flex; flex-direction: column;
+  gap: clamp(10px, 1.5vh, 18px); width: 100%;
+}
+.persona-list__item {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+  gap: clamp(16px, 2.5vw, 36px);
+  padding: clamp(14px, 2vh, 24px) clamp(22px, 3vw, 40px);
+  border-radius: 16px;
+  /* 拿掉彩色底,只留各自顏色的外框 */
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--p-accent) 55%, transparent);
+}
+.persona-list__no {
+  font-family: var(--font-hud); font-size: clamp(16px, 2.4vh, 28px);
+  font-weight: 700; color: var(--p-accent);
+}
+.persona-list__q {
+  text-align: left; font-size: clamp(20px, 3vh, 38px); font-weight: 500;
+  letter-spacing: 0.03em;
+}
+.persona-list__name {
+  font-family: var(--font-display); font-size: clamp(14px, 1.9vh, 22px);
+  letter-spacing: 0.18em; color: color-mix(in srgb, var(--p-accent) 60%, var(--c-text));
+}
+
+/* ══ House info(房屋即時資訊)═══════════════════════════════════════════════ */
+.house { display: flex; flex-direction: column; align-items: center; gap: clamp(24px, 4vh, 52px); width: min(1280px, 92vw); }
+.house__head { text-align: center; display: grid; gap: clamp(8px, 1.2vh, 14px); }
+.house__eyebrow {
+  font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 19px);
+  letter-spacing: 0.42em; text-indent: 0.42em; color: var(--accent-2); text-transform: uppercase;
+}
+.house__title { font-weight: 700; font-size: clamp(30px, 4.6vh, 58px); letter-spacing: 0.04em; }
+.house__live {
+  display: inline-flex; align-items: center; gap: 10px; justify-self: center;
+  font-family: var(--font-hud); font-size: clamp(12px, 1.5vh, 17px);
+  letter-spacing: 0.24em; color: var(--good);
+}
+.house__livedot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px var(--good); animation: blink 1.4s var(--ease) infinite; }
+
+.house__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.8vw, 26px); width: 100%;
+}
+.stat {
+  display: flex; flex-direction: column; gap: clamp(8px, 1.2vh, 14px);
+  padding: clamp(18px, 2.6vh, 32px) clamp(18px, 2vw, 30px);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 4px solid var(--good);
+}
+.stat--warn { border-left-color: var(--warn); }
+.stat--info { border-left-color: var(--info); }
+.stat--good { border-left-color: var(--good); }
+.stat__icon { width: clamp(34px, 4.4vh, 52px); height: clamp(34px, 4.4vh, 52px); color: var(--accent-2); }
+.stat--warn .stat__icon { color: var(--warn); }
+.stat--info .stat__icon { color: var(--info); }
+.stat__icon svg { width: 100%; height: 100%; }
+.stat__label { font-size: clamp(14px, 1.9vh, 22px); color: var(--c-text-dim); letter-spacing: 0.04em; }
+.stat__value {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(34px, 5.4vh, 68px); line-height: 1; letter-spacing: 0.01em;
+}
+.stat__unit { font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px); font-weight: 500; color: var(--c-text-dim); margin-left: 6px; }
+.stat__text { font-family: var(--font-cjk); font-weight: 700; font-size: clamp(26px, 4vh, 46px); }
+
+/* ══ Scene(依序解方展演)══════════════════════════════════════════════════════ */
+.scene {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(16px, 2.6vh, 36px); width: min(1300px, 94vw); height: 100%;
+  justify-content: center;
+}
+.scene__head { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.scene__persona { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 4vh, 48px); letter-spacing: 0.1em; }
+.scene__persona-title { font-size: clamp(15px, 2vh, 24px); color: var(--c-text-dim); letter-spacing: 0.1em; }
+
+.scene__rail { display: flex; gap: clamp(10px, 1.6vw, 24px); }
+.rail__item {
+  display: flex; align-items: center; gap: 10px;
+  padding: clamp(8px, 1.2vh, 14px) clamp(14px, 1.6vw, 24px);
+  border-radius: 999px; border: 1px solid rgba(255,255,255,0.08);
+  color: var(--c-text-dim); transition: all 0.4s var(--ease);
+}
+.rail__idx { font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px); }
+.rail__label { font-size: clamp(14px, 1.9vh, 22px); letter-spacing: 0.06em; }
+.rail__item--active {
+  color: #fff; border-color: var(--rail-tint);
+  background: color-mix(in srgb, var(--rail-tint) 18%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--rail-tint) 35%, transparent);
+}
+.rail__item--active .rail__idx { color: var(--rail-tint); }
+.rail__item--done { color: color-mix(in srgb, var(--rail-tint) 70%, var(--c-text-dim)); border-color: color-mix(in srgb, var(--rail-tint) 30%, transparent); }
+
+.scene__stage { flex: 1 1 auto; width: 100%; display: grid; place-items: center; min-height: 0; }
+.dim {
+  display: grid; grid-template-columns: clamp(300px, 38vw, 520px) 1fr;
+  align-items: center; gap: clamp(30px, 5vw, 80px); width: 100%;
+}
+.dim__visual {
+  position: relative; aspect-ratio: 1; width: 100%; max-width: clamp(300px, 36vh, 480px);
+  justify-self: center; display: grid; place-items: center;
+}
+.dim__info { display: flex; flex-direction: column; gap: clamp(12px, 1.8vh, 22px); }
+.dim__tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px);
+  letter-spacing: 0.18em; color: var(--dim-tint); text-transform: uppercase;
+}
+.dim__tag-idx { font-size: 1.2em; }
+.dim__tag-icon { width: clamp(20px, 2.6vh, 30px); height: clamp(20px, 2.6vh, 30px); }
+.dim__headline { font-weight: 700; font-size: clamp(30px, 5vh, 62px); letter-spacing: 0.03em; line-height: 1.12; }
+.dim__detail { font-size: clamp(16px, 2.4vh, 28px); color: var(--c-text-dim); line-height: 1.55; max-width: 30ch; }
+.dim__metrics { display: flex; align-items: flex-end; gap: clamp(24px, 3vw, 48px); margin-top: clamp(8px, 1.4vh, 18px); flex-wrap: wrap; }
+.metric { display: flex; flex-direction: column; gap: 6px; }
+.metric__value { font-family: var(--font-display); font-weight: 700; font-size: clamp(36px, 6vh, 76px); line-height: 1; color: #fff; }
+.metric__unit { font-family: var(--font-hud); font-size: 0.4em; font-weight: 500; color: var(--c-text-dim); margin-left: 6px; }
+.metric__note { font-size: clamp(13px, 1.7vh, 19px); color: var(--c-text-dim); letter-spacing: 0.08em; }
+.dim__sound {
+  align-self: center;
+  font-family: var(--font-hud); font-size: clamp(15px, 2vh, 24px); letter-spacing: 0.1em;
+  padding: clamp(8px, 1.2vh, 14px) clamp(16px, 1.8vw, 26px); border-radius: 999px;
+  color: var(--dim-tint); border: 1px solid color-mix(in srgb, var(--dim-tint) 50%, transparent);
+  background: color-mix(in srgb, var(--dim-tint) 14%, transparent);
+}
+.scene__sync {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-hud); font-size: clamp(12px, 1.6vh, 18px);
+  letter-spacing: 0.16em; color: var(--c-text-dim);
+}
+.scene__sync-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim-tint); box-shadow: 0 0 12px var(--dim-tint); animation: blink 1.2s var(--ease) infinite; }
+
+/* ── 維度視覺 ──────────────────────────────────────────────────────────────── */
+.viz { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
+
+/* ① 光照 */
+.viz-light__glow { position: absolute; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(circle, var(--dim-tint) 0%, transparent 65%); filter: blur(8px); }
+.viz-light__bulb { width: 34%; height: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff 0%, var(--dim-tint) 60%, color-mix(in srgb, var(--dim-tint) 50%, #000) 100%); }
+.viz-light__ray { position: absolute; top: 50%; left: 50%; width: 4px; height: 46%; transform-origin: top center; translate: -50% 0; background: linear-gradient(to bottom, var(--dim-tint), transparent); border-radius: 999px; }
+
+/* ② 空氣 */
+.viz-air__fan { position: absolute; width: 42%; height: 42%; display: grid; place-items: center; opacity: 0.5; }
+.viz-air__blade { position: absolute; width: 50%; height: 16%; border-radius: 999px; background: color-mix(in srgb, var(--dim-tint) 60%, transparent); transform-origin: left center; left: 50%; }
+.viz-air__particle { position: absolute; bottom: 0; border-radius: 50%; background: var(--dim-tint); box-shadow: 0 0 12px var(--dim-tint); }
+
+/* ③ 溫濕度 */
+.viz-temp { gap: 0; }
+.viz-temp__thermo { position: relative; width: 14%; height: 64%; border-radius: 999px; border: 3px solid color-mix(in srgb, var(--dim-tint) 60%, transparent); display: flex; align-items: flex-end; padding: 6px; }
+.viz-temp__mercury { width: 100%; border-radius: 999px; background: linear-gradient(to top, var(--dim-tint), color-mix(in srgb, var(--dim-tint) 50%, #fff)); box-shadow: 0 0 20px var(--dim-tint); }
+.viz-temp__bulb { position: absolute; bottom: -8%; left: 50%; translate: -50% 0; width: 220%; aspect-ratio: 1; border-radius: 50%; background: var(--dim-tint); box-shadow: 0 0 24px var(--dim-tint); }
+.viz-temp__drops { position: absolute; inset: 0; }
+.viz-temp__drop { position: absolute; top: 0; width: 10px; height: 16px; border-radius: 0 50% 50% 50%; rotate: 45deg; background: color-mix(in srgb, var(--dim-tint) 70%, #fff); box-shadow: 0 0 10px var(--dim-tint); }
+
+/* ④ 聲音 */
+.viz-sound__eq { display: flex; align-items: center; justify-content: center; gap: clamp(4px, 0.8vw, 10px); width: 86%; height: 60%; }
+.viz-sound__bar { flex: 1; height: 100%; border-radius: 999px; transform-origin: center; background: linear-gradient(to top, color-mix(in srgb, var(--dim-tint) 30%, transparent), var(--dim-tint)); box-shadow: 0 0 12px color-mix(in srgb, var(--dim-tint) 50%, transparent); }
+.viz-sound__label { position: absolute; bottom: 4%; font-family: var(--font-hud); font-size: clamp(15px, 2.2vh, 28px); letter-spacing: 0.16em; color: var(--dim-tint); }
+
+/* ══ Loop(情境體驗中)═══════════════════════════════════════════════════════ */
+.loop { position: relative; display: grid; place-items: center; text-align: center; gap: clamp(12px, 1.8vh, 22px); }
+.loop__status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px); letter-spacing: 0.3em; color: color-mix(in srgb, var(--scene-accent) 70%, #fff); }
+.loop__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--scene-accent); box-shadow: 0 0 12px var(--scene-accent); animation: blink 1.4s var(--ease) infinite; }
+.loop__name { font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 3.6vh, 42px); letter-spacing: 0.08em; color: #fff; }
+.loop__title { font-weight: 700; font-size: clamp(28px, 4.6vh, 54px); letter-spacing: 0.06em; }
+.loop__line { font-size: clamp(16px, 2.2vh, 26px); letter-spacing: 0.03em; }
+.loop__summary { display: flex; gap: clamp(12px, 1.6vw, 24px); margin-top: clamp(10px, 1.6vh, 20px); flex-wrap: wrap; justify-content: center; }
+.loop__chip {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: clamp(12px, 1.8vh, 20px) clamp(16px, 2vw, 28px); border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--chip-tint) 36%, transparent);
+  background: color-mix(in srgb, var(--chip-tint) 10%, transparent);
+  min-width: clamp(120px, 14vw, 180px);
+}
+.loop__chip-icon { width: clamp(26px, 3.2vh, 40px); height: clamp(26px, 3.2vh, 40px); color: var(--chip-tint); }
+.loop__chip-label { font-size: clamp(13px, 1.7vh, 20px); color: var(--c-text-dim); letter-spacing: 0.1em; }
+.loop__chip-val { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 3vh, 34px); }
+.loop__chip-val i { font-family: var(--font-hud); font-style: normal; font-size: 0.5em; color: var(--c-text-dim); margin-left: 4px; }
+.loop__hint { margin-top: clamp(10px, 1.6vh, 20px); font-family: var(--font-hud); font-size: clamp(13px, 1.7vh, 20px); letter-spacing: 0.2em; color: var(--c-text-dim); }
+
+/* ── Sensor ring(感應目標)──────────────────────────────────────────────────── */
+.sensor { --d: clamp(240px, 36vh, 400px); position: relative; width: var(--d); height: var(--d); display: grid; place-items: center; }
+.sensor > * { grid-area: 1 / 1; }
+.sensor__pulse { width: var(--d); height: var(--d); border-radius: 50%; border: 2px solid var(--ring-accent, var(--accent)); opacity: 0; animation: sensor-pulse 2.6s ease-out infinite; }
+.sensor__pulse:nth-of-type(2) { animation-delay: 0.86s; }
+.sensor__pulse:nth-of-type(3) { animation-delay: 1.72s; }
+@keyframes sensor-pulse { 0% { transform: scale(0.55); opacity: 0.55; } 100% { transform: scale(1.5); opacity: 0; } }
+.sensor__ring { border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--ring-accent, var(--accent)) 55%, transparent); }
+.sensor__ring--outer { width: var(--d); height: var(--d); box-shadow: 0 0 60px color-mix(in srgb, var(--ring-accent, var(--accent)) 30%, transparent), inset 0 0 50px color-mix(in srgb, var(--ring-accent, var(--accent)) 14%, transparent); }
+.sensor__ring--inner { width: calc(var(--d) * 0.6); height: calc(var(--d) * 0.6); border-color: color-mix(in srgb, var(--ring-accent, var(--accent)) 75%, transparent); }
+.sensor__sweep { width: calc(var(--d) * 0.92); height: calc(var(--d) * 0.92); border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg, color-mix(in srgb, var(--ring-accent, var(--accent)) 42%, transparent) 60deg, transparent 120deg, transparent 360deg); mask: radial-gradient(circle, transparent 38%, #000 39%, #000 49%, transparent 50%); -webkit-mask: radial-gradient(circle, transparent 38%, #000 39%, #000 49%, transparent 50%); animation: sensor-sweep 4s linear infinite; }
+@keyframes sensor-sweep { to { transform: rotate(360deg); } }
+.sensor__core { width: calc(var(--d) * 0.6); height: calc(var(--d) * 0.6); border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--ring-accent, var(--accent)) 22%, transparent) 0%, transparent 70%); }
+.sensor__icon { width: calc(var(--d) * 0.3); height: calc(var(--d) * 0.3); color: color-mix(in srgb, var(--ring-accent, var(--accent)) 50%, #fff); display: grid; place-items: center; filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ring-accent, var(--accent)) 60%, transparent)); }
+.prompt__glyph { width: 100%; height: 100%; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* ── Confirm ripple ────────────────────────────────────────────────────────── */
+.confirm { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 5; }
+.confirm__ring { position: absolute; width: clamp(240px, 36vh, 400px); height: clamp(240px, 36vh, 400px); border-radius: 50%; border: 2.5px solid var(--confirm-accent); box-shadow: 0 0 40px var(--confirm-accent); opacity: 0; animation: confirm-ring 1s ease-out forwards; }
+.confirm__ring--2 { animation-delay: 0.12s; }
+@keyframes confirm-ring { 0% { transform: scale(0.4); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+.confirm__check { position: absolute; width: clamp(80px, 12vh, 130px); height: clamp(80px, 12vh, 130px); color: var(--confirm-accent); filter: drop-shadow(0 0 16px var(--confirm-accent)); transform: scale(0); animation: confirm-check 1.4s ease-out forwards; }
+.confirm__check svg { width: 100%; height: 100%; }
+@keyframes confirm-check { 0% { transform: scale(0); opacity: 0; } 25% { transform: scale(1.15); opacity: 1; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+
+/* ── Ops status dot ────────────────────────────────────────────────────────── */
+.statusdot { position: absolute; bottom: 20px; right: 24px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-hud); font-size: 12px; letter-spacing: 0.16em; color: var(--c-text-dim); opacity: 0.5; z-index: 10; }
+.statusdot__led { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.statusdot__phase { opacity: 0.6; padding-left: 8px; border-left: 1px solid currentColor; }
+.statusdot--live { color: var(--accent-2); }
+.statusdot--idle { color: var(--warn); }
+.statusdot--down { color: var(--down); }
+.statusdot--live .statusdot__led { box-shadow: 0 0 8px currentColor; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WHITE 版（branch: white）— 底色全白、字轉藍
+   放在檔案最後 → 同權重時覆蓋前面的深色設定,要回深色版把這整段刪掉即可。
+   1-5 情境牆(.scene-cols)這一版「只換底色」,卡片與字色不動(見 bento.css 末段)。
+   ══════════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* 待機頁:白底 + 右下淡藍,光束改成藍色發光(白底上白核心會消失 → 暈色加重) */
+  --idle-bg-1:  #ffffff;
+  --idle-bg-2:  #eef5ff;
+  --idle-bg-3:  #d7e6fa;
+  --idle-haze:  #bcd8fb;
+  --beam-core:  #ffffff;
+  --beam-inner: #7cc0ff;
+  --beam-glow:  #2f8dfb;
+  --beam-edge:  #1668dd;
+  /* 三行字:深藍大標 / 中藍英文 / 藍色提示 */
+  --idle-title: #1b3f8f;
+  --idle-sub:   #6a8cc8;
+  --idle-hint:  #2a56a8;
+  /* 全域:底白、字藍 */
+  --c-bg:       #ffffff;
+  --c-text:     #17357a;
+  --c-text-dim: #5b7cb8;
+}
+
+/* 格線:淺色線在白底上看不見 → 換成淡藍灰 */
+.stage__vignette {
+  background:
+    linear-gradient(rgba(70,110,180,0.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(70,110,180,0.10) 1px, transparent 1px);
+}
+
+/* 大標陰影:深藍模糊在白底上會變成髒污 → 換成很淡的藍灰,只留一點厚度 */
+.idle__title {
+  text-shadow:
+    0 2px 10px rgba(120,155,215,0.22),
+    0 8px 22px rgba(110,145,205,0.18),
+    0 18px 40px rgba(105,140,200,0.12);
+  -webkit-box-reflect: below 0.12em linear-gradient(transparent 52%, rgba(60,105,180,0.16) 100%);
+}
+.idle__sub {
+  text-shadow: 0 2px 8px rgba(120,155,215,0.28);
+  -webkit-box-reflect: below 0.3em linear-gradient(transparent 55%, rgba(60,105,180,0.12) 100%);
+}
+/* 提示原本墊深藍外暈(壓在光束上用)→ 白底改墊白色,才不會出現黑圈 */
+.idle__hint {
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.95),
+    0 0 26px rgba(255,255,255,0.85),
+    0 2px 6px rgba(255,255,255,0.9);
+}
+/* 中央柔光:白底上白色看不到 → 換淡藍 */
+.idle__halo { background: radial-gradient(circle, rgba(150,195,250,0.30) 0%, transparent 62%); }
+
+/* 商標:改成藍色漸層(仍保留「被上方光帶照到」的方向感) */
+.idle__logo {
+  background: linear-gradient(148deg,
+    #6fb4ff 0%,
+    #2f8dfb 26%,
+    var(--idle-title, #1b3f8f) 62%,
+    color-mix(in srgb, var(--idle-title, #1b3f8f) 88%, #08214f) 100%);
+}
+
+/* 情境鑰匙圈那頁:五列改成跟 1-5 一樣的平塗色塊 + 白字
+   平塗色用該角色的 accent 混 20% 暖灰(與 sceneColorStore 的 fillColor() 同一套算法),
+   原值亮度偏高,直接鋪白字會糊。 */
+.persona-list__item {
+  background: color-mix(in srgb, var(--p-accent) 80%, #4a4a30);
+  border: 0;
+  color: #ffffff;
+}
+.persona-list__no   { color: rgba(255,255,255,0.72); }
+.persona-list__q    { color: #ffffff; }
+.persona-list__name { color: rgba(255,255,255,0.78); }

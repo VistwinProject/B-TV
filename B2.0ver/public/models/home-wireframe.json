@@ -1,0 +1,1340 @@
+{
+  "source": "3d.glb",
+  "sha256": "65d34eb9d82c3668e0cdddaf1eb793b866edfeab6c83fab80d0c7915a63f2342",
+  "sourceMeshes": 604,
+  "meshes": 107,
+  "retainedCabinetObjects": [
+    {
+      "name": "Group465",
+      "firstSegment": 756,
+      "segments": 4,
+      "firstFillVertex": 27222,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group468",
+      "firstSegment": 760,
+      "segments": 4,
+      "firstFillVertex": 27228,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group469",
+      "firstSegment": 764,
+      "segments": 4,
+      "firstFillVertex": 27234,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group470",
+      "firstSegment": 768,
+      "segments": 4,
+      "firstFillVertex": 27240,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group471",
+      "firstSegment": 772,
+      "segments": 4,
+      "firstFillVertex": 27246,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group472",
+      "firstSegment": 776,
+      "segments": 4,
+      "firstFillVertex": 27252,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group477",
+      "firstSegment": 780,
+      "segments": 4,
+      "firstFillVertex": 27258,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group478",
+      "firstSegment": 784,
+      "segments": 4,
+      "firstFillVertex": 27264,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group482",
+      "firstSegment": 788,
+      "segments": 4,
+      "firstFillVertex": 27270,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group535",
+      "firstSegment": 792,
+      "segments": 4,
+      "firstFillVertex": 27276,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group560",
+      "firstSegment": 796,
+      "segments": 4,
+      "firstFillVertex": 27282,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group729",
+      "firstSegment": 853,
+      "segments": 12,
+      "firstFillVertex": 27420,
+      "fillVertexCount": 36
+    },
+    {
+      "name": "Group819",
+      "firstSegment": 869,
+      "segments": 12,
+      "firstFillVertex": 27462,
+      "fillVertexCount": 36
+    },
+    {
+      "name": "Group828",
+      "firstSegment": 881,
+      "segments": 4,
+      "firstFillVertex": 27498,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group831",
+      "firstSegment": 885,
+      "segments": 4,
+      "firstFillVertex": 27504,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group833",
+      "firstSegment": 889,
+      "segments": 4,
+      "firstFillVertex": 27510,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group841",
+      "firstSegment": 893,
+      "segments": 4,
+      "firstFillVertex": 27516,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group845",
+      "firstSegment": 897,
+      "segments": 4,
+      "firstFillVertex": 27522,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group851",
+      "firstSegment": 901,
+      "segments": 4,
+      "firstFillVertex": 27528,
+      "fillVertexCount": 6
+    },
+    {
+      "name": "Group854",
+      "firstSegment": 905,
+      "segments": 4,
+      "firstFillVertex": 27534,
+      "fillVertexCount": 6
+    }
+  ],
+  "removedRoomObjects": [
+    "3DGeom_1",
+    "3DGeom_101",
+    "Box017_1",
+    "Box018_1",
+    "Box019_1",
+    "Box020_1",
+    "Box021_1",
+    "Box022_1",
+    "Box023_1",
+    "Box024_1",
+    "Box025_1",
+    "Box026_1",
+    "Box027_1",
+    "Box028_1",
+    "Box029_1",
+    "Box030_1",
+    "Box031_1",
+    "Box032_1",
+    "Box033_1",
+    "Box034_1",
+    "Box035_1",
+    "Box036_1",
+    "Box037_1",
+    "Box038_1",
+    "Box039_1",
+    "Box040_1",
+    "Box041_1",
+    "Box042_1",
+    "Box043_1",
+    "Box044_1",
+    "Box045_1",
+    "Box046_1",
+    "Box047_1",
+    "Box048_1",
+    "Box049_1",
+    "ChamferCyl",
+    "Componen57",
+    "Componen59",
+    "Componen61",
+    "Componen62",
+    "Componen65",
+    "Cube002",
+    "Defintio01",
+    "Defintio01002",
+    "Defintio04",
+    "Defintio04002",
+    "Defintion1",
+    "Defintion1001",
+    "Donut002_1",
+    "Mesh219",
+    "Mesh278",
+    "Group269",
+    "Group271",
+    "Group273",
+    "Group275",
+    "Group281",
+    "Group282",
+    "Group283",
+    "Group305",
+    "Group443",
+    "Group447",
+    "Group539",
+    "Group539001",
+    "Group541",
+    "Group542",
+    "Group547",
+    "Group548001",
+    "Group555",
+    "Group567",
+    "Group568",
+    "Group569",
+    "Group570",
+    "Group571",
+    "Group573",
+    "Group574",
+    "Group575",
+    "Group582",
+    "Group585",
+    "Group586",
+    "Group587",
+    "Group633",
+    "Group637",
+    "Group639",
+    "Group641",
+    "Group642",
+    "Group649",
+    "Group653",
+    "Group654",
+    "Group655",
+    "Group657",
+    "Group661",
+    "Group662",
+    "Group663",
+    "Group664",
+    "Group665",
+    "Group667",
+    "Group670",
+    "Group671",
+    "Group673",
+    "Group675",
+    "Group677",
+    "Group677001",
+    "Group678",
+    "Group679",
+    "Group681",
+    "Group682",
+    "Group685",
+    "Group687",
+    "Group688",
+    "Group688001",
+    "Group688002",
+    "Group707",
+    "Group709",
+    "Group711",
+    "Group713",
+    "Group715",
+    "Group717",
+    "Group719",
+    "Group721",
+    "Group723",
+    "Group724",
+    "Group726",
+    "Group730",
+    "Group732",
+    "Group752",
+    "Group765",
+    "Group766",
+    "Group863",
+    "Group871",
+    "Group872",
+    "Group1030",
+    "Group1031",
+    "Group1032",
+    "Group1033",
+    "Group1034",
+    "Group1035",
+    "Group1036",
+    "Group1037",
+    "Group1046",
+    "Group1048",
+    "Group1050",
+    "Group1051",
+    "Group1052",
+    "Group1053",
+    "Group1055",
+    "Group1056",
+    "Group1057",
+    "Group1058",
+    "Group1060",
+    "Group1061",
+    "Group1062",
+    "Group1063",
+    "Group1065",
+    "Group1066",
+    "Group1067",
+    "Group1068",
+    "Group1070",
+    "Group1072",
+    "Group1074",
+    "Group1076",
+    "Line004_1",
+    "Line006_1",
+    "Mesh155",
+    "Mesh201",
+    "Mesh203",
+    "Mesh204",
+    "Mesh205",
+    "Mesh206",
+    "Mesh208",
+    "Mesh209",
+    "Mesh210",
+    "Mesh211",
+    "Mesh212",
+    "Mesh213",
+    "Mesh214",
+    "Mesh215",
+    "Mesh216",
+    "Mesh217",
+    "Mesh218",
+    "Mesh220",
+    "Mesh221",
+    "Mesh222",
+    "Mesh224",
+    "Mesh225",
+    "Mesh226",
+    "Mesh227",
+    "Mesh228",
+    "Mesh229",
+    "Mesh230",
+    "Mesh231",
+    "Mesh232",
+    "Mesh233",
+    "Mesh234",
+    "Mesh235",
+    "Mesh236",
+    "Mesh237",
+    "Mesh238",
+    "Mesh239",
+    "Mesh240",
+    "Mesh241",
+    "Mesh242",
+    "Mesh243",
+    "Mesh244",
+    "Mesh245",
+    "Mesh246",
+    "Mesh247",
+    "Mesh248",
+    "Mesh249",
+    "Mesh250",
+    "Mesh251",
+    "Mesh252",
+    "Mesh253",
+    "Mesh254",
+    "Mesh255",
+    "Mesh256",
+    "Mesh257",
+    "Mesh258",
+    "Mesh259",
+    "Mesh260",
+    "Mesh261",
+    "Mesh262",
+    "Mesh263",
+    "Mesh264",
+    "Mesh265",
+    "Mesh266",
+    "Mesh267",
+    "Mesh268",
+    "Mesh269",
+    "Mesh270",
+    "Mesh271",
+    "Mesh273",
+    "Mesh274",
+    "Mesh274001",
+    "Mesh275",
+    "Mesh276",
+    "Mesh279",
+    "Mesh280",
+    "Mesh281",
+    "Mesh300",
+    "Mesh300001",
+    "Mesh316",
+    "Mesh317",
+    "Mesh318",
+    "Mesh319",
+    "Mesh321",
+    "Mesh322",
+    "Mesh338",
+    "Mesh356",
+    "Mesh357",
+    "Rectangl40",
+    "Rectangl41",
+    "Rectangl42",
+    "Rectangl43",
+    "Rectangl47",
+    "Rectangl48",
+    "Rectangl49",
+    "Rectangl50",
+    "Rectangl51",
+    "Rectangl52",
+    "Rectangl53",
+    "Rectangl54",
+    "Rectangl55",
+    "Rectangl56",
+    "Rectangl57",
+    "Rectangl58",
+    "Rectangl59",
+    "Rectangl60",
+    "Rectangl61",
+    "Rectangl62",
+    "Rectangl63",
+    "Rectangl64",
+    "Rectangl65",
+    "Rectangl66",
+    "Rectangl67",
+    "Rectangl68",
+    "Rectangl69",
+    "Rectangl70",
+    "Rectangl71",
+    "Rectangl72",
+    "Rectangl73",
+    "Rectangl74",
+    "Rectangl75",
+    "Rectangl76",
+    "Rectangl77",
+    "Rectangl78",
+    "Rectangl79",
+    "Rectangl80",
+    "Rectangl81",
+    "Rectangl82",
+    "Rectangl83",
+    "Rectangl84",
+    "Rectangle0",
+    "Rectangle1",
+    "Rectangle2",
+    "Rectangle3",
+    "Torus001_1",
+    "Tube006_1",
+    "Plane002"
+  ],
+  "roomCutZ": -0.9,
+  "removedCabinetObjects": [],
+  "chairObjects": [
+    "3DGeom_202",
+    "Mesh295"
+  ],
+  "partitionWalls": [
+    {
+      "name": "Cube001",
+      "firstVertex": 26376,
+      "vertexCount": 6
+    },
+    {
+      "name": "Group770",
+      "firstVertex": 27456,
+      "vertexCount": 6
+    }
+  ],
+  "spotlights": [
+    "Mesh01001",
+    "Mesh08001",
+    "Mesh15001",
+    "Mesh22001",
+    "Mesh29001",
+    "Mesh36001",
+    "Mesh43001",
+    "Mesh50001"
+  ],
+  "spotlightObjects": [
+    {
+      "name": "Mesh01001",
+      "firstSegment": 1177,
+      "segments": 208,
+      "firstVertex": 28290,
+      "vertexCount": 2412
+    },
+    {
+      "name": "Mesh05",
+      "firstSegment": 1385,
+      "segments": 1,
+      "firstVertex": 30702,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh08001",
+      "firstSegment": 1386,
+      "segments": 208,
+      "firstVertex": 30702,
+      "vertexCount": 2406
+    },
+    {
+      "name": "Mesh12",
+      "firstSegment": 1594,
+      "segments": 1,
+      "firstVertex": 33108,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh15001",
+      "firstSegment": 1595,
+      "segments": 208,
+      "firstVertex": 33108,
+      "vertexCount": 2430
+    },
+    {
+      "name": "Mesh19",
+      "firstSegment": 1803,
+      "segments": 1,
+      "firstVertex": 35538,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh22001",
+      "firstSegment": 1804,
+      "segments": 208,
+      "firstVertex": 35538,
+      "vertexCount": 2418
+    },
+    {
+      "name": "Mesh26",
+      "firstSegment": 2012,
+      "segments": 1,
+      "firstVertex": 37956,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh29001",
+      "firstSegment": 2013,
+      "segments": 208,
+      "firstVertex": 37956,
+      "vertexCount": 2430
+    },
+    {
+      "name": "Mesh33",
+      "firstSegment": 2221,
+      "segments": 1,
+      "firstVertex": 40386,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh36001",
+      "firstSegment": 2222,
+      "segments": 208,
+      "firstVertex": 40386,
+      "vertexCount": 2436
+    },
+    {
+      "name": "Mesh40",
+      "firstSegment": 2430,
+      "segments": 1,
+      "firstVertex": 42822,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh43001",
+      "firstSegment": 2431,
+      "segments": 208,
+      "firstVertex": 42822,
+      "vertexCount": 2418
+    },
+    {
+      "name": "Mesh47",
+      "firstSegment": 2639,
+      "segments": 1,
+      "firstVertex": 45240,
+      "vertexCount": 0
+    },
+    {
+      "name": "Mesh50001",
+      "firstSegment": 2640,
+      "segments": 208,
+      "firstVertex": 45240,
+      "vertexCount": 2412
+    },
+    {
+      "name": "Mesh54",
+      "firstSegment": 2848,
+      "segments": 1,
+      "firstVertex": 47652,
+      "vertexCount": 0
+    }
+  ],
+  "fillTriangles": 24680,
+  "excludedObjects": [
+    "___4_63",
+    "Group702",
+    "Plane04_01",
+    "Plane04_02",
+    "Plane04__3",
+    "Group754",
+    "Group758",
+    "Group736",
+    "Group737",
+    "Group739",
+    "Group740",
+    "Group741",
+    "Group743",
+    "Group744",
+    "Group746",
+    "Group747",
+    "Group748",
+    "Group749",
+    "Group750"
+  ],
+  "omittedDetails": [
+    "Componen55",
+    "Mesh148",
+    "Mesh161",
+    "Mesh174",
+    "Group71",
+    "Group73",
+    "Group75",
+    "Group77",
+    "Group79",
+    "Group81",
+    "Group83",
+    "Group85",
+    "Group225",
+    "Group458",
+    "Group463",
+    "Group473",
+    "Group474",
+    "Group476",
+    "Group480",
+    "Group483",
+    "Group487",
+    "Group838",
+    "Group842",
+    "Group843",
+    "Group855",
+    "Group856",
+    "Group858",
+    "Group860",
+    "Group861",
+    "Group912",
+    "Group913",
+    "Group915",
+    "Group916",
+    "Group921",
+    "Group922",
+    "Group923",
+    "Group925",
+    "Group927",
+    "Group928",
+    "Group929",
+    "Group931",
+    "Group932",
+    "Group933",
+    "Group940",
+    "Group944",
+    "Group948",
+    "Group952",
+    "Group955",
+    "Group961",
+    "Group967",
+    "Group973",
+    "Group976",
+    "Group981",
+    "Group982",
+    "Group983",
+    "Group986",
+    "Group991",
+    "Group992",
+    "Group993",
+    "Group996",
+    "Group997",
+    "Group1000",
+    "Group1001",
+    "Group1002",
+    "Group1003",
+    "Group1004",
+    "Group1006",
+    "Group1008",
+    "Group1009",
+    "Group1009001",
+    "Group1010",
+    "Group1010001",
+    "Group1011",
+    "Group1011001",
+    "Group1015",
+    "Group1024",
+    "Group1025",
+    "Mesh01",
+    "Mesh01002",
+    "Mesh01003",
+    "Mesh02",
+    "Mesh03",
+    "Mesh04",
+    "Mesh06",
+    "Mesh07",
+    "Mesh08",
+    "Mesh08002",
+    "Mesh08003",
+    "Mesh09",
+    "Mesh10",
+    "Mesh11",
+    "Mesh13",
+    "Mesh14",
+    "Mesh15",
+    "Mesh15002",
+    "Mesh15003",
+    "Mesh16",
+    "Mesh17",
+    "Mesh18",
+    "Mesh20",
+    "Mesh21",
+    "Mesh22",
+    "Mesh22002",
+    "Mesh22003",
+    "Mesh23",
+    "Mesh24",
+    "Mesh25",
+    "Mesh27",
+    "Mesh28",
+    "Mesh29",
+    "Mesh29002",
+    "Mesh29003",
+    "Mesh30",
+    "Mesh31",
+    "Mesh32",
+    "Mesh34",
+    "Mesh35",
+    "Mesh36",
+    "Mesh36002",
+    "Mesh36003",
+    "Mesh37",
+    "Mesh38",
+    "Mesh39",
+    "Mesh41",
+    "Mesh42",
+    "Mesh43",
+    "Mesh43002",
+    "Mesh43003",
+    "Mesh44",
+    "Mesh45",
+    "Mesh46",
+    "Mesh48",
+    "Mesh50",
+    "Mesh50002",
+    "Mesh50003",
+    "Mesh51",
+    "Mesh52",
+    "Mesh53",
+    "Mesh55",
+    "Mesh56",
+    "Mesh146",
+    "Mesh159",
+    "Mesh162",
+    "Mesh163",
+    "Mesh164",
+    "Mesh165",
+    "Mesh166",
+    "Mesh173",
+    "Mesh175",
+    "Mesh176",
+    "Mesh177",
+    "Mesh178",
+    "Mesh179",
+    "Mesh180",
+    "Mesh181",
+    "Mesh182",
+    "Mesh183",
+    "Mesh184",
+    "Mesh185",
+    "Mesh187",
+    "Mesh188",
+    "Mesh189",
+    "Mesh190",
+    "Mesh192",
+    "Mesh193",
+    "Mesh194",
+    "Mesh195",
+    "Mesh196",
+    "Mesh198",
+    "Mesh199",
+    "Mesh200",
+    "Mesh302",
+    "mesh_845_1",
+    "mesh_845_2",
+    "mesh_845_3",
+    "mesh_845_4",
+    "mesh_845_5",
+    "mesh_845_6",
+    "mesh_845_7",
+    "mesh_845_8"
+  ],
+  "simplifiedObjects": [
+    {
+      "name": "almofada01",
+      "kind": "furniture-outline",
+      "firstSegment": 466,
+      "segments": 12
+    },
+    {
+      "name": "almofada_m",
+      "kind": "furniture-outline",
+      "firstSegment": 478,
+      "segments": 12
+    },
+    {
+      "name": "braco_mo01",
+      "kind": "furniture-outline",
+      "firstSegment": 490,
+      "segments": 12
+    },
+    {
+      "name": "braco_modu",
+      "kind": "furniture-outline",
+      "firstSegment": 502,
+      "segments": 12
+    },
+    {
+      "name": "Cube001",
+      "kind": "plane-outline",
+      "firstSegment": 514,
+      "segments": 4
+    },
+    {
+      "name": "Group64",
+      "kind": "single-line",
+      "firstSegment": 518,
+      "segments": 1
+    },
+    {
+      "name": "Group65",
+      "kind": "single-line",
+      "firstSegment": 519,
+      "segments": 1
+    },
+    {
+      "name": "Group67",
+      "kind": "single-line",
+      "firstSegment": 594,
+      "segments": 1
+    },
+    {
+      "name": "Group68",
+      "kind": "single-line",
+      "firstSegment": 595,
+      "segments": 1
+    },
+    {
+      "name": "Group293",
+      "kind": "plane-outline",
+      "firstSegment": 596,
+      "segments": 4
+    },
+    {
+      "name": "Group296",
+      "kind": "plane-outline",
+      "firstSegment": 672,
+      "segments": 4
+    },
+    {
+      "name": "Group300",
+      "kind": "plane-outline",
+      "firstSegment": 752,
+      "segments": 4
+    },
+    {
+      "name": "Group465",
+      "kind": "plane-outline",
+      "firstSegment": 756,
+      "segments": 4
+    },
+    {
+      "name": "Group468",
+      "kind": "plane-outline",
+      "firstSegment": 760,
+      "segments": 4
+    },
+    {
+      "name": "Group469",
+      "kind": "plane-outline",
+      "firstSegment": 764,
+      "segments": 4
+    },
+    {
+      "name": "Group470",
+      "kind": "plane-outline",
+      "firstSegment": 768,
+      "segments": 4
+    },
+    {
+      "name": "Group471",
+      "kind": "plane-outline",
+      "firstSegment": 772,
+      "segments": 4
+    },
+    {
+      "name": "Group472",
+      "kind": "plane-outline",
+      "firstSegment": 776,
+      "segments": 4
+    },
+    {
+      "name": "Group477",
+      "kind": "plane-outline",
+      "firstSegment": 780,
+      "segments": 4
+    },
+    {
+      "name": "Group478",
+      "kind": "plane-outline",
+      "firstSegment": 784,
+      "segments": 4
+    },
+    {
+      "name": "Group482",
+      "kind": "plane-outline",
+      "firstSegment": 788,
+      "segments": 4
+    },
+    {
+      "name": "Group535",
+      "kind": "plane-outline",
+      "firstSegment": 792,
+      "segments": 4
+    },
+    {
+      "name": "Group560",
+      "kind": "plane-outline",
+      "firstSegment": 796,
+      "segments": 4
+    },
+    {
+      "name": "Group593",
+      "kind": "plane-outline",
+      "firstSegment": 800,
+      "segments": 4
+    },
+    {
+      "name": "Group597",
+      "kind": "plane-outline",
+      "firstSegment": 816,
+      "segments": 4
+    },
+    {
+      "name": "Group598",
+      "kind": "plane-outline",
+      "firstSegment": 820,
+      "segments": 4
+    },
+    {
+      "name": "Group602",
+      "kind": "furniture-outline",
+      "firstSegment": 824,
+      "segments": 12
+    },
+    {
+      "name": "Group615",
+      "kind": "plane-outline",
+      "firstSegment": 836,
+      "segments": 4
+    },
+    {
+      "name": "Group684",
+      "kind": "single-line",
+      "firstSegment": 852,
+      "segments": 1
+    },
+    {
+      "name": "Group729",
+      "kind": "furniture-outline",
+      "firstSegment": 853,
+      "segments": 12
+    },
+    {
+      "name": "Group770",
+      "kind": "plane-outline",
+      "firstSegment": 865,
+      "segments": 4
+    },
+    {
+      "name": "Group819",
+      "kind": "furniture-outline",
+      "firstSegment": 869,
+      "segments": 12
+    },
+    {
+      "name": "Group828",
+      "kind": "plane-outline",
+      "firstSegment": 881,
+      "segments": 4
+    },
+    {
+      "name": "Group831",
+      "kind": "plane-outline",
+      "firstSegment": 885,
+      "segments": 4
+    },
+    {
+      "name": "Group833",
+      "kind": "plane-outline",
+      "firstSegment": 889,
+      "segments": 4
+    },
+    {
+      "name": "Group841",
+      "kind": "plane-outline",
+      "firstSegment": 893,
+      "segments": 4
+    },
+    {
+      "name": "Group845",
+      "kind": "plane-outline",
+      "firstSegment": 897,
+      "segments": 4
+    },
+    {
+      "name": "Group851",
+      "kind": "plane-outline",
+      "firstSegment": 901,
+      "segments": 4
+    },
+    {
+      "name": "Group854",
+      "kind": "plane-outline",
+      "firstSegment": 905,
+      "segments": 4
+    },
+    {
+      "name": "Group883",
+      "kind": "plane-outline",
+      "firstSegment": 927,
+      "segments": 4
+    },
+    {
+      "name": "Group893",
+      "kind": "single-line",
+      "firstSegment": 931,
+      "segments": 1
+    },
+    {
+      "name": "Group893001",
+      "kind": "single-line",
+      "firstSegment": 932,
+      "segments": 1
+    },
+    {
+      "name": "Group899",
+      "kind": "plane-outline",
+      "firstSegment": 933,
+      "segments": 4
+    },
+    {
+      "name": "Group903",
+      "kind": "plane-outline",
+      "firstSegment": 937,
+      "segments": 4
+    },
+    {
+      "name": "Group905",
+      "kind": "single-line",
+      "firstSegment": 941,
+      "segments": 1
+    },
+    {
+      "name": "Group906",
+      "kind": "plane-outline",
+      "firstSegment": 942,
+      "segments": 4
+    },
+    {
+      "name": "Group907",
+      "kind": "single-line",
+      "firstSegment": 946,
+      "segments": 1
+    },
+    {
+      "name": "Group909",
+      "kind": "plane-outline",
+      "firstSegment": 995,
+      "segments": 4
+    },
+    {
+      "name": "Group914",
+      "kind": "plane-outline",
+      "firstSegment": 1027,
+      "segments": 4
+    },
+    {
+      "name": "Group919",
+      "kind": "plane-outline",
+      "firstSegment": 1031,
+      "segments": 4
+    },
+    {
+      "name": "Group924",
+      "kind": "plane-outline",
+      "firstSegment": 1035,
+      "segments": 4
+    },
+    {
+      "name": "Group926",
+      "kind": "plane-outline",
+      "firstSegment": 1039,
+      "segments": 4
+    },
+    {
+      "name": "Group930",
+      "kind": "plane-outline",
+      "firstSegment": 1043,
+      "segments": 4
+    },
+    {
+      "name": "Group934",
+      "kind": "plane-outline",
+      "firstSegment": 1047,
+      "segments": 4
+    },
+    {
+      "name": "Group935",
+      "kind": "plane-outline",
+      "firstSegment": 1051,
+      "segments": 4
+    },
+    {
+      "name": "Group938",
+      "kind": "plane-outline",
+      "firstSegment": 1055,
+      "segments": 4
+    },
+    {
+      "name": "Group942",
+      "kind": "plane-outline",
+      "firstSegment": 1059,
+      "segments": 4
+    },
+    {
+      "name": "Group946",
+      "kind": "plane-outline",
+      "firstSegment": 1063,
+      "segments": 4
+    },
+    {
+      "name": "Group950",
+      "kind": "plane-outline",
+      "firstSegment": 1067,
+      "segments": 4
+    },
+    {
+      "name": "Group959",
+      "kind": "plane-outline",
+      "firstSegment": 1071,
+      "segments": 4
+    },
+    {
+      "name": "Group965",
+      "kind": "plane-outline",
+      "firstSegment": 1075,
+      "segments": 4
+    },
+    {
+      "name": "Group971",
+      "kind": "plane-outline",
+      "firstSegment": 1079,
+      "segments": 4
+    },
+    {
+      "name": "Group984",
+      "kind": "plane-outline",
+      "firstSegment": 1083,
+      "segments": 4
+    },
+    {
+      "name": "Group985",
+      "kind": "plane-outline",
+      "firstSegment": 1087,
+      "segments": 4
+    },
+    {
+      "name": "Group987",
+      "kind": "plane-outline",
+      "firstSegment": 1091,
+      "segments": 4
+    },
+    {
+      "name": "Group988",
+      "kind": "plane-outline",
+      "firstSegment": 1095,
+      "segments": 4
+    },
+    {
+      "name": "Group989",
+      "kind": "plane-outline",
+      "firstSegment": 1099,
+      "segments": 4
+    },
+    {
+      "name": "Group994",
+      "kind": "plane-outline",
+      "firstSegment": 1103,
+      "segments": 4
+    },
+    {
+      "name": "Group995",
+      "kind": "plane-outline",
+      "firstSegment": 1107,
+      "segments": 4
+    },
+    {
+      "name": "Group998",
+      "kind": "plane-outline",
+      "firstSegment": 1111,
+      "segments": 4
+    },
+    {
+      "name": "Group999",
+      "kind": "plane-outline",
+      "firstSegment": 1115,
+      "segments": 4
+    },
+    {
+      "name": "Mesh05",
+      "kind": "single-line",
+      "firstSegment": 1385,
+      "segments": 1
+    },
+    {
+      "name": "Mesh12",
+      "kind": "single-line",
+      "firstSegment": 1594,
+      "segments": 1
+    },
+    {
+      "name": "Mesh19",
+      "kind": "single-line",
+      "firstSegment": 1803,
+      "segments": 1
+    },
+    {
+      "name": "Mesh26",
+      "kind": "single-line",
+      "firstSegment": 2012,
+      "segments": 1
+    },
+    {
+      "name": "Mesh33",
+      "kind": "single-line",
+      "firstSegment": 2221,
+      "segments": 1
+    },
+    {
+      "name": "Mesh40",
+      "kind": "single-line",
+      "firstSegment": 2430,
+      "segments": 1
+    },
+    {
+      "name": "Mesh47",
+      "kind": "single-line",
+      "firstSegment": 2639,
+      "segments": 1
+    },
+    {
+      "name": "Mesh54",
+      "kind": "single-line",
+      "firstSegment": 2848,
+      "segments": 1
+    },
+    {
+      "name": "Mesh167",
+      "kind": "plane-outline",
+      "firstSegment": 2849,
+      "segments": 4
+    },
+    {
+      "name": "Mesh168",
+      "kind": "plane-outline",
+      "firstSegment": 2853,
+      "segments": 4
+    },
+    {
+      "name": "Mesh169",
+      "kind": "furniture-outline",
+      "firstSegment": 2857,
+      "segments": 12
+    },
+    {
+      "name": "Mesh170",
+      "kind": "furniture-outline",
+      "firstSegment": 2869,
+      "segments": 12
+    },
+    {
+      "name": "Mesh171",
+      "kind": "furniture-outline",
+      "firstSegment": 2881,
+      "segments": 12
+    },
+    {
+      "name": "Mesh172",
+      "kind": "furniture-outline",
+      "firstSegment": 2893,
+      "segments": 12
+    }
+  ],
+  "shellAlignment": {
+    "minX": -3.7944435300839245,
+    "maxX": 5.063462023296827,
+    "minZ": -5.023216605186462,
+    "maxZ": 0.05,
+    "floorY": 0,
+    "topY": 3.3462655500979483
+  },
+  "shellObjects": [
+    {
+      "name": "Plane",
+      "firstSegment": 3379,
+      "segments": 4
+    },
+    {
+      "name": "Plane001",
+      "firstSegment": 3383,
+      "segments": 4
+    }
+  ],
+  "segments": 3387,
+  "thresholdDegrees": 35,
+  "bounds": {
+    "min": [
+      -3.7944435300839245,
+      -0.009999999776482582,
+      -5.023216605186462
+    ],
+    "max": [
+      5.066232681274414,
+      3.3462655500979483,
+      0.05
+    ]
+  }
+}

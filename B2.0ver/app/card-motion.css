@@ -1,0 +1,27 @@
+.animated-symbol{overflow:visible;opacity:1;flex:none}
+.lamp-halo{fill:var(--lamp-from);opacity:.13;transform-origin:22px 18px;animation:lamp-halo 4s ease-in-out infinite}
+.lamp-bulb{fill:var(--lamp-from);fill-opacity:.24;stroke:var(--lamp-from);filter:drop-shadow(0 0 3px var(--lamp-from));animation:lamp-temperature 4s ease-in-out infinite}
+.lamp-rays{stroke:var(--lamp-from);transform-origin:22px 18px;animation:lamp-rays 4s ease-in-out infinite}
+@keyframes lamp-temperature{0%,100%{fill:var(--lamp-from);stroke:var(--lamp-from);fill-opacity:.16;filter:drop-shadow(0 0 1px var(--lamp-from));opacity:var(--lamp-min)}50%{fill:var(--lamp-to);stroke:var(--lamp-to);fill-opacity:.55;filter:drop-shadow(0 0 7px var(--lamp-to));opacity:1}}
+@keyframes lamp-halo{0%,100%{opacity:.06;fill:var(--lamp-from);transform:scale(.7)}50%{opacity:.23;fill:var(--lamp-to);transform:scale(1.12)}}
+@keyframes lamp-rays{0%,100%{opacity:.2;transform:scale(.88);stroke:var(--lamp-from)}50%{opacity:1;transform:scale(1.08);stroke:var(--lamp-to)}}
+.air-streams path{stroke-dasharray:54 14;animation:air-flow 2.8s linear infinite}.air-streams path:nth-child(2){animation-delay:-1s;animation-duration:3.3s}.air-streams path:nth-child(3){animation-delay:-1.8s;animation-duration:2.4s}
+.air-particles circle{fill:currentColor;stroke:none;animation:air-drift 2.8s ease-in-out infinite}.air-particles circle:nth-child(2){animation-delay:-.9s}.air-particles circle:nth-child(3){animation-delay:-1.8s}
+@keyframes air-flow{0%{stroke-dashoffset:68;transform:translateX(-2px);opacity:.45}50%{opacity:1}100%{stroke-dashoffset:0;transform:translateX(2px);opacity:.45}}
+@keyframes air-drift{0%{opacity:0;transform:translate(0,1px)}25%{opacity:.8}100%{opacity:0;transform:translate(30px,-3px)}}
+.water-drop{stroke:#d1f1ff;fill:#8edaff;fill-opacity:.14;animation:water-shimmer 3.6s ease-in-out infinite}.water-surface{stroke:#d1f1ff;animation:water-wave 2.5s ease-in-out infinite}.water-vapor path{stroke:#e3f8ff;animation:water-evaporate 3s ease-out infinite}.water-vapor path:nth-child(2){animation-delay:-1s}.water-vapor path:nth-child(3){animation-delay:-2s}
+@keyframes water-shimmer{0%,100%{fill-opacity:.12}50%{fill-opacity:.4}}@keyframes water-wave{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}@keyframes water-evaporate{0%{opacity:0;transform:translate(0,5px)}25%{opacity:.9}100%{opacity:0;transform:translate(2px,-10px)}}
+.thermometer-column{transform-origin:22px 35px;animation:temperature-column 4.2s ease-in-out infinite}.thermometer-bulb{animation:temperature-color 4.2s ease-in-out infinite}
+@keyframes temperature-column{0%,100%{fill:#72c6ff;transform:scaleY(.25)}50%{fill:#ff7667;transform:scaleY(1)}}@keyframes temperature-color{0%,100%{fill:#72c6ff}50%{fill:#ff7667}}
+.sound-levels path{transform-box:fill-box;transform-origin:center;animation:sound-meter 1.5s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.21s)}@keyframes sound-meter{0%{transform:scaleY(.3);opacity:.5}100%{transform:scaleY(1);opacity:1}}
+.goal-orbit{transform-origin:22px 22px;animation:goal-orbit 12s linear infinite}.goal-check{animation:goal-focus 3.4s ease-in-out infinite}@keyframes goal-orbit{to{transform:rotate(360deg)}}@keyframes goal-focus{0%,100%{opacity:.5}50%{opacity:1}}
+.person-symbol--animated g{transform-box:fill-box;transform-origin:center;animation:person-breathe 4s ease-in-out infinite}@keyframes person-breathe{0%,100%{transform:translateY(1px) scale(.97);opacity:.8}50%{transform:translateY(-1px) scale(1);opacity:1}}
+.reading-number{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;white-space:normal}.reading-number .reading-operator{font-size:.45em;align-self:center;margin-right:4px}.reading-number small{font-size:clamp(12px,1vw,18px);margin-left:4px}.reading-number--range{font-size:clamp(24px,3.4vw,58px)}
+.reading--note .note-content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:.55em}.note-content h3{margin:0;font-size:clamp(21px,2.2vw,36px);line-height:1.25;font-weight:500}.note-content p{font-size:clamp(14px,1.45vw,23px);line-height:1.45;color:#ffffffc7}
+.goal-card{--paint:var(--score);flex:1}.goal-copy{margin:auto 0;font-size:clamp(25px,2.8vw,46px);font-weight:500;line-height:1.42;letter-spacing:.025em}.goal-card header{margin-bottom:24px}.goal-card .goal-label{margin-top:20px;font-size:clamp(13px,1.3vw,20px);letter-spacing:.08em;color:#ffffffc7}
+.pain-subtitle{font-size:clamp(12px,1.2vw,20px)}
+.solution-text h2{font-size:clamp(22px,2.8vw,46px)}.solution-text p{font-size:clamp(15px,1.65vw,27px);line-height:1.5}
+.readings-column .surface header .caption{max-width:calc(100% - 42px)}
+@media(max-width:900px){.note-content h3{font-size:19px}.note-content p{font-size:14px}.goal-copy{font-size:23px}.reading-number{font-size:40px}.reading-number--range{font-size:26px}.solution-text p{font-size:15px}}
+@media(orientation:portrait){.goal-card{min-height:240px}.goal-copy{font-size:28px}.reading-number{font-size:64px}.reading-number--range{font-size:38px}.note-content h3{font-size:26px}.note-content p{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.animated-symbol *,.person-symbol--animated g{animation:none!important}.thermometer-column{fill:#72c6ff;transform:scaleY(.6)}.thermometer-bulb{fill:#72c6ff}.lamp-bulb{opacity:1}.water-vapor path{opacity:.5}}
