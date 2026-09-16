@@ -12,7 +12,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [b2.0-20260916]
   workflow_dispatch:
 
 permissions:
@@ -27,19 +27,24 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: B2.0ver
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
+          cache-dependency-path: B2.0ver/package-lock.json
       - run: npm ci
+      - run: npm test
       - name: Build (相對路徑,供子路徑部署)
-        run: npm run build -- --base=./
+        run: npm run build -- --base=/B-TV/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: B2.0ver/dist
 
   deploy:
     needs: build
