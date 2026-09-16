@@ -1,0 +1,38 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { width: 100%; height: 100%; }
+body { background: #0c0f13; color: #eef3f3; font-family: 'Chiron Hei HK', sans-serif; overflow: hidden; }
+
+.ct { position: relative; width: 100vw; height: 100vh; }
+.ct__stage { position: absolute; inset: 0; }
+.ct__stage canvas { display: block; }
+
+.ct__panel {
+  position: absolute; top: 0; right: 0; width: 340px; height: 100%;
+  background: rgba(14, 18, 24, 0.92); border-left: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column; padding: 16px; gap: 12px; overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+.ct__title { font-weight: 700; font-size: 18px; }
+.ct__hint { font-size: 12px; line-height: 1.5; color: #8aa2a2; }
+.ct__status { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4dbaba; min-height: 28px; line-height: 1.4; }
+
+.ct__fov { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.ct__fov input[type=range] { width: 100%; accent-color: #009393; cursor: pointer; }
+.ct__btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.ct button {
+  font-family: inherit; font-size: 13px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06);
+  color: #eef3f3; border-radius: 8px; padding: 8px 12px; transition: background 0.15s;
+}
+.ct button:hover { background: rgba(255,255,255,0.14); }
+.ct button.primary { background: #009393; border-color: #009393; font-weight: 700; }
+.ct button.primary:hover { background: #00a8a8; }
+.ct button.danger { color: #f7a; border-color: rgba(255,120,150,0.4); }
+
+.ct__list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.ct__item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.04); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.ct__item b { color: #4dbaba; }
+.ct__item .seg { flex: 1; color: #8aa2a2; font-size: 11px; }
+.ct__item .warn { color: #ffb020; font-size: 11px; }
+.ct__item button { padding: 3px 8px; font-size: 11px; }
+.ct__empty { color: #6a7f7f; font-size: 13px; padding: 12px 0; }

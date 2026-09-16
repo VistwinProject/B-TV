@@ -1,0 +1,24 @@
+{
+  "name": "b-sensing-residence-v2",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "B 區 感應光寓 2.0 · 獨立重製介面系統",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.js",
+    "model:wireframe": "node scripts/build-home-wireframe.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^11.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}

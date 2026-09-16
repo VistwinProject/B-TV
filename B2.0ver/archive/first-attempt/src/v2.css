@@ -1,0 +1,26 @@
+/* The reference composition remains in style.css / bento.css.
+   Only the restored NFC control and interaction states live here. */
+body { cursor: default; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid #2f7bff; outline-offset: 4px; }
+.persona-list__button { grid-column: 1 / -1; display: flex; align-items: center; width: 100%; gap: inherit; color: inherit; border: 0; background: none; text-align: left; }
+.persona-list__button .persona-list__q { flex: 1; }
+.persona-list__item:has(button:hover) { filter: brightness(1.06); }
+.nfc-controls { position: fixed; left: 6px; bottom: 10px; z-index: 90; color: #17357a; font-family: var(--font-cjk); }
+.nfc-toggle { display: flex; align-items: center; gap: 18px; padding: 12px 14px; border: 1px solid #b5caec; background: rgba(255,255,255,.96); border-radius: 10px; box-shadow: 0 2px 8px #17357a12; color: #17357a; font-size: clamp(14px, 1vw, 20px); font-weight: 500; }
+.nfc-panel { width: min(350px, calc(100vw - 24px)); padding: 18px; margin-bottom: 10px; border: 1px solid #c7d6ee; border-radius: 18px; background: #fffffff5; box-shadow: 0 16px 64px #17357a30; backdrop-filter: blur(20px); max-height: calc(100dvh - 80px); overflow-y: auto; animation: nfc-enter .22s ease-out; }
+.nfc-panel header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 18px; }
+.nfc-panel header span, .nfc-panel small { font-size: 13px; color: #5b7cb8; }
+.nfc-panel button { border: 1px solid #d4dff0; border-radius: 9px; background: #f5f8ff; color: #17357a; padding: 10px 12px; font-size: 15px; }
+.nfc-panel button:hover { filter: brightness(.96); }
+.nfc-panel button:disabled { opacity: .35; cursor: default; }
+.nfc-invite { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
+.nfc-personas { display: grid; gap: 7px; }
+.nfc-personas button { background: var(--card-color); color: white; border-color: transparent; display: grid; grid-template-columns: 24px 1fr 18px; align-items: center; gap: 10px; text-align: left; }
+.nfc-personas button[aria-pressed="true"] { box-shadow: 0 0 0 2px white, 0 0 0 4px var(--card-color); }
+.nfc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 16px; }
+.nfc-actions button { display: flex; justify-content: space-between; align-items: center; }
+.nfc-panel kbd { font-family: 'TASA Orbiter', sans-serif; opacity: .7; font-size: 13px; }
+.nfc-panel p { font-size: 13px; line-height: 1.6; margin-top: 14px; color: #5b7cb8; }
+@keyframes nfc-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .nfc-panel { animation: none; } }
