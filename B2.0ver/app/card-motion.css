@@ -25,3 +25,34 @@
 @media(max-width:900px){.note-content h3{font-size:19px}.note-content p{font-size:14px}.goal-copy{font-size:23px}.reading-number{font-size:40px}.reading-number--range{font-size:26px}.solution-text p{font-size:15px}}
 @media(orientation:portrait){.goal-card{min-height:240px}.goal-copy{font-size:28px}.reading-number{font-size:64px}.reading-number--range{font-size:38px}.note-content h3{font-size:26px}.note-content p{font-size:20px}}
 @media(prefers-reduced-motion:reduce){.animated-symbol *,.person-symbol--animated g{animation:none!important}.thermometer-column{fill:#72c6ff;transform:scaleY(.6)}.thermometer-bulb{fill:#72c6ff}.lamp-bulb{opacity:1}.water-vapor path{opacity:.5}}
+
+/* Approved ANLB canvas: sizing only, no filters or shader changes. */
+.anlb-orb{position:relative;width:min(42vh,420px);aspect-ratio:1;flex:none;margin:0 auto}
+.anlb-orb-slot,.anlb-orb-renderer{width:100%;height:100%}
+.anlb-orb>p{position:absolute;inset:35% 0 auto;font-size:13px;text-align:center}
+@media(orientation:portrait){.narration .anlb-orb,.farewell .anlb-orb{width:min(65vw,340px)}}
+
+.outro-subtitle{font-size:clamp(24px,3.1vw,48px);font-weight:500;line-height:1.5;min-height:1.5em;text-align:center;max-width:90vw}
+
+/* Shared grid keeps the heading and spoken caption on the same left edge. */
+.goal-card{position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:38% minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+.goal-card>header{grid-column:2;grid-row:1;margin-bottom:clamp(10px,2vh,24px)}
+.goal-content{display:contents}
+.goal-content .anlb-orb{grid-column:1;grid-row:1 / span 2;position:relative;width:min(100%,32vh);aspect-ratio:1;align-self:center;justify-self:center;margin:0;pointer-events:none}
+.goal-content .goal-copy{grid-column:2;grid-row:2;align-self:center;min-width:0;margin:0;font-size:clamp(22px,2.3vw,38px)}
+.goal-card .narration-play{grid-column:2;position:relative;justify-self:start}
+@media(orientation:portrait){.goal-card{min-height:260px}.goal-content .goal-copy{font-size:24px}}
+
+.goal-content .anlb-orb{transform:translateX(-8%)}
+
+.goal-content .goal-copy{display:grid}
+.goal-copy>span{grid-area:1 / 1}
+.goal-copy .goal-final{opacity:0}
+.goal-copy--finished .goal-spoken{animation:goal-caption-out .4s ease .5s both}
+.goal-copy--finished .goal-final{animation:goal-caption-in .5s ease .9s both}
+@keyframes goal-caption-out{from{opacity:1}to{opacity:0;visibility:hidden}}
+@keyframes goal-caption-in{from{opacity:0}to{opacity:1}}
+
+
+
+.goal-card>header,.goal-content .goal-copy{transform:translateX(clamp(-24px,-1.2vw,-10px))}

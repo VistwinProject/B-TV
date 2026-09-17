@@ -1,4 +1,7 @@
+import {childCameraFrame,antiAgingCameraFrame,elderCameraFrame} from './homeCamera.js'
+import {createHomeCleaning} from './homeCleaning.js'
 import * as THREE from 'three'
+import {createHomePeople} from './homePeople.js'
 import {createHomeWindows} from './homeWindows.js'
 import { createHomeLighting } from './homeLighting.js'
 import { createHomeVentilation } from './homeVentilation.js'
@@ -88,9 +91,11 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
   const ventilation=createHomeVentilation(scene,metadata,position)
   const fixtures=createHomeFixtures(scene)
   const windows=createHomeWindows(scene)
+  const people=createHomePeople(scene)
+  const cleaning=createHomeCleaning(scene)
   const cameraDirection=new THREE.Vector3(...SCENE_VIEWS['anti-aging']).normalize(),targetDirection=cameraDirection.clone()
   const orbit=new THREE.Spherical().setFromVector3(cameraDirection),targetOrbit=new THREE.Spherical()
-  let activeCameraScene=null,entrance=null,entranceZoom=1
+  let activeCameraScene=null,entrance=null,entranceZoom=1,scriptedShot=null
   const dayBackground=new THREE.Color('#f1e8d8'),nightBackground=new THREE.Color('#34383b'),targetBackground=nightBackground.clone()
   const dayInk=new THREE.Color('#45423d'),nightInk=new THREE.Color('#ffffff'),captionInk=new THREE.Color()
   let disposed=false, frameId, previous=performance.now(), lastLabel=''
@@ -104,8 +109,10 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
     projected.getCenter(viewCenter);projected.getSize(viewSize)
     const width=host.clientWidth,height=host.clientHeight; if(!width||!height)return
     const aspect=width/height, extent=Math.max(viewSize.y*1.2,viewSize.x/aspect*1.1)
-    const framedX=viewCenter.x, framedY=viewCenter.y
-    const zoomed=extent/(view.zoom*entranceZoom), x=framedX-view.x/100*zoomed*aspect, y=framedY+view.y/100*zoomed
+    const detail=scriptedShot?new THREE.Vector3(...scriptedShot.focus).applyMatrix4(camera.matrixWorldInverse):viewCenter
+    const weight=scriptedShot?.weight||0
+    const framedX=THREE.MathUtils.lerp(viewCenter.x,detail.x,weight), framedY=THREE.MathUtils.lerp(viewCenter.y,detail.y,weight)
+    const zoomed=extent/(view.zoom*entranceZoom*(scriptedShot?.zoom||1)), x=framedX-view.x/100*zoomed*aspect, y=framedY+view.y/100*zoomed
     camera.left=x-zoomed*aspect/2; camera.right=x+zoomed*aspect/2
     // Reserve caption space beneath the model without changing its viewing direction.
     camera.top=y+zoomed*.44; camera.bottom=y-zoomed*.56
@@ -120,6 +127,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
       const state=lighting.tick(dt,view.paused)
       ventilation.tick(dt,view.paused)
       fixtures.tick(dt,view.personId,state)
+      people.tick(view.personId,state)
       windows.tick(dt,view.personId,state,view.paused)
       // Follow the shortest horizontal arc, keeping height independent of the turn.
       targetOrbit.setFromVector3(targetDirection)
@@ -136,8 +144,14 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
         orbit.theta+=angle*turn
         orbit.phi=THREE.MathUtils.lerp(orbit.phi,targetOrbit.phi,turn)
       }
+      scriptedShot=view.personId==='child'?childCameraFrame(state.cycleSeconds):view.personId==='anti-aging'?antiAgingCameraFrame(state.cycleSeconds):view.personId==='elder'?elderCameraFrame(state.cycleSeconds):null
+      if(scriptedShot&&!entrance&&state.cycleSeconds>=(view.personId==='anti-aging'?3.2:2)){
+        // The scripted path already has eased starts/stops; follow it without lag.
+        orbit.setFromVector3(new THREE.Vector3(...scriptedShot.direction).normalize())
+      }
       cameraDirection.setFromSpherical(orbit)
       fitCamera()
+      cleaning.tick(view.personId,state,camera)
       nightBackground.lerp(targetBackground,1-Math.exp(-dt*2))
       scene.background.copy(nightBackground).lerp(dayBackground,state.daylight)
       material.color.copy(nightInk).lerp(dayInk,state.daylight)
@@ -168,7 +182,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
         dayBackground.setHSL(hsl.h,.22,.8,THREE.SRGBColorSpace)
         targetDirection.set(...(SCENE_VIEWS[settings.personId]||SCENE_VIEWS['anti-aging'])).normalize()
         if(activeCameraScene!==view.personId){
-          entrance=null;entranceZoom=1
+          entrance=null;entranceZoom=1;scriptedShot=null
           if(view.personId==='anti-aging'){
             targetOrbit.setFromVector3(targetDirection)
             if(activeCameraScene===null){
@@ -184,6 +198,6 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
       }
       resize()
     },
-    dispose() { disposed=true; cancelAnimationFrame(frameId); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
+    dispose() { disposed=true; cancelAnimationFrame(frameId); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); people.dispose(); cleaning.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
   }
 }

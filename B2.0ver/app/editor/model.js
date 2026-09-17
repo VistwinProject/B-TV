@@ -1,4 +1,4 @@
-export const STORAGE_KEY = 'b2:editor:v1:preset-20260916-1846'
+export const STORAGE_KEY = 'b2:editor:v1:preset-20260917-1940'
 export const THEME_FIELDS = {bgStart:'背景起點',bgMid:'背景中段',bgEnd:'背景終點',haze:'中央柔光',title:'主標文字',subtitle:'英文副標',hint:'提示文字',core:'光束核心',inner:'光束內暈',glow:'光束外暈'}
 export const COLOR_FIELDS = ['痛點卡','解方卡','核心目標卡','左欄第一張','左欄第二張','左欄第三張','數據強調']
 export function makeDefaults(people, house) {

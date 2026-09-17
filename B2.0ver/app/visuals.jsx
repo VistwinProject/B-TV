@@ -1,3 +1,4 @@
+import { VoiceOrb } from './VoiceOrb.jsx'
 import { useEffect, useRef, useState } from 'react'
 import Beam from './editor/Beam.jsx'
 import AnimatedIcon from './AnimatedIcon.jsx'
@@ -66,27 +67,7 @@ export function Film({ photo, label = '你的未來居家' }) {
   </div>
 }
 
-export function Voice({ analyser }) {
-  const wrapper = useRef(null)
-  useEffect(() => {
-    let frame
-    const values = new Uint8Array(128)
-    const update = () => {
-      const source = analyser?.current
-      if (source && wrapper.current) {
-        source.getByteFrequencyData(values)
-        for (const [index, bar] of [...wrapper.current.children].entries()) {
-          bar.style.animation = 'none'
-          bar.style.transform = `scaleY(${.08 + values[Math.floor(index * 1.8)] / 280})`
-        }
-      }
-      frame = requestAnimationFrame(update)
-    }
-    frame = requestAnimationFrame(update)
-    return () => cancelAnimationFrame(frame)
-  }, [analyser])
-  return <div className="voice" ref={wrapper} aria-hidden="true">{Array.from({ length: 48 }, (_, i) => <i key={i} style={{ '--height': `${22 + 76 * Math.abs(Math.sin(i * 1.71))}%`, '--delay': `${-i * .17}s`, '--duration': `${.7 + (i % 7) * .13}s` }} />)}</div>
-}
+export function Voice() { return <VoiceOrb /> }
 
 export function LightRibbon() { return <Beam /> }
 

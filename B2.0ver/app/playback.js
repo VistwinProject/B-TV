@@ -40,7 +40,7 @@ export function advancePlayback(state, event) {
         return state.held === event.id ? state : { ...state, held: event.id }
       }
       return screen(state, 'experience', now, {
-        person: event.id, held: event.id, dimension: 0, loop: 0,
+        person: event.id, held: event.id, dimension: 0, loop: 0, sceneAudioPending:false, sceneAudioFinishedAt:null,
         seen: state.seen.includes(event.id) ? state.seen : [...state.seen, event.id],
         confirmation: { at: now, color: event.color || '#2f7bff' },
       })
@@ -50,20 +50,26 @@ export function advancePlayback(state, event) {
       return state.screen === 'overview' ? screen(state, 'choose', now) : state
     case 'intro': return screen(begin(now, state.revision), 'narration', now)
     case 'outro': return screen(state, 'farewell', now, { held: null })
+    case 'audio-waiting':
+      return event.revision===state.revision && ['farewell','experience'].includes(state.screen) ? (state.screen==='farewell'?{...state,awaitingAudio:true}:{...state,sceneAudioPending:true}) : state
     case 'audio-ended':
+      if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false,sceneAudioFinishedAt:now}
+      if(event.revision===state.revision && state.screen==='farewell')return begin(now,state.revision+1)
       return event.revision === state.revision && ['overview', 'narration'].includes(state.screen)
         ? screen(state, 'choose', now) : state
     case 'audio-failed':
+      if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false}
+      if(event.revision===state.revision && state.screen==='farewell')return {...state,awaitingAudio:false,started:now}
       return event.revision === state.revision && state.screen === 'overview'
         ? { ...state, deadline: now + DURATION.tour } : state
     case 'clock': {
       let next = state.confirmation && now - state.confirmation.at >= 1800
         ? { ...state, confirmation: null } : state
       if (state.screen === 'overview' && now >= state.deadline) return screen(next, 'choose', now)
-      if (state.screen === 'farewell' && now - state.started >= DURATION.farewell) return begin(now, state.revision + 1)
+      if (state.screen === 'farewell' && !state.awaitingAudio && now - state.started >= DURATION.farewell) return begin(now, state.revision + 1)
       if (state.screen !== 'experience') return next
       const elapsed = Math.max(0, now - state.started)
-      if (elapsed >= DURATION.tour && state.seen.length === PEOPLE.length) return screen(next, 'farewell', now, { held: null })
+      if (elapsed >= DURATION.tour && state.seen.length === PEOPLE.length && !state.sceneAudioPending && (state.sceneAudioFinishedAt==null || now-state.sceneAudioFinishedAt>=4000)) return screen(next, 'farewell', now, { held: null })
       const dimension = Math.floor(elapsed / DURATION.dimension) % DIMENSIONS.length
       const loop = Math.floor(elapsed / DURATION.tour)
       return dimension === state.dimension && loop === state.loop ? next : { ...next, dimension, loop }

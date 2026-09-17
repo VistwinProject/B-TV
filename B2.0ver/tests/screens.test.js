@@ -22,7 +22,7 @@ test('all six screen types render actual content without browser dependencies', 
   const screens = [
     ['Welcome',{},'感應光寓'],['Choose',{people:content.people,choose:()=>{}},'選一個情境鑰匙圈'],
     ['Overview',{metrics:content.house},'即時健康資訊'],['Experience',{person:content.people[0],dimension:0},'居家抗老'],
-    ['Narration',{state:{started:0}},'AI 聲紋'],['Farewell',{},'房子的健康，就是你的健康'],
+    ['Narration',{state:{started:0}},'AI 聲紋'],['Farewell',{},'依照您不同的生活型態，'],
   ]
   for(const [name,props,text] of screens) assert.ok(renderToStaticMarkup(createElement(views[name],props)).includes(text),name)
 })

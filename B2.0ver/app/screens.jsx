@@ -1,3 +1,5 @@
+import { sceneCaptionAt } from './sceneCaptions.js'
+import { outroCaptionAt } from './outroCaptions.js'
 import HomeScene from './HomeScene.jsx'
 import { DIMENSIONS } from './playback.js'
 import { BrandFooter, Film, LightRibbon, NumberText, PersonSymbol, Symbol, VerticalReel, Voice } from './visuals.jsx'
@@ -65,7 +67,18 @@ function DimensionReadings({ person, dimension }) {
   return <>{data.metrics.map((metric, index) => <Reading key={`${dimension}-${index}`} metric={metric} dimension={dimension} lighting={data} />)}</>
 }
 
-export function Experience({ person, dimension }) {
+function GoalCaption({person,audioTime,audioStatus}) {
+  const finished=audioStatus==='ended'
+  const staticGoal=!audioStatus || ['idle','error'].includes(audioStatus)
+  return <p key={`${person.id}-${finished}`} className={`goal-copy${finished?' goal-copy--finished':''}`} aria-live="polite">
+    {staticGoal ? person.goal : <>
+      <span className="goal-spoken" aria-hidden={finished}>{sceneCaptionAt(person.id,audioTime)}</span>
+      <span className="goal-final" aria-hidden={!finished}>{person.goal}</span>
+    </>}
+  </p>
+}
+
+export function Experience({ person, dimension, audioTime=0, audioStatus, onPlay }) {
   const { design } = useDesign()
   const layout = design.scenes[person.id], material = design.material
   const solution = person.dimensions[DIMENSIONS[dimension]]
@@ -82,7 +95,7 @@ export function Experience({ person, dimension }) {
       <div className="readings-column enter-panel" style={{ '--delay': '.16s' }}><VerticalReel identity={dimension}><DimensionReadings person={person} dimension={dimension} /></VerticalReel></div>
       <div className="media-column">
         <div className="experience-film enter-panel" style={{ '--delay': '.14s' }}><HomeScene person={person} dimension={dimension} /></div>
-        <article className="goal-card surface enter-panel" style={{ '--delay': '.2s' }}><header><h2 className="caption">核心目標</h2><Symbol name="goal" animated /></header><p className="goal-copy">{person.goal}</p><p className="goal-label">{person.shortName}</p></article>
+        <article className="goal-card surface enter-panel" style={{ '--delay': '.2s' }}><header><h2 className="caption">核心目標</h2><Symbol name="goal" animated /></header><div className="goal-content"><Voice /><GoalCaption person={person} audioTime={audioTime} audioStatus={audioStatus} /></div>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>播放情境語音</button>}</article>
       </div>
       <div className="story-column">
         <Guides tracks={[layout.painHeight,100-layout.painHeight]} path={['scenes',person.id,'painHeight']} axis="y" percent />
@@ -98,6 +111,6 @@ export function Narration({ analyser, audioStatus, onPlay }) {
   return <section className="narration screen-center"><p className="narration-eyebrow">AI 聲紋 · VOICEPRINT</p><Voice analyser={analyser} /><p className="narration-copy">歡迎來到「感應光寓」。我們將以你在上個空間留下的資訊，為你打造專屬的居家體驗。準備好了嗎？體驗即將開始。</p>{['blocked', 'error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus === 'blocked' ? '點此播放前言語音' : '重新播放前言語音'}</button>}</section>
 }
 
-export function Farewell({ analyser }) {
-  return <section className="farewell screen-center"><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><h1>房子的健康，就是你的健康</h1><p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
+export function Farewell({ analyser, audioTime=0, audioStatus, onPlay }) {
+  return <section className="farewell screen-center"><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><p className="outro-subtitle" aria-live="polite" aria-atomic="true">{outroCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus==='blocked' ? '點此播放結語語音' : '重新播放結語語音'}</button>}<p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
 }

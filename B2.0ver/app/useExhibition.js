@@ -84,14 +84,25 @@ export function useExhibition(people, suspended = false) {
 export function useNarration(state, issue, suspended = false) {
   const analyser = useRef(null), retry = useRef(null)
   const [audioStatus, setAudioStatus] = useState('idle')
+  const [audioTime,setAudioTime]=useState(0)
   useEffect(() => {
-    setAudioStatus('idle')
-    if (suspended || (!flags.audio && state.screen !== 'narration')) return
+    setAudioStatus('idle');setAudioTime(0)
+    if (suspended || (!flags.audio && !['narration','farewell','experience'].includes(state.screen))) return
     const cue = { overview: 'lead', narration: 'intro', farewell: 'outro' }[state.screen]
       || (state.screen === 'experience' ? `scene-${state.person}` : null)
     if (!cue) return
-    let active = true, context, source, settled = false
-    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${cue === 'intro' ? 'wav' : 'mp3'}`)
+    let active = true, context, source, settled = false, captionFrame=0, lastCaptionTime=-1
+    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['intro','outro'].includes(cue)) ? 'wav' : 'mp3'}`)
+    if(['farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
+    const syncCaption=()=>{
+      if(!active)return
+      const time=player.currentTime
+      if(Math.abs(time-lastCaptionTime)>=1/30){setAudioTime(time);lastCaptionTime=time}
+      captionFrame=requestAnimationFrame(syncCaption)
+    }
+    captionFrame=requestAnimationFrame(syncCaption)
+    player.ontimeupdate=()=>{if(active){setAudioTime(player.currentTime);lastCaptionTime=player.currentTime}}
+
     function fail() {
       if (!active || settled) return
       settled = true
@@ -100,14 +111,14 @@ export function useNarration(state, issue, suspended = false) {
     }
     player.onerror = fail
     player.onended = () => {
-      if (active && !settled) { settled = true; issue({ action: 'audio-ended', revision: state.revision }) }
+      if (active && !settled) { settled = true; setAudioTime(player.duration);setAudioStatus('ended');issue({ action: 'audio-ended', revision: state.revision }) }
     }
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext
       if (AudioContext) {
         context = new AudioContext()
         analyser.current = context.createAnalyser()
-        analyser.current.fftSize = 256
+        analyser.current.fftSize = 1024
         source = context.createMediaElementSource(player)
         source.connect(analyser.current); analyser.current.connect(context.destination)
         context.resume().catch(() => {})
@@ -127,11 +138,11 @@ export function useNarration(state, issue, suspended = false) {
       play()
     } catch { fail() }
     return () => {
-      active = false; retry.current = null; player.pause(); player.onerror = null; player.onended = null
+      active = false; cancelAnimationFrame(captionFrame);retry.current = null; player.pause(); player.onerror = null; player.onended = null; player.ontimeupdate=null
       player.removeAttribute('src'); player.load()
       source?.disconnect(); analyser.current?.disconnect(); analyser.current = null
       context?.close().catch(() => {})
     }
   }, [state.revision, state.screen, state.person, issue, suspended])
-  return { analyser, audioStatus, play: () => retry.current?.() }
+  return { analyser, audioStatus, audioTime, play: () => retry.current?.() }
 }
