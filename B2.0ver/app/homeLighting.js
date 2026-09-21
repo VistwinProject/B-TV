@@ -1,4 +1,6 @@
+import {pregnancyFrame} from './homePregnancy.js'
 import {elderFrame,ELDER_POSITION} from './homeElder.js'
+import {nomadFrame} from './homeNomad.js'
 import * as T from 'three'
 
 // Exhibition art direction. Lux / EML are not interchangeable with screen intensity.
@@ -7,7 +9,7 @@ export const LIGHT_PROFILES={
   child:{kelvin:4000,brightness:.75,label:'中性白光 · 學習照明',basis:'文案指定 ≥500 Lux；4000K 為展示設定'},
   elder:{kelvin:5000,brightness:1,label:'明亮冷白光 · 視覺補償',basis:'文案指定 ≥800 Lux 與高色溫；5000K 為展示設定'},
   pregnancy:{kelvin:2200,brightness:.3,label:'柔和暖黃光 · 間接照明',basis:'取文案 1800–2700K 範圍內的 2200K'},
-  nomad:{kelvin:5750,brightness:.9,label:'冷白光 · 專注辦公',basis:'取文案 5000–6500K 範圍中值；桌面 500–1000 Lux'},
+  nomad:{kelvin:5750,brightness:1.035,label:'冷白光 · 專注辦公',basis:'取文案 5000–6500K 範圍中值；桌面 500–1000 Lux'},
 }
 export const LIGHT_CYCLE_SECONDS=25
 const smooth=(a,b,t)=>{const x=T.MathUtils.clamp((t-a)/(b-a),0,1);return x*x*(3-2*x)}
@@ -16,7 +18,7 @@ export function lightingFrame(id,seconds){
   const dawn=smooth(24,25,t)
   const night=id==='anti-aging'?smooth(3,9,t)*(1-dawn):0
   const kelvin=T.MathUtils.lerp(profile.kelvin,profile.nightKelvin||profile.kelvin,night)
-  const brightness=id==='anti-aging'?profile.brightness*Math.max(1-smooth(17.5,20,t),dawn):profile.brightness*smooth(0,3,t)*(1-smooth(23,25,t))
+  const brightness=id==='pregnancy'?profile.brightness*pregnancyFrame(t).light:id==='nomad'?profile.brightness*nomadFrame(t).all:id==='anti-aging'?profile.brightness*Math.max(1-smooth(17.5,20,t),dawn):profile.brightness*smooth(0,3,t)*(1-smooth(23,25,t))
   const daylight=id==='anti-aging'?1-night:0
   const windowLight=id==='anti-aging'?daylight:(.45+.45*(.5+.5*Math.sin(t/LIGHT_CYCLE_SECONDS*Math.PI*2)))*(id==='pregnancy'?.35:1)
   return {kelvin,brightness,daylight,windowLight,label:id==='anti-aging'?`${t>=24?'日間緩亮':t>=20?'夜間休息 · 燈光關閉':t>=17.5?'夜間燈光漸暗':night>=1?'夜幕降臨 · 保留室內照明':night>0?'日暮漸暗':'日間情境光'}${t>=20&&t<24?'':` · ${Math.round(kelvin/50)*50}K`}`:`${profile.label} · ${profile.kelvin}K`}
@@ -83,12 +85,12 @@ export function createHomeLighting(scene,metadata,positions){
   const up=new T.Vector3(0,1,0),aim=new T.Vector3(),groundTarget=new T.Vector3()
   let active='anti-aging',time=0,intensity=.85,daylight=1
   return {
-    select(id){if(id!==active){active=id;time=0}},
+    select(id){if(id!==active){active=id;time=0;if(id==='nomad'||id==='pregnancy'){intensity=0;daylight=0}}},
     tick(dt,paused=false){
       if(!paused)time+=dt
       // The anti-aging timeline already eases every transition; do not delay its
       // final one-second dawn with a second low-pass filter.
-      const frame=lightingFrame(active,time),blend=active==='anti-aging'?1:1-Math.exp(-dt*3)
+      const frame=lightingFrame(active,time),blend=active==='anti-aging'||active==='nomad'||active==='pregnancy'?1:1-Math.exp(-dt*3)
       intensity=T.MathUtils.lerp(intensity,frame.brightness,blend)
       daylight=T.MathUtils.lerp(daylight,frame.daylight,blend)
       const boost=active==='elder'?elderFrame(time).floorBoost:0

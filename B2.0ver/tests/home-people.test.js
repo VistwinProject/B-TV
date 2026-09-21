@@ -7,7 +7,7 @@ import {lightingFrame} from '../app/homeLighting.js'
 test('each static figure has a single connected surface through torso and joints',()=>{
   const scene=new T.Scene(),people=createHomePeople(scene)
   assert.equal(scene.children[0].children.length,2)
-  for(const mesh of scene.children[0].children){
+  for(const mesh of [...scene.children[0].children,...scene.getObjectByName('people-nomad').children]){
     const {position}=mesh.geometry.attributes,indices=mesh.geometry.index.array
     assert.ok([...position.array].every(Number.isFinite))
     const neighbors=Array.from({length:position.count},()=>[])

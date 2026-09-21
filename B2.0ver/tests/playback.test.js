@@ -79,7 +79,7 @@ test('audio end, unavailable audio, watchdog and stale callbacks', () => {
   const state = update(begin(), { action: 'invite', now: 0, hasAudio: true })
   assert.equal(state.deadline, DURATION.audioLimit)
   assert.equal(update(state, { action: 'clock', now: 120000 }).screen, 'choose')
-  assert.equal(update(state, { action: 'audio-ended', revision: state.revision, now: 5000 }).screen, 'choose')
+  assert.equal(update(state, { action: 'audio-ended', revision: state.revision, now: 5000 }).screen, 'overview')
   const failure = update(state, { action: 'audio-failed', revision: state.revision, now: 300 })
   assert.equal(failure.deadline, 20300)
   const scene = update(state, { action: 'person', id: 'pregnancy', now: 100 })

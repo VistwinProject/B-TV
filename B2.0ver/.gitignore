@@ -29,3 +29,5 @@ dist-white
 !public/voice/intro.wav
 !public/voice/outro.wav
 !public/voice/scene-*.wav
+
+!public/voice/lead.wav

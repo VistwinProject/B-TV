@@ -49,8 +49,17 @@ test('each of 20 dimensions renders its own solution and accessible 3D scene', (
 })
 
 test('the build entry cannot import first-attempt source', async () => {
-  const bundle=await build({entryPoints:['app/main.jsx'],bundle:true,format:'esm',write:false,metafile:true,loader:{'.otf':'file','.ttf':'file'},outdir:resolve(output,'bundle'),external:['/fonts/*','/icons/*','/bg/*'],jsx:'automatic'})
+  const bundle=await build({entryPoints:['app/main.jsx'],bundle:true,format:'esm',write:false,metafile:true,loader:{'.otf':'file','.ttf':'file'},outdir:resolve(output,'bundle'),external:['/fonts/*','/icons/*','/bg/*','/backgrounds/*'],jsx:'automatic'})
   for(const name of Object.keys(bundle.metafile.inputs)) assert.ok(!name.startsWith('src/') && !name.startsWith('archive/'),name)
   assert.ok(bundle.metafile.inputs['app/playback.js'])
   assert.ok(bundle.metafile.inputs['app/interface.css'])
+})
+
+test('overview contains no legacy video or hidden 3D scene and keeps live visual indicators',()=>{
+  const html=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house}))
+  assert.ok(!html.includes('<video'))
+  assert.ok(!html.includes('WALKTHROUGH'))
+  assert.ok(!html.includes('home-scene'))
+  assert.ok(html.includes('未來居家照片輪播'))
+  assert.equal((html.match(/class="symbol animated-symbol /g)||[]).length,content.house.length)
 })

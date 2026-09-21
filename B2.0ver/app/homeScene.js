@@ -1,4 +1,4 @@
-import {childCameraFrame,antiAgingCameraFrame,elderCameraFrame} from './homeCamera.js'
+import {childCameraFrame,antiAgingCameraFrame,elderCameraFrame,nomadCameraFrame,pregnancyCameraFrame} from './homeCamera.js'
 import {createHomeCleaning} from './homeCleaning.js'
 import * as THREE from 'three'
 import {createHomePeople} from './homePeople.js'
@@ -93,6 +93,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
   const windows=createHomeWindows(scene)
   const people=createHomePeople(scene)
   const cleaning=createHomeCleaning(scene)
+  const bottleCleaning=createHomeCleaning(scene,'pregnancy')
   const cameraDirection=new THREE.Vector3(...SCENE_VIEWS['anti-aging']).normalize(),targetDirection=cameraDirection.clone()
   const orbit=new THREE.Spherical().setFromVector3(cameraDirection),targetOrbit=new THREE.Spherical()
   let activeCameraScene=null,entrance=null,entranceZoom=1,scriptedShot=null
@@ -144,7 +145,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
         orbit.theta+=angle*turn
         orbit.phi=THREE.MathUtils.lerp(orbit.phi,targetOrbit.phi,turn)
       }
-      scriptedShot=view.personId==='child'?childCameraFrame(state.cycleSeconds):view.personId==='anti-aging'?antiAgingCameraFrame(state.cycleSeconds):view.personId==='elder'?elderCameraFrame(state.cycleSeconds):null
+      scriptedShot=view.personId==='child'?childCameraFrame(state.cycleSeconds):view.personId==='anti-aging'?antiAgingCameraFrame(state.cycleSeconds):view.personId==='elder'?elderCameraFrame(state.cycleSeconds):view.personId==='nomad'?nomadCameraFrame(state.cycleSeconds):view.personId==='pregnancy'?pregnancyCameraFrame(state.cycleSeconds):null
       if(scriptedShot&&!entrance&&state.cycleSeconds>=(view.personId==='anti-aging'?3.2:2)){
         // The scripted path already has eased starts/stops; follow it without lag.
         orbit.setFromVector3(new THREE.Vector3(...scriptedShot.direction).normalize())
@@ -152,6 +153,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
       cameraDirection.setFromSpherical(orbit)
       fitCamera()
       cleaning.tick(view.personId,state,camera)
+      bottleCleaning.tick(view.personId,state,camera)
       nightBackground.lerp(targetBackground,1-Math.exp(-dt*2))
       scene.background.copy(nightBackground).lerp(dayBackground,state.daylight)
       material.color.copy(nightInk).lerp(dayInk,state.daylight)
@@ -198,6 +200,6 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
       }
       resize()
     },
-    dispose() { disposed=true; cancelAnimationFrame(frameId); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); people.dispose(); cleaning.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
+    dispose() { disposed=true; cancelAnimationFrame(frameId); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); people.dispose(); cleaning.dispose(); bottleCleaning.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
   }
 }

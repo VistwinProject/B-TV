@@ -51,8 +51,10 @@ export function advancePlayback(state, event) {
     case 'intro': return screen(begin(now, state.revision), 'narration', now)
     case 'outro': return screen(state, 'farewell', now, { held: null })
     case 'audio-waiting':
+      if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:now+DURATION.audioLimit}
       return event.revision===state.revision && ['farewell','experience'].includes(state.screen) ? (state.screen==='farewell'?{...state,awaitingAudio:true}:{...state,sceneAudioPending:true}) : state
     case 'audio-ended':
+      if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:Math.max(state.started+DURATION.tour,now+4000)}
       if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false,sceneAudioFinishedAt:now}
       if(event.revision===state.revision && state.screen==='farewell')return begin(now,state.revision+1)
       return event.revision === state.revision && ['overview', 'narration'].includes(state.screen)

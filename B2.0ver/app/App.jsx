@@ -1,5 +1,5 @@
 import { VoiceOrbProvider } from './VoiceOrb.jsx'
-import { Component, useState, useEffect } from 'react'
+import { Component, useState, useEffect, useRef } from 'react'
 import content from './exhibition.json'
 import { useExhibition, useNarration, flags } from './useExhibition.js'
 import { Choose, Experience, Farewell, Narration, Overview, Welcome } from './screens.jsx'
@@ -38,11 +38,17 @@ export default function App() {
   const [preview, setPreview] = useState({ screen: 'welcome', person: content.people[0].id, dimension: 0, started: 0 })
   useEffect(() => { if (editing) setPreview({ ...playback, person: playback.person || content.people[0].id }) }, [editing])
   const state = editing ? preview : playback
+  const stage=useRef(null)
+  useEffect(()=>{
+    if(editing || state.screen!=='experience' || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
+    const fade=stage.current?.animate([{opacity:0},{opacity:1}],{duration:500,easing:'ease-out'})
+    return ()=>fade?.cancel()
+  },[state.person,state.screen,editing])
   const { analyser, audioStatus, audioTime, play } = useNarration(playback, issue, editing)
   const theme = Object.fromEntries(Object.entries(design.theme).map(([key,value]) => [`--edit-${key}`,value]))
   let view
   switch (state.screen) {
-    case 'overview': view = <Overview metrics={content.house} />; break
+    case 'overview': view = <Overview metrics={content.house} audioTime={audioTime} audioStatus={editing?'idle':audioStatus} onPlay={play} />; break
     case 'choose': view = <Choose people={content.people} choose={id => editing ? setPreview(v => ({ ...v, screen: 'experience', person: id, dimension: 0 })) : operate('person', id)} />; break
     case 'experience': view = <Experience person={content.people.find(p => p.id === state.person)} dimension={state.dimension} audioTime={audioTime} audioStatus={editing ? 'idle' : audioStatus} onPlay={play} />; break
     case 'narration': view = <Narration analyser={analyser} audioStatus={editing ? "idle" : audioStatus} onPlay={play} />; break
@@ -50,9 +56,8 @@ export default function App() {
     default: view = <Welcome />
   }
   const connectionLabel = connection === 'local' ? '本機預覽' : connection === 'connected' ? (reader ? '讀卡機就緒' : '等待讀卡機') : '連線中'
-  return <VoiceOrbProvider analyser={analyser} active={playback.screen !== 'welcome'} paused={editing}><main className="exhibition" data-screen={state.screen} data-editing={editing} style={theme}>
-    <div className="stage-screen" key={state.screen === 'experience' ? 'experience' : `${state.screen}-${state.revision}`}>{view}</div>
-    {!editing && state.confirmation && <div key={state.confirmation.at} className="confirmation" style={{ '--confirm-color': state.confirmation.color }} aria-hidden="true"><i /><i /><span>✓</span></div>}
+  return <VoiceOrbProvider enabled={['overview','narration','experience','farewell'].includes(state.screen)} analyser={analyser} active={playback.screen !== 'welcome'} paused={editing}><main className="exhibition" data-screen={state.screen} data-editing={editing} style={theme}>
+    <div ref={stage} className="stage-screen" key={state.screen === 'experience' ? 'experience' : `${state.screen}-${state.revision}`}>{view}</div>
     <div className="device-status" data-connected={connection === 'connected' && reader}><i /><span>{connectionLabel}</span><span>{state.screen === 'experience' && state.loop > 0 ? '情境體驗' : names[state.screen]}</span></div>
     {!editing && <Operator state={state} operate={operate} />}
     {!editing && !flags.kiosk && <button className="editor-launch" onClick={() => setEditing(true)}>E · 編輯畫面</button>}

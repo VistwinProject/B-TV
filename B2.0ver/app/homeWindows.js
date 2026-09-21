@@ -1,3 +1,5 @@
+import {pregnancyFrame} from './homePregnancy.js'
+import {nomadFrame} from './homeNomad.js'
 import {elderFrame} from './homeElder.js'
 import * as T from 'three'
 
@@ -21,16 +23,15 @@ export function createHomeWindows(scene){
     function box(x,y,z,w,h,d){const g=new T.BoxGeometry(w,h,d),e=new T.EdgesGeometry(g);geometries.push(g,e);const m=new T.Mesh(g,cloth),l=new T.LineSegments(e,ink);m.position.set(x,y,z);l.position.copy(m.position);root.add(m,l);return [m,l]}
     function pane(x,y,z,w,h,material){const g=new T.PlaneGeometry(w,h);geometries.push(g);const p=new T.Mesh(g,material);p.rotation.y=-Math.PI/2;p.position.set(x,y,z);root.add(p);return p}
     box(4.94,2.34,-2.277,.09,.08,1.58)
-    if(id==='anti-aging')for(let i=0;i<12;i++)slats.push(...box(4.92,2.23-i*.115,-2.277,.125,.018,1.44))
+    if(id==='anti-aging'||id==='nomad')for(let i=0;i<12;i++)slats.push(...box(4.92,2.23-i*.115,-2.277,.125,.018,1.44))
     if(id==='child'){pane(4.92,1.83,-2.277,1.43,.94,cloth);box(4.92,1.36,-2.277,.045,.04,1.45)}
     if(id==='elder'||id==='pregnancy'){
       for(const side of [-1,1])for(let i=0;i<5;i++){
         const pair=box(4.9+(i%2)*.025,1.58,-2.277+side*(.48+i*.045),.06,1.46,.05)
-        if(id==='elder')for(const mesh of pair)curtains.push({mesh,side,index:i})
+        for(const mesh of pair)curtains.push({mesh,side,index:i})
       }
-      if(id==='pregnancy')pane(4.88,1.58,-2.277,1.38,1.43,cloth)
+
     }
-    if(id==='nomad')for(let i=0;i<8;i++)box(4.91,2.2-i*.16,-2.277,.025,.08,1.44)
     pane(4.86,1.58,-2.277,1.42,1.45,light)
     // Window light washes inward across the floor, with slat / zebra banding.
     const floor= new T.PlaneGeometry(2.8,1.8);geometries.push(floor)
@@ -40,5 +41,5 @@ export function createHomeWindows(scene){
     sets.push({id,root,uniforms,cloth,ink,slats,curtains,weight:0})
   }
   let time=0
-  return {tick(dt,id,state,paused=false){if(!paused)time+=dt;for(const s of sets){s.weight=T.MathUtils.lerp(s.weight,s.id===id?1:0,1-Math.exp(-dt*2.5));s.root.visible=s.weight>.002;const closed=s.id==='anti-aging'?blindsClosure(state.cycleSeconds||0):s.id==='elder'?elderFrame(state.cycleSeconds).curtain:0;for(const panel of s.curtains){panel.mesh.position.z=-2.277+panel.side*T.MathUtils.lerp(.48+panel.index*.045,.073+panel.index*.146,closed);panel.mesh.scale.z=T.MathUtils.lerp(1,3.0,closed)}for(const slat of s.slats)slat.rotation.z=closed*Math.PI/2;s.cloth.opacity=s.weight*(s.id==='pregnancy'?.13:.3+closed*.35);s.ink.opacity=s.weight*.55;s.uniforms.amount.value=s.weight*state.windowLight*.22*(1-closed);s.uniforms.phase.value=Math.sin(time*.18)*.15}},dispose(){sets.forEach(s=>scene.remove(s.root));geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose())}}
+  return {tick(dt,id,state,paused=false){if(!paused)time+=dt;for(const s of sets){s.weight=T.MathUtils.lerp(s.weight,s.id===id?1:0,1-Math.exp(-dt*2.5));s.root.visible=s.weight>.002;const closed=s.id==='pregnancy'?pregnancyFrame(state.cycleSeconds).curtain:s.id==='anti-aging'?blindsClosure(state.cycleSeconds||0):s.id==='elder'?elderFrame(state.cycleSeconds).curtain:s.id==='nomad'?nomadFrame(state.cycleSeconds).blinds:0;for(const panel of s.curtains){panel.mesh.position.z=-2.277+panel.side*T.MathUtils.lerp(.48+panel.index*.045,.073+panel.index*.146,closed);panel.mesh.scale.z=T.MathUtils.lerp(1,3.0,closed)}for(const slat of s.slats)slat.rotation.z=closed*Math.PI/2;s.cloth.opacity=s.weight*(s.id==='pregnancy'?.13:.3+closed*.35);s.ink.opacity=s.weight*.55;s.uniforms.amount.value=s.weight*state.windowLight*.22*(1-closed);s.uniforms.phase.value=Math.sin(time*.18)*.15}},dispose(){sets.forEach(s=>scene.remove(s.root));geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose())}}
 }

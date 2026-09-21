@@ -1,4 +1,3 @@
-import {LIGHT_CYCLE_SECONDS} from './homeLighting.js'
 import { useDesign } from './editor/DesignContext.jsx'
 import { useEffect, useRef, useState } from 'react'
 
@@ -24,7 +23,6 @@ export default function HomeScene({ person }) {
   return <div className="film home-scene" data-person={person.id}>
     <div className="home-scene-canvas" ref={host} role="img" aria-label={`${person.title}的 3D 客廳：實際模型黑底白線與情境燈光，情境正交運鏡`} />
     {status !== 'ready' && <div className="home-scene-status" role="status">{status === 'error' ? '空間線框無法載入，請重新整理畫面' : '正在載入空間線框…'}</div>}
-    <div className="film-caption"><b>你的未來居家</b><span>{beat} · {LIGHT_CYCLE_SECONDS} 秒循環</span></div>
-    <span className="home-scene-tag">3D 空間線框</span>
+    <div className="film-caption"><b>你的未來居家</b><span>{beat}</span></div>
   </div>
 }

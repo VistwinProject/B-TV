@@ -28,7 +28,7 @@ export function PersonSymbol({ id, animated = false }) {
 
 export function NumberText({ value, duration = 1300 }) {
   const element = useRef(null)
-  const numeric = /^\d+(\.\d+)?(?:\s*[–—-]\s*\d+(\.\d+)?)?$/.test(String(value))
+  const numeric = /^\d+(\.\d+)?(?:\s*[–—~‐-]\s*\d+(\.\d+)?)?$/.test(String(value))
   useEffect(() => {
     if (!numeric) return
     let frame, cancelled = false

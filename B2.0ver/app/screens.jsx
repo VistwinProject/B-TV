@@ -1,8 +1,11 @@
+import {overviewCaptionAt} from './overviewCaptions.js'
+import {houseCardColor} from './editor/model.js'
+import {useEffect,useState} from 'react'
 import { sceneCaptionAt } from './sceneCaptions.js'
 import { outroCaptionAt } from './outroCaptions.js'
 import HomeScene from './HomeScene.jsx'
 import { DIMENSIONS } from './playback.js'
-import { BrandFooter, Film, LightRibbon, NumberText, PersonSymbol, Symbol, VerticalReel, Voice } from './visuals.jsx'
+import { BrandFooter, Film, mediaURL, NumberText, PersonSymbol, Symbol, VerticalReel, Voice } from './visuals.jsx'
 
 import { useDesign } from './editor/DesignContext.jsx'
 import Guides from './editor/Guides.jsx'
@@ -11,40 +14,78 @@ export const DIMENSION_LABELS = ['光照', '空氣', '溫濕度', '聲音']
 const CIRCLES = ['①', '②', '③', '④']
 
 export function Welcome() {
-  return <section className="welcome screen-center">
-    <LightRibbon />
-    <div className="welcome-type"><h1>感應光寓</h1><p>SENSING RESIDENCE</p><span>請入座，將邀請卡放上感應區</span></div>
+  const {design,editing,patch}=useDesign(),settings=design.welcome
+  const textProps=key=>({
+    className:editing?'welcome-editable':undefined,
+    style:{'--text-scale':settings[key].size/100,'--text-spacing':`${settings[key].spacing}em`,transform:`translate(${settings[key].x}vw,${settings[key].y}vh)`},
+    onPointerDown:editing?e=>{
+      e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId)
+      const startX=e.clientX,startY=e.clientY,original=settings[key],element=e.currentTarget
+      element.onpointermove=event=>patch(['welcome',key],{...original,x:original.x+(event.clientX-startX)/window.innerWidth*100,y:original.y+(event.clientY-startY)/window.innerHeight*100})
+      element.onpointerup=element.onpointercancel=()=>{element.onpointermove=null}
+    }:undefined
+  })
+  return <section className="welcome screen-center" style={{'--welcome-line-gap':settings.lineGap,'--subtitle-scale':settings.subtitle.size/100}}>
+    <div className="welcome-type"><div className="welcome-heading"><h1 {...textProps('title')} aria-label="感應光寓">{Array.from('感應光寓').map(letter=><span key={letter} aria-hidden="true">{letter}</span>)}</h1><p {...textProps('subtitle')} aria-label="SENSING RESIDENCE">{Array.from('SENSING RESIDENCE').map((letter,index)=><span key={index} aria-hidden="true">{letter===' '? '\u00a0':letter}</span>)}</p></div><span {...textProps('hint')}>請入座，將邀請卡放上感應區</span></div>
     <i className="brand-logo welcome-logo" role="img" aria-label="ANLB inside" />
   </section>
 }
 
 export function Choose({ people, choose }) {
-  return <section className="choices screen-center"><div className="choices-content">
+  const {design}=useDesign(),material=design.material
+  return <section className="choices screen-center" data-panel="glass" data-background={material.background==='white'?'white':'key'} style={{'--person-color':'#7ba9df','--card-alpha':material.alpha,'--paint-alpha':material.alpha,'--card-wash':`${material.wash*100}%`,'--card-blur':`${material.blur}px`,'--card-gloss':Math.min(1,material.gloss/3),'--card-filter':material.refract==='off'?'none':'url(#choices-glass-distortion)'}}>
+    <svg width="0" height="0" aria-hidden="true" style={{position:'absolute'}}><defs><filter id="choices-glass-distortion"><feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale={material.refract==='strong'?25:8} xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
+    <div className="experience-light" /><div className="choices-content">
     <p className="choices-eyebrow">你的痛點，寶舖有解方</p>
     <h1>選一個情境鑰匙圈，放上感應區</h1>
     <ol>{people.map((person, i) => <li key={person.id} style={{ '--delay': `${.15 + i * .09}s` }}>
-      <button style={{ '--person-color': person.color }} onClick={() => choose(person.id)}>
+      <button className="surface" style={{ '--person-color': person.color, '--paint': design.scenes[person.id].colors[0] || 'transparent', '--paint-alpha': design.scenes[person.id].colors[0] === null ? 0 : material.alpha }} onClick={() => choose(person.id)}>
         <b>{String(i + 1).padStart(2, '0')}</b><span>{person.question}</span><small>{person.shortName}</small>
       </button></li>)}</ol>
     <p className="choices-caption">房子會調整光、空氣、溫濕度與聲音來照顧你</p>
   </div></section>
 }
 
-export function Overview({ metrics }) {
+const homePhotos=['0909-3.png','0909-4.png','0909-5.png','孕婦1.png']
+function HomePhotoCarousel(){
+  const {editing}=useDesign(),[index,setIndex]=useState(0)
+  useEffect(()=>{
+    // Preload the following images to avoid a blank frame during the upward wipe.
+    const images=homePhotos.map(file=>{const image=new Image();image.src=mediaURL(`scenes/${file}`);return image})
+    return ()=>{images.forEach(image=>{image.onload=null})}
+  },[])
+  useEffect(()=>{if(editing)return;const timer=setInterval(()=>setIndex(i=>(i+1)%homePhotos.length),4500);return ()=>clearInterval(timer)},[editing])
+  return <VerticalReel identity={index}><img className="overview-photo" src={mediaURL(`scenes/${homePhotos[index]}`)} alt={`未來居家場景 ${index+1}`} /></VerticalReel>
+}
+
+function HouseScanIcon(){
+  return <svg className="overview-house-scan" viewBox="0 0 100 90" fill="none" aria-hidden="true">
+    <g className="house-scan-building" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path className="house-scan-fill" d="M22 40 50 16 78 40V76H22Z" />
+      <path d="M14 43 50 12 86 43M43 76V55H57V76M30 44H40V54H30ZM60 44H70V54H60ZM17 77H83" />
+    </g>
+    <path className="house-scan-line" d="M8 10H92" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+}
+
+export function Overview({ metrics, audioTime=0, audioStatus='idle', onPlay }) {
   const { design } = useDesign()
-  const panel = key => ({ background: design.house.panels[key].color || 'transparent', border: design.house.panels[key].rim ? '1px solid #5ca0ff' : '1px solid transparent', boxShadow: design.house.panels[key].rim ? undefined : 'none' })
-  return <section className="overview" style={{ gridTemplateColumns: design.house.columns.map(v => `minmax(0, ${v}fr)`).join(' '), gridTemplateRows: design.house.rows.map(v => `minmax(0, ${v}fr)`).join(' ') }} aria-label="房屋即時健康資訊牆">
+  const material=design.material
+  const panel = key => ({ '--paint':houseCardColor(design.house,key),'--paint-alpha':design.house.alpha })
+  return <section className="overview" data-background={material.background==='white'?'white':'key'} data-panel="glass" style={{ '--wall-title':design.house.textColors.title,'--wall-number':design.house.textColors.number,'--wall-caption':design.house.textColors.caption,'--person-color':'#7ba9df','--card-alpha':design.house.alpha,'--card-wash':`${material.wash*100}%`,'--card-blur':`${material.blur}px`,'--card-gloss':Math.min(1,material.gloss/3),'--card-filter':material.refract === 'off' ? 'none' : 'url(#overview-glass-distortion)',gridTemplateColumns: design.house.columns.map(v => `minmax(0, ${v}fr)`).join(' '), gridTemplateRows: design.house.rows.map(v => `minmax(0, ${v}fr)`).join(' ') }} aria-label="房屋即時健康資訊牆">
+    <svg width="0" height="0" aria-hidden="true" style={{position:'absolute'}}><defs><filter id="overview-glass-distortion"><feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale={material.refract==='strong'?25:8} xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
+    <div className="experience-light" />
     <Guides tracks={design.house.columns} path={['house','columns']} /><Guides axis="y" tracks={design.house.rows} path={['house','rows']} />
-    <article className="overview-intro surface" style={panel("intro")}><p className="caption">寶舖 SENSOR · 數位孿生平台</p><h1>這間房子的<br />即時健康資訊</h1></article>
+    <article className="overview-intro surface" style={panel("intro")}><p className="caption">寶舖 SENSOR · 數位孿生平台</p><div className="overview-house-content"><HouseScanIcon /><h1>房子的健康<br />就是你的健康</h1></div><p className="caption">選一個情境鑰匙圈，看寶舖怎麼解</p></article>
     {metrics.map((metric, index) => <article key={metric.key} className={`overview-stat surface overview-${metric.key}`} style={{ ...panel(metric.key), '--delay': `${index * .05}s` }}>
-      <header><h2 className="caption">{metric.label}</h2><Symbol name={metric.icon} /></header>
+      <header><h2 className="caption">{metric.label}</h2>{metric.key==='weather'?<span className="weather-degrees overview-number"><NumberText value={metric.value}/><small>{metric.unit}</small></span>:<Symbol name={metric.key.startsWith('pm25')?'dust':metric.icon} animated />}</header>
       <div className={`overview-number ${['co2', 'temp', 'light'].includes(metric.key) ? 'overview-number--stack' : ''}`}>
-        {metric.text ? <><strong className="weather-description">{metric.text}</strong><span className="weather-degrees"><NumberText value={metric.value} />{metric.unit}</span></>
+        {metric.text ? <><Symbol name="weather" className="weather-feature" animated /><strong className="weather-description">{metric.text}</strong></>
           : <><NumberText value={metric.value} /><small>{metric.unit}</small></>}
       </div>
     </article>)}
-    <div className="overview-film surface"><Film /></div>
-    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR · 24/7</p><h2>房子的健康<br />就是你的健康</h2><p className="caption">選一個情境鑰匙圈，看寶舖怎麼解</p></article>
+    <div className="overview-image surface" aria-label="未來居家照片輪播"><HomePhotoCarousel /></div>
+    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR</p><div className="overview-voice-content"><Voice /><div className={`overview-spoken${audioStatus==='ended'?' overview-spoken--finished':''}`} aria-live="polite">{['idle','error'].includes(audioStatus)?<h2>房屋的即時健康資訊</h2>:<><p className="overview-live-caption" aria-hidden={audioStatus==='ended'}>{overviewCaptionAt(audioTime)}</p><h2 className="overview-final-caption" aria-hidden={audioStatus!=='ended'}>房屋的即時健康資訊</h2></>}</div></div>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放資訊牆語音</button>}</article>
   </section>
 }
 
@@ -52,11 +93,12 @@ function Reading({ metric, dimension, lighting }) {
   const icon = metric.icon || DIMENSIONS[dimension]
   const kelvin = metric.kelvin || lighting.kelvin
   const lightMode = metric.lightMode || lighting.lightMode
+  const lightRange = dimension === 0 && /^(lux|k)$/i.test(metric.unit) ? String(metric.value).match(/^(\d+)\s*([–—-])\s*(\d+)$/) : null
   return <article className={`reading surface${metric.kind === 'note' ? ' reading--note' : ''}`}>
     <header><p className="caption">{CIRCLES[dimension]} {metric.icon === 'humid' ? '濕度' : DIMENSION_LABELS[dimension]}</p><Symbol name={icon} animated kelvin={kelvin} lightMode={lightMode} /></header>
     {metric.kind === 'note' ? <div className="note-content"><h3>{metric.note}</h3><p>{metric.detail}</p></div> : <>
       <div className={`reading-number ${dimension === 2 || String(metric.value).length >= 6 || metric.operator ? 'reading-number--range' : ''}`}>
-        {metric.operator && <span className="reading-operator">{metric.operator}</span>}<NumberText value={metric.value} /><small>{metric.unit}</small>
+        {metric.operator && <span className="reading-operator">{metric.operator}</span>}{lightRange ? <><span><NumberText value={lightRange[1]} />{lightRange[2]}</span><span className="reading-value-unit"><NumberText value={lightRange[3]} /><small>{metric.unit}</small></span></> : <><NumberText value={metric.value} /><small>{metric.unit}</small></>}
       </div><p className="reading-note">{metric.note}</p>
     </>}
   </article>

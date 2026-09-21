@@ -87,13 +87,13 @@ export function useNarration(state, issue, suspended = false) {
   const [audioTime,setAudioTime]=useState(0)
   useEffect(() => {
     setAudioStatus('idle');setAudioTime(0)
-    if (suspended || (!flags.audio && !['narration','farewell','experience'].includes(state.screen))) return
+    if (suspended || (!flags.audio && !['overview','narration','farewell','experience'].includes(state.screen))) return
     const cue = { overview: 'lead', narration: 'intro', farewell: 'outro' }[state.screen]
       || (state.screen === 'experience' ? `scene-${state.person}` : null)
     if (!cue) return
     let active = true, context, source, settled = false, captionFrame=0, lastCaptionTime=-1
-    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['intro','outro'].includes(cue)) ? 'wav' : 'mp3'}`)
-    if(['farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
+    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['lead','intro','outro'].includes(cue)) ? 'wav' : 'mp3'}`)
+    if(['overview','farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
     const syncCaption=()=>{
       if(!active)return
       const time=player.currentTime

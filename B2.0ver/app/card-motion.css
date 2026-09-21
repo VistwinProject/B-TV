@@ -56,3 +56,70 @@
 
 
 .goal-card>header,.goal-content .goal-copy{transform:translateX(clamp(-24px,-1.2vw,-10px))}
+
+.weather-cloud{animation:weather-cloud 4s ease-in-out infinite alternate}.weather-sun{transform-origin:15px 15px;animation:weather-sun 12s linear infinite}
+@keyframes weather-cloud{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+@keyframes weather-sun{to{transform:rotate(360deg)}}
+
+.dust-specks circle{fill:currentColor;stroke-width:.6;animation:dust-float 3.4s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.31s)}
+@keyframes dust-float{from{transform:translate(-1px,2px);opacity:.5}to{transform:translate(1px,-2px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.dust-specks circle{animation:none}}
+
+.overview-weather header{display:flex;flex-direction:column;align-items:stretch;gap:clamp(8px,1.2vh,16px)}
+.overview-weather .weather-degrees{margin:0;padding-top:0;align-self:flex-end;white-space:nowrap;text-align:right;font-size:clamp(30px,4.5vw,87px);font-weight:400;line-height:.95;letter-spacing:-.025em}
+.overview-weather>.overview-number{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:clamp(8px,1.2vh,16px);flex:1;margin-top:0;padding-top:10px}
+.overview .overview-weather .weather-feature{width:clamp(64px,6.5vw,112px);height:clamp(68px,7vw,120px);stroke-width:1.1;color:#6287aa}
+.forecast-sun{animation:forecast-peek 9s ease-in-out infinite;transform-origin:30px 15px}
+.forecast-glow{fill:#ffe8b3;opacity:.24}
+.forecast-rays{transform-origin:30px 15px;animation:forecast-rays 18s linear infinite}
+.forecast-cloud--back{animation:forecast-back 9s ease-in-out infinite}
+.forecast-cloud--front{animation:forecast-front 9s ease-in-out infinite}
+.forecast-cloud--low{animation:forecast-low 6s ease-in-out infinite alternate}
+@keyframes forecast-peek{0%,25%,85%,100%{transform:translate(-5px,9px);opacity:.12}40%,60%{transform:translate(1px,-2px);opacity:1}}
+@keyframes forecast-back{0%,25%,85%,100%{transform:translate(1px,0)}40%,60%{transform:translate(-3px,1px)}}
+@keyframes forecast-front{0%,100%{transform:translate(0,0)}50%{transform:translate(-2px,1px)}}
+@keyframes forecast-low{from{transform:translate(-1px,0)}to{transform:translate(1px,-1px)}}
+@keyframes forecast-rays{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.forecast-sun{transform:translate(0,-2px);opacity:1}}
+
+.overview-claim .overview-voice-content{display:grid;grid-template-columns:38% minmax(0,1fr);align-items:center;flex:1;min-height:0;gap:0}
+.overview-claim .anlb-orb{width:min(100%,32vh);margin:0;transform:translateX(-8%)}
+.overview-spoken{display:grid;width:100%;text-align:center;align-items:center;min-height:3.6em;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em}
+.overview-spoken>*{grid-area:1/1}
+.overview-spoken .overview-live-caption{margin:0;white-space:pre-line}
+.overview-claim .overview-spoken h2{margin:0;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:inherit}
+.overview-final-caption{opacity:0;visibility:hidden}
+.overview-spoken--finished .overview-live-caption{animation:goal-caption-out .5s ease forwards}
+.overview-spoken--finished .overview-final-caption{visibility:visible;animation:goal-caption-in .6s ease .6s both}
+@media(orientation:portrait){.overview-claim{min-height:260px}.overview-spoken{font-size:24px}}
+
+.overview-house-content{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(4px,1vh,12px)}
+.overview-intro .overview-house-content h1{margin:0}
+.overview-house-scan{width:clamp(84px,11.25vh,150px);max-height:37.5%;flex:none;color:var(--wall-title);transform:translateY(-10px)}
+.house-scan-building{animation:house-scan-illuminate 12s ease forwards}
+.house-scan-fill{fill:currentColor;fill-opacity:.03;animation:house-scan-fill 12s ease forwards}
+.house-scan-line{color:#fff;stroke:#fff;animation:house-scan-pass 7s ease-in-out forwards;filter:drop-shadow(0 0 3px #fff)}
+@keyframes house-scan-pass{0%,5%{transform:translateY(0);opacity:0}8%{transform:translateY(0);opacity:1}24%{transform:translateY(70px);opacity:1}40%{transform:translateY(0);opacity:1}56%{transform:translateY(70px);opacity:1}72%{transform:translateY(0);opacity:1}78%,100%{transform:translateY(0);opacity:0}}
+@keyframes house-scan-illuminate{0%,45.5%{color:var(--wall-title);opacity:.4;filter:none}58%,70%,82%{color:#fff;opacity:1;filter:drop-shadow(0 0 5px #ffffff99)}64%,76%,88%{color:#fff;opacity:.3;filter:none}100%{color:var(--wall-title);opacity:1;filter:none}}
+@keyframes house-scan-fill{0%,45.5%{fill-opacity:.03}58%,70%,82%{fill-opacity:.25}64%,76%,88%{fill-opacity:.06}100%{fill-opacity:0}}
+@media(prefers-reduced-motion:reduce){.house-scan-building,.house-scan-fill{animation:none;opacity:1;color:var(--wall-title)}.house-scan-fill{fill-opacity:0}.house-scan-line{animation:none;display:none}}
+
+.overview-intro h1,.overview .weather-description{font-size:clamp(17px,2.33vw,37px);font-weight:500}
+.overview .weather-description{line-height:1.42;letter-spacing:.025em}
+@media(max-width:900px){.overview-intro h1,.overview .weather-description{font-size:23px}}
+
+/* Preserve type sizes while keeping units beside their associated values. */
+.overview-number--stack{white-space:nowrap}
+.overview-number--stack small{display:inline-block;margin:0 0 0 5px}
+.reading-value-unit{display:inline-flex;align-items:baseline;white-space:nowrap;gap:4px}
+.reading-value-unit small{flex:none}
+
+@media(orientation:portrait){.overview-weather .weather-degrees{font-size:56px}}
+
+/* Align the forecast temperature with the bottom inset of dashboard row three. */
+.overview .overview-weather{display:grid;grid-template-rows:subgrid}
+.overview-weather header{grid-row:1;min-height:0;padding-bottom:clamp(14px,1.6vw,28px)}
+.overview-weather .weather-degrees{margin-top:auto}
+.overview-weather>.overview-number{grid-row:2;min-height:0}
+@media(max-width:900px){.overview-weather header{padding-bottom:12px}}
+@media(orientation:portrait){.overview .overview-weather{display:flex;flex-direction:column}.overview-weather header{padding-bottom:0}.overview-weather .weather-degrees{margin-top:12px}}

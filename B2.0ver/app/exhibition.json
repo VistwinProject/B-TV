@@ -734,7 +734,7 @@
       "key": "weather",
       "icon": "weather",
       "label": "天氣預報",
-      "value": 28,
+      "value": "26 ~ 32",
       "unit": "°C",
       "status": "info",
       "text": "多雲時晴"

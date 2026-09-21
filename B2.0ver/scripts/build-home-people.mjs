@@ -86,10 +86,72 @@ limb(elder,'rest-upper-arm',[-.18,1.22,-.23],[-.24,.98,-.17],.067,.047)
 limb(elder,'rest-forearm',[-.24,.98,-.17],[-.19,.82,-.21],.048,.031)
 oval(elder,'rest-hand',[-.19,.785,-.22],[.039,.059,.034])
 
+// Nomad workers use the same continuous surface construction as the other figures.
+for(const desk of [false,true]){
+  const person=new T.Group();person.name=desk?'nomad-desk-worker':'nomad-sofa-worker';person.userData.scene='nomad';person.position.set(...(desk?[3.025,0,-3.70]:[-.25,0,-1.57]));person.rotation.y=desk?Math.PI:0;root.add(person)
+  torso(person,[[.49,.18,.13],[.68,.16,.12],[.87,.17,.12,-.02],[1.09,.22,.13,-.04],[1.16,.18,.095,-.045]])
+  limb(person,'neck',[0,1.13,-.045],[0,1.25,-.065],.062,.055)
+  oval(person,'head',[0,1.37,-.09],[.108,.145,.105])
+  for(const side of [-1,1]){
+    limb(person,'thigh',[side*.10,.54,0],[side*.14,.47,-.43],.10,.075)
+    limb(person,'shin',[side*.14,.47,-.43],[side*.15,.10,-.51],.074,.043)
+    oval(person,'shoe',[side*.15,.055,-.59],[.07,.055,.13])
+    const mouse=desk&&side===1,elbow=[side*(mouse?.30:.25),.84,-.13],wrist=[mouse?.425:desk?-.06:side*.16,desk?.84:.72,desk?-.20:-.34]
+    limb(person,'upper-arm',[side*.20,1.09,-.04],elbow,.075,.052)
+    limb(person,'forearm',elbow,wrist,.052,.032)
+    oval(person,'hand',[wrist[0],wrist[1]-.01,wrist[2]-.035],[.048,.031,.07])
+  }
+}
+
+// Pregnancy care: seated mother, a father leaning over the right end, and a supine baby.
+const mother=new T.Group();mother.name='pregnancy-mother';mother.userData.scene='pregnancy';mother.position.set(-1.05,0,-1.57);root.add(mother)
+torso(mother,[[.49,.19,.14],[.68,.19,.18,-.07],[.86,.18,.18,-.06],[1.04,.19,.12,.035],[1.11,.16,.095,.04]])
+oval(mother,'belly',[0,.77,-.18],[.205,.22,.205])
+limb(mother,'neck',[0,1.08,.04],[0,1.20,.02],.06,.055)
+oval(mother,'head',[0,1.32,.015],[.105,.145,.10])
+oval(mother,'hair',[0,1.36,.06],[.114,.12,.11])
+// Gathered ponytail, extending behind the head then tapering toward the shoulders.
+limb(mother,'ponytail-tie',[0,1.39,.135],[0,1.38,.205],.045,.038)
+limb(mother,'ponytail-upper',[0,1.38,.205],[.015,1.27,.26],.061,.054)
+limb(mother,'ponytail-tip',[.015,1.27,.26],[.04,1.08,.255],.054,.019)
+for(const side of [-1,1]){
+  limb(mother,'thigh',[side*.11,.54,0],[side*.15,.48,-.43],.11,.08)
+  limb(mother,'shin',[side*.15,.48,-.43],[side*.16,.10,-.54],.075,.045)
+  oval(mother,'foot',[side*.16,.055,-.61],[.065,.055,.13])
+  limb(mother,'arm',[side*.18,1.04,.03],[side*.27,.80,-.13],.068,.05)
+  const hand=new T.Group();hand.name=`pregnancy-mother-hand-${side}`;hand.userData.scene='pregnancy';hand.position.copy(mother.position);root.add(hand)
+  limb(hand,'forearm',[side*.27,.80,-.13],[side*.10,.79,-.355],.05,.031)
+  oval(hand,'hand',[side*.085,.78,-.365],[.064,.03,.042])
+}
+const father=new T.Group();father.name='pregnancy-feeding-father';father.userData.scene='pregnancy';father.position.set(1.38,0,-2.50);father.rotation.y=Math.PI/2;root.add(father)
+torso(father,[[.82,.17,.12,.02],[.96,.17,.12,-.04],[1.12,.20,.13,-.18],[1.27,.23,.12,-.31],[1.32,.18,.10,-.35]])
+limb(father,'neck',[0,1.29,-.34],[0,1.39,-.41],.064,.058)
+oval(father,'head',[0,1.47,-.47],[.108,.14,.105])
+for(const side of [-1,1]){
+  limb(father,'thigh',[side*.10,.86,.02],[side*.15,.46,-.06],.10,.072)
+  limb(father,'shin',[side*.15,.46,-.06],[side*.17,.10,.035],.071,.046)
+  oval(father,'foot',[side*.17,.055,-.035],[.07,.055,.14])
+  limb(father,'arm',[side*.21,1.26,-.30],[side*.25,.98,-.40],.074,.05)
+  limb(father,'forearm',[side*.25,.98,-.40],[side===1?.025:-.10,.72,-.53],.05,.032)
+  oval(father,'hand',[side===1?.025:-.10,.70,-.55],[.042,.045,.06])
+}
+const baby=new T.Group();baby.name='pregnancy-cradle-baby';baby.userData.scene='pregnancy';baby.userData.bounds=[[-.40,-.12,-.24],[.40,.26,.24]];baby.position.set(.55,.50,-2.50);root.add(baby)
+oval(baby,'body',[-.025,.025,0],[.15,.073,.085])
+limb(baby,'neck',[.10,.04,0],[.15,.055,0],.045,.043)
+oval(baby,'head',[.225,.06,0],[.09,.085,.079])
+for(const side of [-1,1]){
+  limb(baby,'arm',[.065,.045,side*.064],[.02,.07,side*.14],.035,.028)
+  limb(baby,'forearm',[.02,.07,side*.14],[.105,.12,side*.15],.028,.022)
+  oval(baby,'hand',[.12,.125,side*.15],[.03,.025,.025])
+  limb(baby,'thigh',[-.12,.025,side*.04],[-.22,.09,side*.073],.042,.032)
+  limb(baby,'shin',[-.22,.09,side*.073],[-.30,.035,side*.09],.031,.024)
+  oval(baby,'foot',[-.30,.055,side*.095],[.036,.044,.027])
+}
+
 const result=[]
 for(const actor of root.children){
   const res=48,material=new T.MeshBasicMaterial(),mc=new MarchingCubes(res,material,false,false,20000)
-  const min=actor===man?[-.55,-.12,-.3]:[-.43,-.12,-.87],max=actor===man?[.55,2.36,.3]:[.43,1.61,.35]
+  const min=actor.userData.bounds?actor.userData.bounds[0]:actor===man?[-.55,-.12,-.3]:actor.userData.scene==='nomad'?[-.58,-.12,-.87]:[-.43,-.12,-.87],max=actor.userData.bounds?actor.userData.bounds[1]:actor===man?[.55,2.36,.3]:actor.userData.scene==='nomad'?[.58,1.61,.35]:[.43,1.61,.35]
   const span=max.map((v,i)=>v-min[i]),samples=fields.get(actor);mc.isolation=0
   for(let z=0;z<res;z++)for(let y=0;y<res;y++)for(let x=0;x<res;x++){
     const p=[x,y,z].map((v,i)=>min[i]+v/res*span[i]);let distance=1e3
@@ -103,7 +165,7 @@ for(const actor of root.children){
   const welded=mergeVertices(geometry,1e-5)
   // Collapse sampling-grid slivers to keep a clean, low-poly exterior.
   const simplified=new SimplifyModifier().modify(welded,Math.floor(welded.attributes.position.count*.93))
-  result.push({scene:actor===elder?'elder':actor===adult||actor===child?'child':'anti-aging',name:actor.name,position:actor.position.toArray(),rotation:actor.rotation.y,positions:Array.from(simplified.attributes.position.array,v=>+v.toFixed(5)),indices:Array.from(simplified.index.array)})
+  result.push({scene:actor.userData.scene|| (actor===elder?'elder':actor===adult||actor===child?'child':'anti-aging'),name:actor.name,position:actor.position.toArray(),rotation:actor.rotation.y,positions:Array.from(simplified.attributes.position.array,v=>+v.toFixed(5)),indices:Array.from(simplified.index.array)})
   console.log(actor.name, simplified.index.count/3,'triangles')
   geometry.dispose();welded.dispose();simplified.dispose();mc.geometry.dispose();material.dispose()
 }

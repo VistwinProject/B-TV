@@ -1,7 +1,28 @@
 {
   "schema": 1,
+  "welcome": {
+    "title": {
+      "size": 100,
+      "spacing": 0,
+      "x": 0,
+      "y": 0.017051091269841268
+    },
+    "subtitle": {
+      "size": 100,
+      "spacing": 0,
+      "x": 0.07678264604810997,
+      "y": 2.1546378968253967
+    },
+    "hint": {
+      "size": 89,
+      "spacing": -0.09,
+      "x": 0,
+      "y": 5
+    },
+    "lineGap": 1
+  },
   "theme": {
-    "bgStart": "#ffffff",
+    "bgStart": "#ff8f8f",
     "bgMid": "#eef5ff",
     "bgEnd": "#d7e6fa",
     "haze": "#ffffff",
@@ -36,60 +57,77 @@
     "edge": 1
   },
   "house": {
+    "alpha": 0.3,
+    "textColors": {
+      "title": "#425e9a",
+      "number": "#295dc7",
+      "caption": "#2a56a2"
+    },
+    "colorMode": "palette",
+    "uniformColor": "#a9b0df",
+    "palette": [
+      "#70bfff",
+      "#70d4ff",
+      "#2d87e6",
+      "#b9a0fd",
+      "#9eb6ff"
+    ],
+    "colorOrder": [
+      0,
+      2,
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      1,
+      4
+    ],
     "columns": [
       0.7945242346938776,
-      0.5338845663265307,
-      0.9585911989795918,
-      0.878,
-      1.553,
+      0.5145385611718916,
+      0.9779372041342309,
+      0.9280036801930823,
+      1.5029963198069178,
       1.282
     ],
     "rows": [
-      0.78,
-      1.0453352272727272,
-      1.0966696428571432,
-      1
+      0.85,
+      1.096897929768443,
+      0.9321600253499112,
+      1.026567400301444
     ],
     "panels": {
       "intro": {
-        "color": "#a2d0f8",
-        "rim": false
+        "color": "#a2d0f8"
       },
       "pm25": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#a23939"
       },
       "pm25_out": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "co2": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "temp": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "rh": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "weather": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "light": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "sound": {
-        "color": "#ffffff",
-        "rim": true
+        "color": "#ffffff"
       },
       "claim": {
-        "color": "#a2d0f8",
-        "rim": false
+        "color": "#a2d0f8"
       }
     }
   },
@@ -111,8 +149,8 @@
         "#6da0c0",
         "#85bfd1",
         "#5a88c4",
-        "#1f938c",
-        "#7876db",
+        "#73bfba",
+        "#9291ee",
         "#ffffff"
       ]
     },
@@ -151,9 +189,9 @@
         "y": 3
       },
       "colors": [
-        "#c47f75",
+        "#c43131",
         "#e65c00",
-        "#db923d",
+        "#ff955c",
         "#bb0202",
         "#f96224",
         "#ff6047",
@@ -173,12 +211,12 @@
         "y": 3
       },
       "colors": [
-        "#c8b189",
+        "#dcbb74",
         "#ca8612",
         "#ffae00",
-        "#ad3925",
-        "#e18437",
-        "#b04a63",
+        "#e1b847",
+        "#e07015",
+        "#db8251",
         "#ffffff"
       ]
     },
@@ -191,7 +229,7 @@
       "painHeight": 40,
       "homeView": {
         "zoom": 1.84,
-        "x": 4,
+        "x": 7,
         "y": 3
       },
       "colors": [
@@ -208,10 +246,10 @@
   "material": {
     "background": "key",
     "panel": "glass",
-    "alpha": 0.56,
+    "alpha": 0.5,
     "wash": 0,
-    "blur": 4,
-    "gloss": 1.7,
+    "blur": 3,
+    "gloss": 1.54,
     "refract": "soft"
   }
 }
