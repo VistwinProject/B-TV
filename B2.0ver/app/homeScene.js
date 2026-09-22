@@ -1,4 +1,9 @@
+import {DURATION} from './playback.js'
+import {overviewTourFrame,createOverviewScan} from './overviewTour.js'
+import {childCameraFrame,antiAgingCameraFrame,elderCameraFrame,nomadCameraFrame,pregnancyCameraFrame} from './homeCamera.js'
+import {createHomeCleaning} from './homeCleaning.js'
 import * as THREE from 'three'
+import {createHomePeople} from './homePeople.js'
 import {createHomeWindows} from './homeWindows.js'
 import { createHomeLighting } from './homeLighting.js'
 import { createHomeVentilation } from './homeVentilation.js'
@@ -6,7 +11,7 @@ import {createHomeFixtures,SCENE_VIEWS} from './homeFixtures.js'
 
 // Line data is extracted from 3d.glb by scripts/build-home-wireframe.mjs.
 // Fixed orthographic camera with simplified translucent furniture and source-model lamps.
-export async function createHomeScene(host, { signal, onBeat } = {}) {
+export async function createHomeScene(host, { signal, onBeat, overview=false, onTour } = {}) {
   const base = `${import.meta.env.BASE_URL}models/home-wireframe`
   const [metadata, buffer, fillBuffer] = await Promise.all([
     fetch(`${base}.json`, { signal }).then(r => { if (!r.ok) throw new Error('Model metadata unavailable'); return r.json() }),
@@ -32,7 +37,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
   }
   if(fillCursor<fillGeometry.getAttribute('position').count) fillGeometry.addGroup(fillCursor,fillGeometry.getAttribute('position').count-fillCursor,0)
   const fillMesh=new THREE.Mesh(fillGeometry,[fillMaterial,partitionMaterial,lampMaterial])
-  const scene = new THREE.Scene(); scene.background = new THREE.Color('#000000'); scene.add(fillMesh)
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(overview?'#5e698b':'#000000'); scene.add(fillMesh)
   const bounds = new THREE.Box3(new THREE.Vector3(...metadata.bounds.min),new THREE.Vector3(...metadata.bounds.max))
   const a=metadata.shellAlignment
   const wallGeometry=new THREE.BufferGeometry()
@@ -86,16 +91,33 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
   host.appendChild(renderer.domElement)
   const lighting=createHomeLighting(scene,metadata,position)
   const ventilation=createHomeVentilation(scene,metadata,position)
-  const fixtures=createHomeFixtures(scene)
+  const fixtures=createHomeFixtures(scene,{overview})
   const windows=createHomeWindows(scene)
+  const people=overview?{tick(){},dispose(){}}:createHomePeople(scene)
+  const scan=overview?createOverviewScan(scene,bounds):null
+  let tourTime=0
+  if(overview)scene.traverse(object=>{if(/^(coffee-(cup|saucer|surface|handle)|counter-cup|conference-|nomad-laptop)/.test(object.name))object.visible=false})
+  const cleaning=createHomeCleaning(scene)
+  const bottleCleaning=createHomeCleaning(scene,'pregnancy')
   const cameraDirection=new THREE.Vector3(...SCENE_VIEWS['anti-aging']).normalize(),targetDirection=cameraDirection.clone()
   const orbit=new THREE.Spherical().setFromVector3(cameraDirection),targetOrbit=new THREE.Spherical()
-  let activeCameraScene=null,entrance=null,entranceZoom=1
+  let activeCameraScene=null,entrance=null,entranceZoom=1,scriptedShot=null
   const dayBackground=new THREE.Color('#f1e8d8'),nightBackground=new THREE.Color('#34383b'),targetBackground=nightBackground.clone()
   const dayInk=new THREE.Color('#45423d'),nightInk=new THREE.Color('#ffffff'),captionInk=new THREE.Color()
   let disposed=false, frameId, previous=performance.now(), lastLabel=''
   const paint = () => renderer.render(scene,camera)
   let view={zoom:1,x:0,y:0,personId:'anti-aging'}
+  // One fixed orthographic extent for the whole orbit, independent of angle.
+  const overviewExtent=new THREE.Vector2()
+  if(overview){
+    const probe=camera.clone(),box=new THREE.Box3(),v=new THREE.Vector3()
+    for(let step=0;step<72;step++){
+      const direction=new THREE.Vector3(...SCENE_VIEWS.nomad).normalize().applyAxisAngle(new THREE.Vector3(0,1,0),step*Math.PI/36)
+      probe.position.copy(center).addScaledVector(direction,size.length()*2);probe.lookAt(center);probe.updateMatrixWorld(true);box.makeEmpty()
+      for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z])box.expandByPoint(v.set(x,y,z).applyMatrix4(probe.matrixWorldInverse))
+      const span=box.getSize(v);overviewExtent.x=Math.max(overviewExtent.x,span.x);overviewExtent.y=Math.max(overviewExtent.y,span.y)
+    }
+  }
   const fitCamera = () => {
     camera.position.copy(center).addScaledVector(cameraDirection,size.length()*2)
     camera.lookAt(center);camera.updateMatrixWorld(true)
@@ -103,12 +125,14 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
     for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z])projected.expandByPoint(point.set(x,y,z).applyMatrix4(camera.matrixWorldInverse))
     projected.getCenter(viewCenter);projected.getSize(viewSize)
     const width=host.clientWidth,height=host.clientHeight; if(!width||!height)return
-    const aspect=width/height, extent=Math.max(viewSize.y*1.2,viewSize.x/aspect*1.1)
-    const framedX=viewCenter.x, framedY=viewCenter.y
-    const zoomed=extent/(view.zoom*entranceZoom), x=framedX-view.x/100*zoomed*aspect, y=framedY+view.y/100*zoomed
+    const aspect=width/height, extent=overview?Math.max(overviewExtent.y*1.2,overviewExtent.x/aspect*1.2):Math.max(viewSize.y*1.2,viewSize.x/aspect*1.1)
+    const detail=scriptedShot?new THREE.Vector3(...scriptedShot.focus).applyMatrix4(camera.matrixWorldInverse):viewCenter
+    const weight=scriptedShot?.weight||0
+    const framedX=THREE.MathUtils.lerp(viewCenter.x,detail.x,weight), framedY=THREE.MathUtils.lerp(viewCenter.y,detail.y,weight)
+    const zoomed=extent/(view.zoom*entranceZoom*(scriptedShot?.zoom||1)), x=framedX-view.x/100*zoomed*aspect, y=framedY+view.y/100*zoomed
     camera.left=x-zoomed*aspect/2; camera.right=x+zoomed*aspect/2
-    // Reserve caption space beneath the model without changing its viewing direction.
-    camera.top=y+zoomed*.44; camera.bottom=y-zoomed*.56
+    // Center the overview; retain caption space for the five scenario scenes.
+    camera.top=y+zoomed*(overview?.5:.44); camera.bottom=y-zoomed*(overview?.5:.56)
     camera.updateProjectionMatrix()
   }
   const resize=()=>{fitCamera();renderer.setSize(host.clientWidth,host.clientHeight,false);paint()}
@@ -117,9 +141,13 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
     if(disposed)return
     const dt=Math.min((now-previous)/1000,.05);previous=now
     if(!document.hidden) {
-      const state=lighting.tick(dt,view.paused)
+      if(overview&&!view.paused)tourTime=Math.min(DURATION.overview/1000,tourTime+dt)
+      const tourFrame=overview?overviewTourFrame(tourTime):null
+      let state=lighting.tick(dt,view.paused,overview?{brightness:.85*tourFrame.light,daylight:.15*tourFrame.light}:null)
+      if(overview){state={...state,cycleSeconds:21,tourSeconds:tourTime};scan.tick(tourFrame)}
       ventilation.tick(dt,view.paused)
       fixtures.tick(dt,view.personId,state)
+      people.tick(view.personId,state)
       windows.tick(dt,view.personId,state,view.paused)
       // Follow the shortest horizontal arc, keeping height independent of the turn.
       targetOrbit.setFromVector3(targetDirection)
@@ -136,10 +164,19 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
         orbit.theta+=angle*turn
         orbit.phi=THREE.MathUtils.lerp(orbit.phi,targetOrbit.phi,turn)
       }
+      scriptedShot=overview?overviewTourFrame(tourTime):view.personId==='child'?childCameraFrame(state.cycleSeconds):view.personId==='anti-aging'?antiAgingCameraFrame(state.cycleSeconds):view.personId==='elder'?elderCameraFrame(state.cycleSeconds):view.personId==='nomad'?nomadCameraFrame(state.cycleSeconds):view.personId==='pregnancy'?pregnancyCameraFrame(state.cycleSeconds):null
+      if(scriptedShot&&!entrance&&state.cycleSeconds>=(view.personId==='anti-aging'?3.2:2)){
+        // The scripted path already has eased starts/stops; follow it without lag.
+        orbit.setFromVector3(new THREE.Vector3(...scriptedShot.direction).normalize())
+      }
       cameraDirection.setFromSpherical(orbit)
       fitCamera()
+      if(overview)onTour?.({time:tourTime})
+      cleaning.tick(view.personId,state,camera)
+      bottleCleaning.tick(view.personId,state,camera)
       nightBackground.lerp(targetBackground,1-Math.exp(-dt*2))
-      scene.background.copy(nightBackground).lerp(dayBackground,state.daylight)
+      if(overview)scene.background.set('#5e698b')
+      else scene.background.copy(nightBackground).lerp(dayBackground,state.daylight)
       material.color.copy(nightInk).lerp(dayInk,state.daylight)
       fillMaterial.color.copy(nightInk).lerp(dayInk,state.daylight)
       wallMaterial.color.copy(nightInk).lerp(dayInk,state.daylight)
@@ -168,7 +205,7 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
         dayBackground.setHSL(hsl.h,.22,.8,THREE.SRGBColorSpace)
         targetDirection.set(...(SCENE_VIEWS[settings.personId]||SCENE_VIEWS['anti-aging'])).normalize()
         if(activeCameraScene!==view.personId){
-          entrance=null;entranceZoom=1
+          entrance=null;entranceZoom=1;scriptedShot=null
           if(view.personId==='anti-aging'){
             targetOrbit.setFromVector3(targetDirection)
             if(activeCameraScene===null){
@@ -184,6 +221,6 @@ export async function createHomeScene(host, { signal, onBeat } = {}) {
       }
       resize()
     },
-    dispose() { disposed=true; cancelAnimationFrame(frameId); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
+    dispose() { disposed=true; cancelAnimationFrame(frameId); scan?.dispose(); lighting.dispose(); ventilation.dispose(); fixtures.dispose(); windows.dispose(); people.dispose(); cleaning.dispose(); bottleCleaning.dispose(); observer.disconnect(); geometry.dispose(); material.dispose(); fillGeometry.dispose(); fillMaterial.dispose(); partitionMaterial.dispose(); lampMaterial.dispose(); wallGeometry.dispose(); wallMaterial.dispose(); addedGeometries.forEach(g=>g.dispose()); addedMaterials.forEach(m=>m.dispose()); renderer.dispose(); renderer.domElement.remove() },
   }
 }

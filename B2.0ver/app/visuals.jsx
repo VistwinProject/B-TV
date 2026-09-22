@@ -1,5 +1,5 @@
+import { VoiceOrb } from './VoiceOrb.jsx'
 import { useEffect, useRef, useState } from 'react'
-import Beam from './editor/Beam.jsx'
 import AnimatedIcon from './AnimatedIcon.jsx'
 
 export const mediaURL = path => `${import.meta.env.BASE_URL}${path}`
@@ -27,7 +27,7 @@ export function PersonSymbol({ id, animated = false }) {
 
 export function NumberText({ value, duration = 1300 }) {
   const element = useRef(null)
-  const numeric = /^\d+(\.\d+)?(?:\s*[–—-]\s*\d+(\.\d+)?)?$/.test(String(value))
+  const numeric = /^\d+(\.\d+)?(?:\s*[–—~‐-]\s*\d+(\.\d+)?)?$/.test(String(value))
   useEffect(() => {
     if (!numeric) return
     let frame, cancelled = false
@@ -50,49 +50,8 @@ export function NumberText({ value, duration = 1300 }) {
   return <span ref={element}>{numeric ? String(value).replace(/\d+(?:\.\d+)?/g, '0') : value}</span>
 }
 
-export function Film({ photo, label = '你的未來居家' }) {
-  const video = useRef(null)
-  const [failed, setFailed] = useState(false)
-  useEffect(() => {
-    const resume = () => { if (document.visibilityState === 'visible') video.current?.play().catch(() => {}) }
-    document.addEventListener('visibilitychange', resume)
-    return () => document.removeEventListener('visibilitychange', resume)
-  }, [])
-  return <div className="film">
-    {!failed && (photo ? <img src={mediaURL(photo)} alt={label} onError={() => setFailed(true)} />
-      : <video ref={video} src={mediaURL('video/house-tour.mp4')} autoPlay muted loop playsInline preload="auto" onError={() => setFailed(true)} />)}
-    {failed && <span className="film-error">影像暫時無法播放</span>}
-    <div className="film-caption"><b>{label}</b><span>WALKTHROUGH</span></div>
-  </div>
-}
+export function Voice() { return <VoiceOrb /> }
 
-export function Voice({ analyser }) {
-  const wrapper = useRef(null)
-  useEffect(() => {
-    let frame
-    const values = new Uint8Array(128)
-    const update = () => {
-      const source = analyser?.current
-      if (source && wrapper.current) {
-        source.getByteFrequencyData(values)
-        for (const [index, bar] of [...wrapper.current.children].entries()) {
-          bar.style.animation = 'none'
-          bar.style.transform = `scaleY(${.08 + values[Math.floor(index * 1.8)] / 280})`
-        }
-      }
-      frame = requestAnimationFrame(update)
-    }
-    frame = requestAnimationFrame(update)
-    return () => cancelAnimationFrame(frame)
-  }, [analyser])
-  return <div className="voice" ref={wrapper} aria-hidden="true">{Array.from({ length: 48 }, (_, i) => <i key={i} style={{ '--height': `${22 + 76 * Math.abs(Math.sin(i * 1.71))}%`, '--delay': `${-i * .17}s`, '--duration': `${.7 + (i % 7) * .13}s` }} />)}</div>
-}
-
-export function LightRibbon() { return <Beam /> }
-
-export function BrandFooter() {
-  return <footer className="brand-footer"><span>感應光寓 <em>SENSING RESIDENCE</em></span><i className="brand-logo" role="img" aria-label="ANLB inside" /></footer>
-}
 
 // Keep both old and new panes during the 0.8 s reel transition.
 export function VerticalReel({ identity, children }) {

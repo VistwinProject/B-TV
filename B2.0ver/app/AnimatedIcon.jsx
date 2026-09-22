@@ -3,6 +3,14 @@ import { lightingStyle } from './iconLighting.js'
 export default function AnimatedIcon({ name, kelvin, lightMode, className = '' }) {
   let drawing
   switch (name) {
+    case 'cloud': drawing=<><g className="weather-cloud"><path d="M11 33a9 9 0 0 1-2-18A13 13 0 0 1 33 13a10 10 0 0 1 0 20Z" /></g><g className="air-particles"><circle cx="6" cy="39" r="1"/><circle cx="15" cy="42" r="1"/></g></>;break
+    case 'dust': drawing=<g className="dust-specks">{[[7,9,1.6],[19,6,2.1],[33,10,1.2],[12,21,2.5],[26,18,1.7],[38,24,2],[5,34,1.3],[21,32,2.4],[33,38,1.7],[15,43,1.1],[29,46,1],[40,5,1]].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r} style={{'--i':i}}/>)}</g>;break
+    case 'weather': drawing=<>
+      <g className="forecast-sun"><circle className="forecast-glow" cx="30" cy="15" r="10" stroke="none"/><circle cx="30" cy="15" r="5.5" fill="#ffe6a1" stroke="#d6a650"/><g className="forecast-rays" stroke="#d6a650"><path d="M30 5v2m0 16v2M20 15h2m16 0h2M23 8l1.5 1.5M36 21l1.5 1.5M23 22l1.5-1.5M36 9l1.5-1.5"/></g></g>
+      <g className="forecast-cloud forecast-cloud--back"><path d="M20 29a5 5 0 0 1-1-10 7 7 0 0 1 13-3 6 6 0 0 1 5 13Z" fill="#dceaf4"/><path d="M23 19q4-3 7 0" opacity=".3"/></g>
+      <g className="forecast-cloud forecast-cloud--front"><path d="M9 36a6 6 0 0 1-1-12 8 8 0 0 1 15-3 6 6 0 0 1 8 6 5 5 0 0 1-1 9Z" fill="#f0f7fc"/><path d="M11 26q4-3 7-1M10 33h13" opacity=".3"/></g>
+      <g className="forecast-cloud forecast-cloud--low"><path d="M26 42a4 4 0 0 1-1-8 5 5 0 0 1 9-2 5 5 0 0 1 5 10Z" fill="#e5f0f8"/></g>
+    </>;break
     case 'light': drawing = <>
       <circle className="lamp-halo" cx="22" cy="18" r="15" stroke="none" />
       <g className="lamp-rays"><path d="M22 1v4M5 8l4 3M1 21h5M39 8l-4 3M38 21h5" /></g>
