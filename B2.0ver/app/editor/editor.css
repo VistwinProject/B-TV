@@ -2,7 +2,7 @@
 .exhibition,.choices{background:linear-gradient(#fff 60%,#fafcff)}
 .welcome h1,.choices h1,.farewell h1{color:var(--edit-title)}.welcome-type p,.narration-eyebrow{color:var(--edit-subtitle)}.welcome-type>span,.choices-caption,.farewell-caption{color:var(--edit-hint)}
 .overview{color:var(--edit-title)}.overview .caption{color:var(--edit-subtitle)}
-.story-column{position:relative}.experience[data-background=white]{background:#fff}.experience[data-background=white] .experience-light,.experience[data-background=video] .experience-light{display:none}.experience-wall-video{position:absolute;inset:0;overflow:hidden}.experience-wall-video .film{width:100%;height:100%}.experience-wall-video .film-caption{display:none}
+.story-column{position:relative}
 .experience .surface{position:relative;background:color-mix(in srgb,color-mix(in srgb,var(--paint) 80%,#4a4a30) calc(var(--card-alpha)*100%),transparent)}
 :is(.experience,.overview,.choices)[data-panel=glass] .surface{background:color-mix(in srgb,color-mix(in srgb,var(--paint),white var(--card-wash)) calc(var(--card-alpha)*100%),transparent);backdrop-filter:var(--card-filter) blur(var(--card-blur));-webkit-backdrop-filter:blur(var(--card-blur));border:1px solid #ffffff80;box-shadow:inset 0 1px 0 #ffffffa0,0 8px 30px #09255c18}
 :is(.experience,.overview,.choices)[data-panel=glass] .surface:before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#fff9,transparent 48%,#ffffff30);opacity:var(--card-gloss);pointer-events:none}:is(.experience,.overview,.choices)[data-panel=glass] .surface>*{position:relative}.experience .reading-number small{color:var(--highlight)}
@@ -41,3 +41,9 @@
 .choices>.experience-light{position:absolute;inset:0;z-index:-1;width:100%;height:100%;mask-size:cover;mask-position:center}
 .choices .choices-content{position:relative}
 .choices button.surface{position:relative;display:grid;color:#1b3f8f}
+
+.farewell{isolation:isolate;background:linear-gradient(#fff 60%,#fafcff)}
+.farewell>.experience-light{position:absolute;inset:0;z-index:-1;width:100%;height:100%;mask-size:cover;mask-position:center}
+
+/* Editor previews must remain visible even when a page entrance or exit is paused. */
+.exhibition[data-editing=true]>.stage-screen{animation:none!important;opacity:1!important}

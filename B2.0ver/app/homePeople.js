@@ -61,6 +61,7 @@ export function createHomePeople(scene) {
       childRoot.visible=id==='child'&&visibility>0
       elderRoot.visible=id==='elder'&&visibility>0
       pregnancyRoot.visible=id==='pregnancy'&&visibility>0
+      if(pregnancyRoot.visible){
       const care=pregnancyFrame(state.cycleSeconds)
       bottle.position.set(.82,.775-care.feed*.045,-2.5)
       for(const {name,attr,base} of careAnimated){
@@ -77,9 +78,12 @@ export function createHomePeople(scene) {
         }
         attr.needsUpdate=true
       }
-      nomadRoot.visible=id==='nomad'
-      const motion=id==='nomad'?nomadFrame(state.cycleSeconds).mouse:0
+      }
+      nomadRoot.visible=id==='nomad'&&visibility>0
+      if(nomadRoot.visible){
+      const motion=nomadFrame(state.cycleSeconds).mouse
       for(const {attr,base} of animated){for(let i=0;i<attr.count;i++){const x=base[i*3],y=base[i*3+1],z=base[i*3+2];const weight=T.MathUtils.smoothstep(x,.22,.38)*T.MathUtils.smoothstep(-z,.10,.21)*T.MathUtils.smoothstep(y,.66,.78);attr.array[i*3]=x-motion*weight}attr.needsUpdate=true}
+      }
       pages.opacity=.85*visibility
       ink.color.copy(nightInk).lerp(dayInk,state.daylight)
       ink.opacity=(.62+state.brightness*.24)*visibility

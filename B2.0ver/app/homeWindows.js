@@ -33,11 +33,11 @@ export function createHomeWindows(scene){
 
     }
     pane(4.86,1.58,-2.277,1.42,1.45,light)
-    // Window light washes inward across the floor, with slat / zebra banding.
-    const floor= new T.PlaneGeometry(2.8,1.8);geometries.push(floor)
-    const patch=new T.Mesh(floor,light);patch.rotation.x=-Math.PI/2;patch.position.set(3.45,.023,-2.4);root.add(patch)
-    // Soft translucent shaft from the actual left-hand window towards the living space.
-    const beam=new T.BufferGeometry();beam.setAttribute('position',new T.Float32BufferAttribute([4.84,2.2,-2.95,4.84,2.2,-1.6,2.05,.04,-1.5,4.84,2.2,-2.95,2.05,.04,-1.5,2.05,.04,-3.2],3));beam.setAttribute('uv',new T.Float32BufferAttribute([0,1,1,1,1,0,0,1,1,0,0,0],2));geometries.push(beam);root.add(new T.Mesh(beam,light))
+    // Slats run along world Z; floor bands vary along inward X to stay parallel.
+    const floor=new T.PlaneGeometry(2.8,1.8);geometries.push(floor)
+    const floorUv=floor.getAttribute('uv')
+    for(let i=0;i<floorUv.count;i++){const u=floorUv.getX(i),v=floorUv.getY(i);floorUv.setXY(i,v,u)}
+    const patch=new T.Mesh(floor,light);patch.name='window-floor-light';patch.rotation.x=-Math.PI/2;patch.position.set(3.45,.023,-2.4);root.add(patch)
     sets.push({id,root,uniforms,cloth,ink,slats,curtains,weight:0})
   }
   let time=0

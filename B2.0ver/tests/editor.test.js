@@ -40,9 +40,9 @@ test('editor pause excludes editing time and ignores NFC/late audio scene change
   state=advancePlayback(state,{action:'remove',now:9000})
   assert.equal(state.held,null)
   state=advancePlayback(state,{action:'resume',now:105100})
-  assert.equal(state.deadline,120100)
-  assert.equal(advancePlayback(state,{action:'clock',now:120099}).screen,'overview')
-  assert.equal(advancePlayback(state,{action:'clock',now:120100}).screen,'choose')
+  assert.equal(state.deadline,118100)
+  assert.equal(advancePlayback(state,{action:'clock',now:118099}).screen,'overview')
+  assert.equal(advancePlayback(state,{action:'clock',now:118100}).screen,'choose')
 })
 test('editing fifth scenario cannot consume its final cycle', () => {
   let state=begin(0)
@@ -52,7 +52,11 @@ test('editing fifth scenario cannot consume its final cycle', () => {
   assert.equal(advancePlayback(state,{action:'clock',now:104999}).dimension,0)
   assert.equal(advancePlayback(state,{action:'clock',now:105000}).dimension,1)
   assert.equal(advancePlayback(state,{action:'clock',now:119999}).screen,'experience')
-  assert.equal(advancePlayback(state,{action:'clock',now:120000}).screen,'farewell')
+  assert.equal(advancePlayback(state,{action:'clock',now:126999}).exitStartedAt,null)
+  state=advancePlayback(state,{action:'clock',now:127000})
+  assert.equal(state.exitStartedAt,127000)
+  assert.equal(advancePlayback(state,{action:'clock',now:127249}).screen,'experience')
+  assert.equal(advancePlayback(state,{action:'clock',now:127250}).screen,'farewell')
 })
 
 test('welcome typography migrates old presets and round-trips bounded text positions',()=>{

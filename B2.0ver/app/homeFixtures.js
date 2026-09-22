@@ -18,11 +18,11 @@ function purifierOutletPoint(phase,radius=.12){
   return [radius,.66+(p-3)*.64]
 }
 // Grayscale fixture bodies; only diffusers and light washes carry scenario color.
-export function createHomeFixtures(scene){
+export function createHomeFixtures(scene,{overview=false}={}){
   const geometries=[],materials=[],sets=[]
   const geo=g=>(geometries.push(g),g)
   for(const id of Object.keys(SCENE_VIEWS)){
-    const bulbs=[];let sofaGlow=null,sofaFill=null,portraitInk=null,mobile=null,purifierAir=null
+    const bulbs=[];let readingGlow=null,sofaGlow=null,sofaFill=null,portraitInk=null,mobile=null,purifierAir=null
     const group=new T.Group();group.name=`fixtures-${id}`;scene.add(group)
     const ink=new T.LineBasicMaterial({color:'#dddddd',transparent:true,depthWrite:false})
     const fill=new T.MeshBasicMaterial({color:'#ffffff',transparent:true,side:T.DoubleSide,depthWrite:false})
@@ -69,14 +69,15 @@ export function createHomeFixtures(scene){
       const axis=origin.clone().sub(target),height=axis.length(),rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),axis.normalize())
       const shade=new T.CylinderGeometry(.055,.105,.13,12,1,true);shade.applyQuaternion(rotation)
       shape(shade,origin.toArray(),false,reading,null,'reading-lamp-head')
+      readingGlow=glow.clone();materials.push(readingGlow)
       const beamMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending,
-        uniforms:glow.uniforms,
+        uniforms:readingGlow.uniforms,
         vertexShader:'varying vec2 tex;void main(){tex=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
         fragmentShader:'varying vec2 tex;uniform vec3 tint;uniform float strength;void main(){float a=sin(tex.y*3.14159)*(.16+.20*tex.y)*strength;gl_FragColor=vec4(tint,a);}'})
       materials.push(beamMaterial)
       const beamGeometry=geo(new T.CylinderGeometry(.035,.23,height,24,1,true));beamGeometry.applyQuaternion(rotation)
       const beam=new T.Mesh(beamGeometry,beamMaterial);beam.name='book-reading-spotlight';beam.position.copy(origin).add(target).multiplyScalar(.5);reading.add(beam)
-      const pageGlow=new T.Mesh(geo(new T.PlaneGeometry(.45,.34)),glow);pageGlow.rotation.x=-Math.PI/2;pageGlow.position.copy(target);pageGlow.position.y+=.018;reading.add(pageGlow)
+      const pageGlow=new T.Mesh(geo(new T.PlaneGeometry(.45,.34)),readingGlow);pageGlow.rotation.x=-Math.PI/2;pageGlow.position.copy(target);pageGlow.position.y+=.018;reading.add(pageGlow)
 
       tableLamp(3.65,-3.25)
       const plant=new T.Group();plant.name='counter-side-foliage-plant';plant.position.set(2.37,0,-1.38);group.add(plant)
@@ -98,10 +99,14 @@ export function createHomeFixtures(scene){
       }
 
       const horse=new T.Group();horse.name='rocking-horse';horse.position.set(.7,0,-3.05);group.add(horse)
-      for(const z of [-.19,.19])curve([[-.52,.17,z],[-.3,.055,z],[.25,.055,z],[.52,.17,z]],.024,horse)
-      for(const x of [-.25,.25])for(const z of [-.14,.14])rod([x,.13,z],[x*.8,.48,z],.025,horse)
+      for(const z of [-.19,.19]){
+        const anchors=[[-.3,.055,z],[.25,.055,z]]
+        curve([[-.52,.17,z],...anchors,[.52,.17,z]],.024,horse)
+        // Feet share the rocker's curve knots, so all four joints meet exactly.
+        for(const foot of anchors)rod(foot,[foot[0]*.8,.57,Math.sign(z)*.14],.025,horse)
+      }
       shape(new T.SphereGeometry(.24,12,8).scale(1.5,.65,.7),[0,.49,0],false,horse)
-      cube([0,.59,0],[.38,.05,.25],false,horse)
+      shape(new T.CylinderGeometry(1,1,.06,32).scale(.39,1,.24),[0,.59,0],false,horse,null,'rocking-horse-oval-seat')
       rod([.24,.46,0],[.32,.88,0],.075,horse)
       shape(new T.SphereGeometry(.13,12,8).scale(1.4,.85,.65),[.39,.88,0],false,horse)
       for(const z of [-.05,.05])shape(new T.ConeGeometry(.035,.13,6),[.29,1,z],false,horse)
@@ -144,8 +149,10 @@ export function createHomeFixtures(scene){
         rod([0,0,0],[x,-.025,z],.008,mobile);rod([x,-.025,z],[x,-.15,z],.004,mobile)
         shape(i===0?new T.OctahedronGeometry(.043):i===1?new T.SphereGeometry(.04,8,6):new T.TorusGeometry(.034,.009,5,10),[x,-.19,z],false,mobile,null,'mobile-toy')
       }
+    }
+    if(id==='pregnancy'||(overview&&id==='nomad')){
       // Reference tower: filter drum, tapered control neck and tall hollow loop.
-      const purifier=new T.Group();purifier.name='pregnancy-air-purifier';purifier.position.set(-3.42,0,-1.25);group.add(purifier)
+      const purifier=new T.Group();purifier.name=id==='nomad'?'overview-air-purifier':'pregnancy-air-purifier';purifier.position.set(-3.42,0,-1.25);group.add(purifier)
       shape(new T.CylinderGeometry(.165,.165,.32,24),[0,.21,0],false,purifier,null,'purifier-intake')
       shape(new T.CylinderGeometry(.17,.17,.055,24),[0,.0275,0],false,purifier,null,'purifier-base')
       shape(new T.CylinderGeometry(.13,.165,.15,24),[0,.445,0],false,purifier,null,'purifier-control-neck')
@@ -286,19 +293,31 @@ export function createHomeFixtures(scene){
       cube([2.85,1.55,-3.13],[.66,.035,.07],true,group,'monitor-light-bar')
       wash([2.8,.82,-3.42],1.15,.8)
     }
-    sets.push({id,group,ink,fill,body,glow,bulbs,sofaGlow,sofaFill,portraitInk,mobile,purifierAir,weight:0})
+    sets.push({id,group,ink,fill,body,glow,bulbs,readingGlow,sofaGlow,sofaFill,portraitInk,mobile,purifierAir,weight:0})
   }
   return {
     tick(dt,id,state){
       for(const s of sets){
         s.weight=T.MathUtils.lerp(s.weight,id===s.id?1:0,1-Math.exp(-dt*2.5))
         // Match the figures' visibility envelope, including all prop outlines.
-        const visibility=s.id==='nomad'?T.MathUtils.clamp(state.brightness/.85,0,1):1,w=s.weight*visibility
+        const visibility=s.id==='nomad'&&!overview?T.MathUtils.clamp(state.brightness/.85,0,1):1,w=s.weight*visibility
         s.group.visible=w>.002
         s.ink.opacity=w*.85;s.ink.color.set(state.daylight>.5?'#555555':'#dddddd');s.body.opacity=w*.23
+        if(!s.group.visible){
+          s.ink.opacity=s.body.opacity=s.fill.opacity=0
+          s.glow.uniforms.strength.value=0
+          if(s.purifierAir)s.purifierAir.material.uniforms.strength.value=0
+          if(s.readingGlow)s.readingGlow.uniforms.strength.value=0
+          if(s.sofaGlow){s.sofaGlow.uniforms.strength.value=0;s.sofaFill.opacity=0;s.portraitInk.opacity=0}
+          for(const bulb of s.bulbs)bulb.opacity=0
+          continue
+        }
         if(s.mobile){
           const t=state.cycleSeconds||0,turn=T.MathUtils.smoothstep(t,15,18)
           s.mobile.rotation.y=turn*.9*(1-T.MathUtils.smoothstep(t,23,25))
+        }
+        if(s.purifierAir){
+          const t=state.tourSeconds??state.cycleSeconds??0
           const {position,alpha}=s.purifierAir.geometry.attributes
           for(let i=0;i<position.count;i++){
             const u=((t*.28+i*.618)%1),a=i*2.4
@@ -306,12 +325,19 @@ export function createHomeFixtures(scene){
             else {const [x,y]=purifierOutletPoint((i-40)/110,.12);position.setXYZ(i,x*(1+u*.35),y+Math.sin(a)*u*.025,-.063-u*.95)}
             alpha.setX(i,Math.sin(u*Math.PI)*.65)
           }
-          position.needsUpdate=true;alpha.needsUpdate=true;s.purifierAir.material.uniforms.strength.value=w*pregnancyFrame(t).light
+          position.needsUpdate=true;alpha.needsUpdate=true;s.purifierAir.material.uniforms.strength.value=w*(s.id==='nomad'?1:pregnancyFrame(t).light)
         }
         const n=nomadFrame(state.cycleSeconds)
         const lampFactor=s.id==='elder'?elderFrame(state.cycleSeconds).lamps:s.id==='nomad'?n.desk*n.reset*.65:1
         s.fill.opacity=w*(.07+state.brightness*.48*lampFactor);s.fill.color.copy(state.color)
         s.glow.uniforms.tint.value.copy(state.color);s.glow.uniforms.strength.value=w*state.brightness*.5*lampFactor
+        if(s.readingGlow){
+          // Reading shot arrives at 17s; brighten gently over the following 2s.
+          const t=state.cycleSeconds||0
+          const factor=T.MathUtils.smoothstep(t,17,19)
+          s.readingGlow.uniforms.tint.value.copy(state.color)
+          s.readingGlow.uniforms.strength.value=w*state.brightness*.5*factor
+        }
         if(s.sofaGlow){
           const factor=n.sofa*n.reset
           s.sofaGlow.uniforms.tint.value.copy(state.color);s.sofaGlow.uniforms.strength.value=w*state.brightness*.65*factor

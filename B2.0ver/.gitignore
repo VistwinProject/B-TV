@@ -31,3 +31,5 @@ dist-white
 !public/voice/scene-*.wav
 
 !public/voice/lead.wav
+
+!public/voice/choose.wav

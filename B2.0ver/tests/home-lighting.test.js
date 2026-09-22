@@ -56,13 +56,15 @@ test('anti-aging keeps the lamps on after the background becomes dark',()=>{asse
   for(const key of ['brightness','daylight','kelvin','windowLight'])assert.ok(Math.abs(end[key]-start[key])<.00001,key)
 })
 
-test('child reading spotlight tracks scene brightness down to zero',async()=>{
+test('child reading spotlight waits for reading shot and tracks brightness down to zero',async()=>{
   const {createHomeFixtures}=await import('../app/homeFixtures.js')
   const scene=new T.Scene(),fixtures=createHomeFixtures(scene)
   const beam=scene.getObjectByName('book-reading-spotlight'),state={brightness:.75,daylight:0,color:new T.Color('#ffffff')}
   for(let i=0;i<120;i++)fixtures.tick(1/60,'child',state)
+  assert.equal(beam.material.uniforms.strength.value,0)
+  fixtures.tick(1/60,'child',{...state,cycleSeconds:19})
   assert.ok(beam.material.uniforms.strength.value>0)
-  fixtures.tick(1/60,'child',{...state,brightness:0});assert.equal(beam.material.uniforms.strength.value,0)
+  fixtures.tick(1/60,'child',{...state,cycleSeconds:19,brightness:0});assert.equal(beam.material.uniforms.strength.value,0)
   fixtures.dispose();assert.equal(scene.children.length,0)
 })
 
@@ -78,21 +80,22 @@ test('elder floor lamps flank the TV and their bulbs extinguish with downlights'
   fixtures.dispose()
 })
 
-test('elder walking spotlights begin vertical and ease toward the path after the eye-level turn',()=>{
+test('elder spotlights retain fixed beams and floor pools throughout the storyboard',()=>{
   const metadata=JSON.parse(readFileSync(new URL('../public/models/home-wireframe.json',import.meta.url)))
   const b=readFileSync(new URL('../public/models/home-wireframe.bin',import.meta.url))
   const positions=new T.BufferAttribute(new Float32Array(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)),3)
   const scene=new T.Scene(),lights=createHomeLighting(scene,metadata,positions)
-  lights.select('elder');lights.tick(6)
-  const pools=scene.children[0].children.filter(o=>o.userData.elderWalkingPath)
-  assert.equal(pools.length,3)
-  const starts=pools.map(o=>o.position.clone())
-  const beams=pools.map(o=>scene.getObjectByName(o.name.replace('pool','beam')))
-  for(const beam of beams)assert.ok(beam.quaternion.angleTo(new T.Quaternion())<1e-6)
-  lights.tick(2);const middle=pools.map(o=>o.position.clone())
-  lights.tick(2)
-  pools.forEach((o,i)=>{assert.ok(starts[i].distanceTo(middle[i])>0);assert.ok(middle[i].distanceTo(starts[i].clone().lerp(o.position,.5))<1e-6)})
-  lights.tick(7)
-  pools.forEach((o,i)=>assert.ok(o.position.distanceTo(starts[i])<1e-6))
+  const lamps=scene.children[0].children.filter(o=>o.name.startsWith('downlight-'))
+  assert.equal(lamps.length,16)
+  const initial=lamps.map(o=>({position:o.position.clone(),quaternion:o.quaternion.clone(),scale:o.scale.clone()}))
+  lights.select('elder')
+  for(let t=0;t<26;t+=.25){
+    lights.tick(.25)
+    lamps.forEach((o,i)=>{
+      assert.ok(o.position.equals(initial[i].position))
+      assert.ok(o.quaternion.equals(initial[i].quaternion))
+      assert.ok(o.scale.equals(initial[i].scale))
+    })
+  }
   lights.dispose()
 })

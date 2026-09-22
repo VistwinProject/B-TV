@@ -76,21 +76,14 @@ export function createHomeLighting(scene,metadata,positions){
   wash.name='rectangular-counter-light';wash.rotation.x=-Math.PI/2;wash.position.set(3.795,.836,-1.305);counterLight.add(wash)
   geometries.push(areaGeometry,washGeometry)
   const nearby=new Set([...downlights].sort((a,b)=>a.distance-b.distance).slice(0,3))
-  const walkingLights=[...nearby].sort((a,b)=>a.origin.x-b.origin.x)
-  walkingLights.forEach((lamp,i)=>{
-    const step=[.95,.4,-.15][i]
-    lamp.walkTarget=new T.Vector3(ELDER_POSITION[0]-Math.sin(1.9)*step,.018,ELDER_POSITION[2]-Math.cos(1.9)*step)
-    lamp.pool.userData.elderWalkingPath=true
-  })
-  const up=new T.Vector3(0,1,0),aim=new T.Vector3(),groundTarget=new T.Vector3()
   let active='anti-aging',time=0,intensity=.85,daylight=1
   return {
     select(id){if(id!==active){active=id;time=0;if(id==='nomad'||id==='pregnancy'){intensity=0;daylight=0}}},
-    tick(dt,paused=false){
+    tick(dt,paused=false,override=null){
       if(!paused)time+=dt
       // The anti-aging timeline already eases every transition; do not delay its
       // final one-second dawn with a second low-pass filter.
-      const frame=lightingFrame(active,time),blend=active==='anti-aging'||active==='nomad'||active==='pregnancy'?1:1-Math.exp(-dt*3)
+      const frame=override?{...lightingFrame(active,time),...override}:lightingFrame(active,time),blend=active==='anti-aging'||active==='nomad'||active==='pregnancy'?1:1-Math.exp(-dt*3)
       intensity=T.MathUtils.lerp(intensity,frame.brightness,blend)
       daylight=T.MathUtils.lerp(daylight,frame.daylight,blend)
       const boost=active==='elder'?elderFrame(time).floorBoost:0
@@ -98,23 +91,7 @@ export function createHomeLighting(scene,metadata,positions){
         const localBoost=nearby.has(lamp)?boost:0
         lamp.beamUniforms.strength.value=intensity*(1+localBoost*.3)
         lamp.poolUniforms.strength.value=intensity*(1+localBoost*.85)
-        if(active==='elder'&&lamp.walkTarget){
-          // Once the camera reaches eye level, ease the footprint toward the path.
-          // The same envelope brings it back to vertical with the overview shot.
-          groundTarget.set(lamp.origin.x,lamp.origin.y-lamp.height,lamp.origin.z).lerp(lamp.walkTarget,boost)
-          aim.copy(lamp.origin).sub(groundTarget)
-          lamp.beam.position.copy(lamp.origin).add(groundTarget).multiplyScalar(.5)
-          lamp.beam.scale.y=aim.length()/lamp.height
-          lamp.beam.quaternion.setFromUnitVectors(up,aim.normalize())
-          lamp.pool.position.set(groundTarget.x,.018,groundTarget.z)
-          lamp.pool.scale.set(1-.2*boost,1+.18*boost,1)
-          lamp.pool.rotation.set(-Math.PI/2,0,-1.9*boost)
-        }else{
-          lamp.beam.position.set(lamp.origin.x,lamp.origin.y-lamp.height/2,lamp.origin.z)
-          lamp.beam.scale.set(1,1,1);lamp.beam.quaternion.identity()
-          lamp.pool.position.set(lamp.origin.x,.018,lamp.origin.z)
-          lamp.pool.scale.set(1,1,1);lamp.pool.rotation.set(-Math.PI/2,0,0)
-        }
+
       }
       uniforms.strength.value=intensity;uniforms.tint.value.lerp(kelvinColor(frame.kelvin),blend)
       // Indirect warm illumination: subdued shafts and a soft floor wash.

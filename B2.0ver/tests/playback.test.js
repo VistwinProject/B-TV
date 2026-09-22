@@ -2,11 +2,11 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { advancePlayback as update, begin, PEOPLE, DURATION, nfcAction } from '../app/playback.js'
 
-test('invitation timeline: overview for 20 seconds, then choices', () => {
+test('invitation timeline: overview for 18 seconds, then choices', () => {
   const started = update(begin(), { action: 'invite', now: 100 })
   assert.equal(started.screen, 'overview')
-  assert.equal(update(started, { action: 'clock', now: 20099 }).screen, 'overview')
-  assert.equal(update(started, { action: 'clock', now: 20100 }).screen, 'choose')
+  assert.equal(update(started, { action: 'clock', now: 18099 }).screen, 'overview')
+  assert.equal(update(started, { action: 'clock', now: 18100 }).screen, 'choose')
 })
 
 test('held invitation cannot restart either the overview or choices', () => {
@@ -35,12 +35,17 @@ test('all 120 encounter orders wait for the entire fifth cycle and outro', () =>
       checked++
       assert.equal(state.seen.length, 5)
       assert.equal(update(state, { action: 'clock', now: time + 19999 }).screen, 'experience')
-      const ending = update(state, { action: 'clock', now: time + 20000 })
+      assert.equal(update(state,{action:'clock',now:time+26999}).exitStartedAt,null)
+      const fading=update(state,{action:'clock',now:time+27000})
+      assert.equal(fading.screen,'experience')
+      assert.equal(fading.exitStartedAt,time+27000)
+      assert.equal(update(fading,{action:'clock',now:time+27249}).screen,'experience')
+      const ending = update(fading, { action: 'clock', now: time + 27250 })
       assert.equal(ending.screen, 'farewell')
       assert.equal(update(ending, { action: 'clock', now: time + 28999 }).screen, 'farewell')
       const home = update(ending, { action: 'clock', now: time + 29000 })
-      assert.equal(home.screen, 'welcome')
-      assert.deepEqual(home.seen, [])
+      assert.equal(home.screen, 'farewell')
+      assert.equal(home.seen.length, 5)
       return
     }
     for (const id of remaining) {
@@ -81,7 +86,7 @@ test('audio end, unavailable audio, watchdog and stale callbacks', () => {
   assert.equal(update(state, { action: 'clock', now: 120000 }).screen, 'choose')
   assert.equal(update(state, { action: 'audio-ended', revision: state.revision, now: 5000 }).screen, 'overview')
   const failure = update(state, { action: 'audio-failed', revision: state.revision, now: 300 })
-  assert.equal(failure.deadline, 20300)
+  assert.equal(failure.deadline, 18000)
   const scene = update(state, { action: 'person', id: 'pregnancy', now: 100 })
   for (const action of ['audio-ended','audio-failed']) assert.strictEqual(update(scene, { action, revision: state.revision, now: 1000 }), scene)
 })
@@ -95,10 +100,10 @@ test('removal preserves the current scene and unknown tags are ignored', () => {
   assert.deepEqual(nfcAction({type:'tag-present',data:{kind:'character',id:'nomad'}}), {action:'person',id:'nomad'})
 })
 
-test('intro waits for audio completion then goes directly to character selection', () => {
+test('intro opens character selection and stays there after narration', () => {
   const intro = update(begin(), {action:'intro',now:0})
-  assert.equal(intro.screen,'narration')
-  assert.equal(update(intro,{action:'clock',now:20000}).screen,'narration')
+  assert.equal(intro.screen,'choose')
+  assert.equal(update(intro,{action:'clock',now:20000}).screen,'choose')
   assert.equal(update(intro,{action:'next',now:20000}).screen,'choose')
   assert.equal(update(intro,{action:'audio-ended',revision:intro.revision,now:21230}).screen,'choose')
   assert.equal(update(intro,{action:'audio-ended',revision:intro.revision-1,now:21230}),intro)

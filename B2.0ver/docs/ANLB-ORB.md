@@ -9,7 +9,7 @@
 - 不支援 WebGPU 時顯示原版錯誤，不換製另一顆球。
 
 ## 音檔
-目前只有 public/voice/intro.wav。其餘檔名沿用 public/voice/README.md；放入後以 VITE_AUDIO_ENABLED=true 啟用全區旁白。缺檔時不能驗證該情境的實際音量同步，球維持思考。
+目前資訊牆、角色選擇、五情境及結語使用 public/voice 中的八支 WAV，預設啟用。對照表見 public/voice/README.md。字幕同步在語音結束後停止；退出編輯模式時語音與房屋動畫從頭播放。
 
 ## 驗證
 原版 demo 已檢查思考、停頓與待機。接入頁前言量測到非零 RMS，情境靜音時 thinking / level=0，結語結束後 idle / level=0。新增測試驗證原包一致及生命週期。35 項測試、正式建置通過。

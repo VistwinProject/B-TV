@@ -1,6 +1,5 @@
 import { VoiceOrb } from './VoiceOrb.jsx'
 import { useEffect, useRef, useState } from 'react'
-import Beam from './editor/Beam.jsx'
 import AnimatedIcon from './AnimatedIcon.jsx'
 
 export const mediaURL = path => `${import.meta.env.BASE_URL}${path}`
@@ -51,29 +50,8 @@ export function NumberText({ value, duration = 1300 }) {
   return <span ref={element}>{numeric ? String(value).replace(/\d+(?:\.\d+)?/g, '0') : value}</span>
 }
 
-export function Film({ photo, label = '你的未來居家' }) {
-  const video = useRef(null)
-  const [failed, setFailed] = useState(false)
-  useEffect(() => {
-    const resume = () => { if (document.visibilityState === 'visible') video.current?.play().catch(() => {}) }
-    document.addEventListener('visibilitychange', resume)
-    return () => document.removeEventListener('visibilitychange', resume)
-  }, [])
-  return <div className="film">
-    {!failed && (photo ? <img src={mediaURL(photo)} alt={label} onError={() => setFailed(true)} />
-      : <video ref={video} src={mediaURL('video/house-tour.mp4')} autoPlay muted loop playsInline preload="auto" onError={() => setFailed(true)} />)}
-    {failed && <span className="film-error">影像暫時無法播放</span>}
-    <div className="film-caption"><b>{label}</b><span>WALKTHROUGH</span></div>
-  </div>
-}
-
 export function Voice() { return <VoiceOrb /> }
 
-export function LightRibbon() { return <Beam /> }
-
-export function BrandFooter() {
-  return <footer className="brand-footer"><span>感應光寓 <em>SENSING RESIDENCE</em></span><i className="brand-logo" role="img" aria-label="ANLB inside" /></footer>
-}
 
 // Keep both old and new panes during the 0.8 s reel transition.
 export function VerticalReel({ identity, children }) {

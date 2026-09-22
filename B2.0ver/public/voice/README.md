@@ -1,18 +1,18 @@
-# 2.0 配音檔
+# B 區目前使用的配音
 
-請提供以下八個 MP3：
+所有頁面旁白預設啟用，字幕依音檔 currentTime 切換。
 
-- lead.mp3
-- intro.mp3
-- outro.mp3
-- scene-anti-aging.mp3
-- scene-child.mp3
-- scene-elder.mp3
-- scene-pregnancy.mp3
-- scene-nomad.mp3
+- `lead.wav`：資訊牆，來源為「語音檔/資訊牆2.wav」（12.57 秒）；語音結束顯示「房屋當前的健康資訊」。
+- `choose.wav`：角色選擇／前言（25.11 秒）。
+- `scene-anti-aging.wav`：居家抗老，來源為「語音檔/居家抗老2.wav」（22.38 秒）。
+- `scene-child.wav`：兒童免疫。
+- `scene-elder.wav`：在宅樂齡，來源為「語音檔/在宅樂齡3.wav」（19.59 秒）。
+- `scene-pregnancy.wav`：孕婦照護。
+- `scene-nomad.wav`：數位遊牧。
+- `outro.wav`：結語（9.89 秒）。
 
-將 .env.example 複製成 .env，設定 VITE_AUDIO_ENABLED=true，重新啟動服務。新版由 app/useExhibition.js 管理播放與取消；沒有使用第一次嘗試的 src/speech.js。沒有音檔時，資訊牆依計時退路繼續。
+情境語音結束後顯示 `app/exhibition.json` 的核心目標。字幕同步迴圈在結束、錯誤或離頁時停止，手動重播時重新啟動。
 
-前言已內建 `intro.wav`，來源為使用者新增的「B 同一間房子_.wav」，獨立預設啟用，取代前言的 intro.mp3；播放完成直接進入角色選擇。其他頁面的 MP3 仍由 VITE_AUDIO_ENABLED 控制。
+進入 E 編輯會停止語音；退出編輯後，原展演頁的語音、房屋動畫與計時都從頭開始，已體驗情境紀錄保留。普通進場語音延遲 1 秒；兩段自動淡入轉場延遲 0.25 秒。
 
-2026-09-17 更新：outro.wav 與 scene-anti-aging.wav、scene-child.wav、scene-elder.wav、scene-pregnancy.wav、scene-nomad.wav 已內建並預設啟用。情境字幕時間軸位於 app/sceneCaptions.js，使用音檔 currentTime 換句；單支播完保留既有核心目標。五種體驗完成後，最後一支旁白播完保留核心目標 4 秒再進結語。lead.mp3 仍由 VITE_AUDIO_ENABLED 控制。
+五種情境都選過後，最後情境語音結束且至少完成 25 秒場景時間，再停留 2 秒，以 0.25 秒淡出及淡入結語。結語播完保留最後字幕，不自動回首頁。

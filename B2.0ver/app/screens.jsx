@@ -1,11 +1,12 @@
+import OverviewHome from './OverviewHome.jsx'
+import {chooseCaptionAt} from './chooseCaptions.js'
 import {overviewCaptionAt} from './overviewCaptions.js'
 import {houseCardColor} from './editor/model.js'
-import {useEffect,useState} from 'react'
 import { sceneCaptionAt } from './sceneCaptions.js'
 import { outroCaptionAt } from './outroCaptions.js'
 import HomeScene from './HomeScene.jsx'
 import { DIMENSIONS } from './playback.js'
-import { BrandFooter, Film, mediaURL, NumberText, PersonSymbol, Symbol, VerticalReel, Voice } from './visuals.jsx'
+import { NumberText, PersonSymbol, Symbol, VerticalReel, Voice } from './visuals.jsx'
 
 import { useDesign } from './editor/DesignContext.jsx'
 import Guides from './editor/Guides.jsx'
@@ -26,36 +27,23 @@ export function Welcome() {
     }:undefined
   })
   return <section className="welcome screen-center" style={{'--welcome-line-gap':settings.lineGap,'--subtitle-scale':settings.subtitle.size/100}}>
-    <div className="welcome-type"><div className="welcome-heading"><h1 {...textProps('title')} aria-label="感應光寓">{Array.from('感應光寓').map(letter=><span key={letter} aria-hidden="true">{letter}</span>)}</h1><p {...textProps('subtitle')} aria-label="SENSING RESIDENCE">{Array.from('SENSING RESIDENCE').map((letter,index)=><span key={index} aria-hidden="true">{letter===' '? '\u00a0':letter}</span>)}</p></div><span {...textProps('hint')}>請入座，將邀請卡放上感應區</span></div>
+    <div className="welcome-type"><div className="welcome-heading"><h1 {...textProps('title')} aria-label="感光公寓">{Array.from('感光公寓').map(letter=><span key={letter} aria-hidden="true">{letter}</span>)}</h1><p {...textProps('subtitle')} aria-label="SENSING RESIDENCE">{Array.from('SENSING RESIDENCE').map((letter,index)=><span key={index} aria-hidden="true">{letter===' '? '\u00a0':letter}</span>)}</p></div><span {...textProps('hint')}>請入座，將邀請卡放上感應區</span></div>
     <i className="brand-logo welcome-logo" role="img" aria-label="ANLB inside" />
   </section>
 }
 
-export function Choose({ people, choose }) {
+export function Choose({ people, choose, audioTime=0, audioStatus='idle', onPlay, onTourStart, onTourComplete }) {
   const {design}=useDesign(),material=design.material
   return <section className="choices screen-center" data-panel="glass" data-background={material.background==='white'?'white':'key'} style={{'--person-color':'#7ba9df','--card-alpha':material.alpha,'--paint-alpha':material.alpha,'--card-wash':`${material.wash*100}%`,'--card-blur':`${material.blur}px`,'--card-gloss':Math.min(1,material.gloss/3),'--card-filter':material.refract==='off'?'none':'url(#choices-glass-distortion)'}}>
     <svg width="0" height="0" aria-hidden="true" style={{position:'absolute'}}><defs><filter id="choices-glass-distortion"><feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale={material.refract==='strong'?25:8} xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
     <div className="experience-light" /><div className="choices-content">
-    <p className="choices-eyebrow">你的痛點，寶舖有解方</p>
-    <h1>選一個情境鑰匙圈，放上感應區</h1>
+    <Voice />
+    <div className="choices-spoken" aria-live="polite" aria-atomic="true"><p>{chooseCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放角色選擇語音</button>}</div>
     <ol>{people.map((person, i) => <li key={person.id} style={{ '--delay': `${.15 + i * .09}s` }}>
       <button className="surface" style={{ '--person-color': person.color, '--paint': design.scenes[person.id].colors[0] || 'transparent', '--paint-alpha': design.scenes[person.id].colors[0] === null ? 0 : material.alpha }} onClick={() => choose(person.id)}>
         <b>{String(i + 1).padStart(2, '0')}</b><span>{person.question}</span><small>{person.shortName}</small>
       </button></li>)}</ol>
-    <p className="choices-caption">房子會調整光、空氣、溫濕度與聲音來照顧你</p>
   </div></section>
-}
-
-const homePhotos=['0909-3.png','0909-4.png','0909-5.png','孕婦1.png']
-function HomePhotoCarousel(){
-  const {editing}=useDesign(),[index,setIndex]=useState(0)
-  useEffect(()=>{
-    // Preload the following images to avoid a blank frame during the upward wipe.
-    const images=homePhotos.map(file=>{const image=new Image();image.src=mediaURL(`scenes/${file}`);return image})
-    return ()=>{images.forEach(image=>{image.onload=null})}
-  },[])
-  useEffect(()=>{if(editing)return;const timer=setInterval(()=>setIndex(i=>(i+1)%homePhotos.length),4500);return ()=>clearInterval(timer)},[editing])
-  return <VerticalReel identity={index}><img className="overview-photo" src={mediaURL(`scenes/${homePhotos[index]}`)} alt={`未來居家場景 ${index+1}`} /></VerticalReel>
 }
 
 function HouseScanIcon(){
@@ -68,7 +56,7 @@ function HouseScanIcon(){
   </svg>
 }
 
-export function Overview({ metrics, audioTime=0, audioStatus='idle', onPlay }) {
+export function Overview({ metrics, audioTime=0, audioStatus='idle', onPlay, onTourStart, onTourComplete }) {
   const { design } = useDesign()
   const material=design.material
   const panel = key => ({ '--paint':houseCardColor(design.house,key),'--paint-alpha':design.house.alpha })
@@ -84,8 +72,8 @@ export function Overview({ metrics, audioTime=0, audioStatus='idle', onPlay }) {
           : <><NumberText value={metric.value} /><small>{metric.unit}</small></>}
       </div>
     </article>)}
-    <div className="overview-image surface" aria-label="未來居家照片輪播"><HomePhotoCarousel /></div>
-    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR</p><div className="overview-voice-content"><Voice /><div className={`overview-spoken${audioStatus==='ended'?' overview-spoken--finished':''}`} aria-live="polite">{['idle','error'].includes(audioStatus)?<h2>房屋的即時健康資訊</h2>:<><p className="overview-live-caption" aria-hidden={audioStatus==='ended'}>{overviewCaptionAt(audioTime)}</p><h2 className="overview-final-caption" aria-hidden={audioStatus!=='ended'}>房屋的即時健康資訊</h2></>}</div></div>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放資訊牆語音</button>}</article>
+    <div className="overview-image surface" aria-label="未來居家空間線稿"><OverviewHome onTourStart={onTourStart} onTourComplete={onTourComplete} /></div>
+    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR</p><div className="overview-voice-content"><Voice /><div className={`overview-spoken${audioStatus==='ended'?' overview-spoken--finished':''}`} aria-live="polite">{['idle','error'].includes(audioStatus)?<h2>房屋當前的健康資訊</h2>:<><p className="overview-live-caption" aria-hidden={audioStatus==='ended'}>{overviewCaptionAt(audioTime)}</p><h2 className="overview-final-caption" aria-hidden={audioStatus!=='ended'}>房屋當前的健康資訊</h2></>}</div></div>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放資訊牆語音</button>}</article>
   </section>
 }
 
@@ -128,8 +116,7 @@ export function Experience({ person, dimension, audioTime=0, audioStatus, onPlay
   const styles = { '--person-color': person.color, '--columns': layout.columns.map(value => `${value}fr`).join(' '), '--pain-height': `${layout.painHeight}%` }
   colorSlots.forEach((slot, index) => { styles[`--${slot}`] = layout.colors[index] || 'transparent'; if (index < 6) styles[`--${slot}-alpha`] = layout.colors[index] === null ? 0 : material.alpha })
   Object.assign(styles, { '--card-alpha': material.alpha, '--card-wash': `${material.wash*100}%`, '--card-blur': `${material.blur}px`, '--card-gloss': Math.min(1,material.gloss/3), '--card-filter': material.refract === 'off' ? 'none' : 'url(#glass-distortion)' })
-  return <section className="experience" data-background={material.background} data-panel={material.panel} style={styles} aria-label={`${person.title}情境`}>
-    {material.background === 'video' && <div className="experience-wall-video"><Film /></div>}
+  return <section className="experience" data-person={person.id} data-background={material.background} data-panel={material.panel} style={styles} aria-label={`${person.title}情境`}>
     <svg width="0" height="0" aria-hidden="true" style={{position:'absolute'}}><defs><filter id="glass-distortion"><feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale={material.refract === 'strong' ? 25 : 8} xChannelSelector="R" yChannelSelector="G" /></filter></defs></svg>
     <div className="experience-light" />
     <div className="experience-columns">
@@ -145,14 +132,9 @@ export function Experience({ person, dimension, audioTime=0, audioStatus, onPlay
         <div className="solution-reel enter-panel" style={{ '--delay': '.26s' }}><VerticalReel identity={dimension}><article className="solution surface"><header><Symbol name={DIMENSIONS[dimension]} animated kelvin={solution.kelvin} lightMode={solution.lightMode} /><p className="caption">{CIRCLES[dimension]} {DIMENSION_LABELS[dimension]}解方</p></header><div className="solution-text"><h2>{solution.headline}</h2><p>{solution.detail}</p></div></article></VerticalReel></div>
       </div>
     </div>
-    <BrandFooter />
   </section>
 }
 
-export function Narration({ analyser, audioStatus, onPlay }) {
-  return <section className="narration screen-center"><p className="narration-eyebrow">AI 聲紋 · VOICEPRINT</p><Voice analyser={analyser} /><p className="narration-copy">歡迎來到「感應光寓」。我們將以你在上個空間留下的資訊，為你打造專屬的居家體驗。準備好了嗎？體驗即將開始。</p>{['blocked', 'error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus === 'blocked' ? '點此播放前言語音' : '重新播放前言語音'}</button>}</section>
-}
-
 export function Farewell({ analyser, audioTime=0, audioStatus, onPlay }) {
-  return <section className="farewell screen-center"><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><p className="outro-subtitle" aria-live="polite" aria-atomic="true">{outroCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus==='blocked' ? '點此播放結語語音' : '重新播放結語語音'}</button>}<p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
+  return <section className="farewell screen-center" style={{'--person-color':'#7ba9df'}}><div className="experience-light" /><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><p className="outro-subtitle" aria-live="polite" aria-atomic="true">{outroCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus==='blocked' ? '點此播放結語語音' : '重新播放結語語音'}</button>}<p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
 }

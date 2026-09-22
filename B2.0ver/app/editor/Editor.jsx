@@ -3,7 +3,7 @@ import content from '../exhibition.json'
 import { useDesign, DEFAULT_DESIGN } from './DesignContext.jsx'
 import { COLOR_FIELDS, importDesign, shuffleHouseColors } from './model.js'
 
-const pages = { welcome: '首頁文字', overview: '房屋資訊牆', choose: '角色選擇', experience: '五種情境', narration: '前言', farewell: '結語' }
+const pages = { welcome: '首頁文字', overview: '房屋資訊牆', choose: '前言／角色選擇', experience: '五種情境', farewell: '結語' }
 export function Range({ label, value, min = 0, max = 1, step = .01, onChange, numeric = false }) {
   const [draft,setDraft]=useState(String(value))
   useEffect(()=>setDraft(String(value)),[value])

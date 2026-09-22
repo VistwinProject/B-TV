@@ -30,7 +30,7 @@
 .anlb-orb{position:relative;width:min(42vh,420px);aspect-ratio:1;flex:none;margin:0 auto}
 .anlb-orb-slot,.anlb-orb-renderer{width:100%;height:100%}
 .anlb-orb>p{position:absolute;inset:35% 0 auto;font-size:13px;text-align:center}
-@media(orientation:portrait){.narration .anlb-orb,.farewell .anlb-orb{width:min(65vw,340px)}}
+@media(orientation:portrait){.farewell .anlb-orb{width:min(65vw,340px)}}
 
 .outro-subtitle{font-size:clamp(24px,3.1vw,48px);font-weight:500;line-height:1.5;min-height:1.5em;text-align:center;max-width:90vw}
 
@@ -84,7 +84,7 @@
 
 .overview-claim .overview-voice-content{display:grid;grid-template-columns:38% minmax(0,1fr);align-items:center;flex:1;min-height:0;gap:0}
 .overview-claim .anlb-orb{width:min(100%,32vh);margin:0;transform:translateX(-8%)}
-.overview-spoken{display:grid;width:100%;text-align:center;align-items:center;min-height:3.6em;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em}
+.overview-spoken{transform:translateX(-12px);display:grid;width:100%;text-align:center;align-items:center;min-height:3.6em;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em}
 .overview-spoken>*{grid-area:1/1}
 .overview-spoken .overview-live-caption{margin:0;white-space:pre-line}
 .overview-claim .overview-spoken h2{margin:0;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:inherit}
@@ -123,3 +123,65 @@
 .overview-weather>.overview-number{grid-row:2;min-height:0}
 @media(max-width:900px){.overview-weather header{padding-bottom:12px}}
 @media(orientation:portrait){.overview .overview-weather{display:flex;flex-direction:column}.overview-weather header{padding-bottom:0}.overview-weather .weather-degrees{margin-top:12px}}
+
+/* Role selection uses the scene orb scale and caption typography. */
+.choices .choices-content{width:90vw;height:100%;box-sizing:border-box;padding:2vh 0 5vh;gap:25px;justify-content:center}
+.choices .anlb-orb{width:min(100%,32vh);flex:none;margin:0 auto -10px}
+.choices-spoken{position:relative;width:100%;min-height:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em;color:#1b3f8f;flex:none}
+.choices-spoken p{margin:0;text-wrap:pretty}
+.choices .choices-spoken .narration-play{position:absolute;right:0;bottom:0;width:auto;display:block;padding:6px 12px;font-size:14px;letter-spacing:0;background:#ffffffb3;color:#1b3f8f}
+.choices ol{margin:0;gap:clamp(8px,1.3vh,16px)}
+.choices ol button{padding-top:clamp(10px,1.5vh,18px);padding-bottom:clamp(10px,1.5vh,18px)}
+@media(orientation:portrait){.choices .choices-content{height:auto;padding:0 0 32px;gap:25px}.choices-spoken{font-size:24px;min-height:0}.choices ol{margin:0}.choices ol button{padding:16px}}
+
+
+/* Exhibition typography: 1920px reference, 4/3 size at 2560px.
+   Retain the existing portrait layout and editor text multipliers. */
+@media(min-width:901px) and (orientation:landscape){
+  .choices,.experience,.overview,.welcome,.farewell{--type-px:calc(100vw / 1920)}
+  .choices-spoken{font-size:calc(38 * var(--type-px));height:2.84em;min-height:2.84em}
+  .choices button>b{font-size:calc(25.92 * var(--type-px))}
+  .choices button>span{font-size:calc(32.4 * var(--type-px))}
+  .choices button>small{font-size:calc(20.52 * var(--type-px))}
+  .experience .caption,
+  .experience .reading-note{font-size:calc(21 * var(--type-px))}
+  .experience .reading-number{font-size:calc(115.2 * var(--type-px))}
+  .experience .reading-number--range{font-size:calc(58 * var(--type-px))}
+  .experience .reading-number small{font-size:calc(18 * var(--type-px))}
+  .experience .note-content h3{font-size:calc(36 * var(--type-px))}
+  .experience .note-content p{font-size:calc(23 * var(--type-px))}
+  .experience .goal-content .goal-copy{font-size:calc(38 * var(--type-px))}
+  .experience .pain h1{font-size:calc(34 * var(--type-px))}
+  .experience .pain-subtitle{font-size:calc(20 * var(--type-px))}
+  .experience .pain-question p{font-size:calc(38 * var(--type-px))}
+  .experience .solution-text h2{font-size:calc(46 * var(--type-px))}
+  .experience .solution-text p{font-size:calc(27 * var(--type-px))}
+  .experience .symbol{width:calc(60 * var(--type-px));height:calc(60 * var(--type-px))}
+  .experience .solution .symbol{width:calc(58 * var(--type-px));height:calc(58 * var(--type-px))}
+  .experience .person-symbol{width:calc(104 * var(--type-px))}
+  .experience .readings-column .surface header .caption{max-width:calc(100% - 70 * var(--type-px))}
+  .experience .film-caption b{font-size:calc(19 * var(--type-px))}
+  .experience .film-caption span{font-size:calc(11 * var(--type-px))}
+}
+
+@media(min-width:901px) and (orientation:landscape){
+  .welcome-heading{--english-size:calc(29.16 * var(--type-px) * var(--subtitle-scale,1))}
+  .welcome-heading h1{font-size:calc(129.6 * var(--type-px) * var(--text-scale,1))}
+  .welcome-type>span{font-size:calc(23.76 * var(--type-px) * var(--text-scale,1))}
+  .welcome-logo{width:calc(230.4 * var(--type-px))}
+  .overview .caption{font-size:calc(16 * var(--type-px))}
+  .overview-claim .caption{font-size:calc(21 * var(--type-px))}
+  .overview .overview-number,.overview .weather-degrees{font-size:calc(86.4 * var(--type-px))}
+  .overview-intro h1,.overview .weather-description{font-size:calc(37 * var(--type-px))}
+  .overview .overview-spoken{font-size:calc(38 * var(--type-px))}
+  .overview-stat .symbol{width:calc(37 * var(--type-px));height:calc(37 * var(--type-px))}
+  .overview .overview-weather .weather-feature{width:calc(112 * var(--type-px));height:calc(120 * var(--type-px))}
+  .overview-house-scan{width:calc(121.5 * var(--type-px))}
+  .overview .film-caption b{font-size:calc(34 * var(--type-px))}
+  .overview .film-caption span{font-size:calc(18 * var(--type-px))}
+  .farewell .outro-subtitle{font-size:calc(48 * var(--type-px))}
+  .farewell .narration-eyebrow{font-size:calc(18.36 * var(--type-px))}
+  .farewell .farewell-caption{font-size:calc(19.44 * var(--type-px))}
+  .farewell .anlb-orb{width:calc(420 * var(--type-px))}
+}
+.overview-home{position:relative;width:100%;height:100%;overflow:hidden;border-radius:inherit}

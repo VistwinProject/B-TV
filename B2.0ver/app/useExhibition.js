@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import { advancePlayback, begin, nfcAction, PEOPLE } from './playback.js'
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { createCaptionSync } from './captionSync.js'
+import { advancePresentation } from './pageTransitions.js'
+import { begin, nfcAction, PEOPLE, DURATION } from './playback.js'
 
 const query = new URLSearchParams(window.location.search)
 export const flags = {
@@ -9,12 +11,12 @@ export const flags = {
 }
 
 export function useExhibition(people, suspended = false) {
-  const [state, dispatch] = useReducer(advancePlayback, null, () => begin(performance.now()))
+  const [state, dispatch] = useReducer(advancePresentation, null, () => begin(performance.now()))
   const [connection, setConnection] = useState(flags.hardware ? 'connecting' : 'local')
   const [reader, setReader] = useState(false)
   const socket = useRef(null)
   const issue = useCallback((event) => dispatch({ ...event, now: performance.now(), hasAudio: flags.audio }), [])
-  useEffect(() => { issue({ action: suspended ? 'pause' : 'resume' }) }, [suspended, issue])
+  useLayoutEffect(() => { issue({ action: suspended ? 'pause' : 'resume', restart:!suspended }) }, [suspended, issue])
   const accept = useCallback((message) => {
     if (message?.type === 'reader-connected') setReader(true)
     if (message?.type === 'reader-disconnected') { setReader(false); issue({ action: 'remove' }) }
@@ -87,31 +89,27 @@ export function useNarration(state, issue, suspended = false) {
   const [audioTime,setAudioTime]=useState(0)
   useEffect(() => {
     setAudioStatus('idle');setAudioTime(0)
-    if (suspended || (!flags.audio && !['overview','narration','farewell','experience'].includes(state.screen))) return
-    const cue = { overview: 'lead', narration: 'intro', farewell: 'outro' }[state.screen]
+    if (suspended || (!flags.audio && !['choose','overview','farewell','experience'].includes(state.screen))) return
+    const cue = { choose: 'choose', overview: 'lead', farewell: 'outro' }[state.screen]
       || (state.screen === 'experience' ? `scene-${state.person}` : null)
     if (!cue) return
-    let active = true, context, source, settled = false, captionFrame=0, lastCaptionTime=-1
-    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['lead','intro','outro'].includes(cue)) ? 'wav' : 'mp3'}`)
+    let active = true, context, source, settled = false, entryTimer
+    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['choose','lead','outro'].includes(cue)) ? 'wav' : 'mp3'}${cue==='scene-elder'?'?v=3':['scene-anti-aging','lead'].includes(cue)?'?v=2':''}`)
     if(['overview','farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
-    const syncCaption=()=>{
-      if(!active)return
-      const time=player.currentTime
-      if(Math.abs(time-lastCaptionTime)>=1/30){setAudioTime(time);lastCaptionTime=time}
-      captionFrame=requestAnimationFrame(syncCaption)
-    }
-    captionFrame=requestAnimationFrame(syncCaption)
-    player.ontimeupdate=()=>{if(active){setAudioTime(player.currentTime);lastCaptionTime=player.currentTime}}
+    const captions=createCaptionSync(player,setAudioTime)
+    player.ontimeupdate=()=>{if(active&&!settled)captions.sync()}
 
     function fail() {
       if (!active || settled) return
       settled = true
+      clearTimeout(entryTimer)
+      captions.stop()
       setAudioStatus('error')
       issue({ action: 'audio-failed', revision: state.revision })
     }
     player.onerror = fail
     player.onended = () => {
-      if (active && !settled) { settled = true; setAudioTime(player.duration);setAudioStatus('ended');issue({ action: 'audio-ended', revision: state.revision }) }
+      if (active && !settled) { settled = true; captions.stop();setAudioTime(player.duration);setAudioStatus('ended');issue({ action: 'audio-ended', revision: state.revision }) }
     }
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext
@@ -126,19 +124,23 @@ export function useNarration(state, issue, suspended = false) {
       const play = () => {
         if (!active) return
         settled = false
+        captions.start()
+        if(['overview','farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
         setAudioStatus('loading')
         context?.resume().catch(() => {})
         player.play().then(() => { if (active) setAudioStatus(context?.state === 'suspended' ? 'blocked' : 'playing') }).catch(error => {
           if (!active) return
-          if (error.name === 'NotAllowedError') setAudioStatus('blocked')
+          if (error.name === 'NotAllowedError') {captions.stop();setAudioStatus('blocked')}
           else fail()
         })
       }
-      retry.current = () => { player.load(); play() }
-      play()
+      retry.current = () => { clearTimeout(entryTimer); player.load(); play() }
+      // Special automatic transitions narrate after fading in; ordinary entries keep one second.
+      setAudioStatus('loading')
+      entryTimer = setTimeout(play, state.fadeIn?DURATION.fade:1000)
     } catch { fail() }
     return () => {
-      active = false; cancelAnimationFrame(captionFrame);retry.current = null; player.pause(); player.onerror = null; player.onended = null; player.ontimeupdate=null
+      active = false; clearTimeout(entryTimer); captions.stop();retry.current = null; player.pause(); player.onerror = null; player.onended = null; player.ontimeupdate=null
       player.removeAttribute('src'); player.load()
       source?.disconnect(); analyser.current?.disconnect(); analyser.current = null
       context?.close().catch(() => {})
