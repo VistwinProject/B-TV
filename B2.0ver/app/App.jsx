@@ -14,7 +14,7 @@ function Operator({ state, operate }) {
   if (flags.kiosk) return null
   return <aside className="operator" aria-label="展演操作">
     {expanded && <section className="operator-panel" id="operator-panel">
-      <header><strong>感光公寓 2.0</strong><span>{state.seen.length} / 5 已體驗</span></header>
+      <header><strong>感應光寓 2.0</strong><span>{state.seen.length} / 5 已體驗</span></header>
       <button className="operator-invite" onClick={() => operate('invite')}>感應邀請卡 <kbd>C</kbd></button>
       <div className="operator-people">{content.people.map((person, i) => <button key={person.id} style={{ '--person-color': person.color }} aria-pressed={state.person === person.id} onClick={() => operate('person', person.id)}>
         <kbd>{i + 1}</kbd><span>{person.title}</span><span aria-label={state.seen.includes(person.id) ? '已體驗' : '未體驗'}>{state.seen.includes(person.id) ? '✓' : '○'}</span>

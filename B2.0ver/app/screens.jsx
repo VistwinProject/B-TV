@@ -27,7 +27,7 @@ export function Welcome() {
     }:undefined
   })
   return <section className="welcome screen-center" style={{'--welcome-line-gap':settings.lineGap,'--subtitle-scale':settings.subtitle.size/100}}>
-    <div className="welcome-type"><div className="welcome-heading"><h1 {...textProps('title')} aria-label="感光公寓">{Array.from('感光公寓').map(letter=><span key={letter} aria-hidden="true">{letter}</span>)}</h1><p {...textProps('subtitle')} aria-label="SENSING RESIDENCE">{Array.from('SENSING RESIDENCE').map((letter,index)=><span key={index} aria-hidden="true">{letter===' '? '\u00a0':letter}</span>)}</p></div><span {...textProps('hint')}>請入座，將邀請卡放上感應區</span></div>
+    <div className="welcome-type"><div className="welcome-heading"><h1 {...textProps('title')} aria-label="感應光寓">{Array.from('感應光寓').map(letter=><span key={letter} aria-hidden="true">{letter}</span>)}</h1><p {...textProps('subtitle')} aria-label="SENSING RESIDENCE">{Array.from('SENSING RESIDENCE').map((letter,index)=><span key={index} aria-hidden="true">{letter===' '? '\u00a0':letter}</span>)}</p></div><span {...textProps('hint')}>請入座，將邀請卡放上感應區</span></div>
     <i className="brand-logo welcome-logo" role="img" aria-label="ANLB inside" />
   </section>
 }

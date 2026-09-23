@@ -9,7 +9,7 @@ test('role narration follows media-time phrase boundaries and supports replay',(
     assert.equal(chooseCaptionAt(caption.end-.01),caption.text)
     if(index>0)assert.equal(CHOOSE_CAPTIONS[index-1].end,caption.start)
   }
-  assert.equal(chooseCaptionAt(25.11),CHOOSE_CAPTIONS[3].text)
+  assert.equal(chooseCaptionAt(23.919),CHOOSE_CAPTIONS[3].text)
   assert.equal(chooseCaptionAt(0),CHOOSE_CAPTIONS[0].text)
 })
 

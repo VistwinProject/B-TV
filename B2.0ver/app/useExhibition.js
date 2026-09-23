@@ -119,7 +119,7 @@ export function useNarration(state, issue, suspended = false) {
       || (state.screen === 'experience' ? `scene-${state.person}` : null)
     if (!cue) return
     let active = true, context, source, settled = false, entryTimer
-    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['choose','lead','outro'].includes(cue)) ? 'wav' : 'mp3'}${cue==='scene-elder'?'?v=3':['scene-anti-aging','lead'].includes(cue)?'?v=2':''}`)
+    const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['choose','lead','outro'].includes(cue)) ? 'wav' : 'mp3'}${cue==='scene-elder'?'?v=3':['scene-anti-aging','lead','choose'].includes(cue)?'?v=2':''}`)
     if(['overview','farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
     const captions=createCaptionSync(player,setAudioTime)
     player.ontimeupdate=()=>{if(active&&!settled)captions.sync()}

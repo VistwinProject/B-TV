@@ -20,7 +20,7 @@ after(async () => { if(output) await rm(output,{recursive:true,force:true}) })
 
 test('all five screen types render actual content without browser dependencies', () => {
   const screens = [
-    ['Welcome',{},'感光公寓'],['Choose',{people:content.people,choose:()=>{}},'同一間房子，面對不同的人'],
+    ['Welcome',{},'感應光寓'],['Choose',{people:content.people,choose:()=>{}},'同一間房子，面對不同的人'],
     ['Overview',{metrics:content.house},'房屋當前的健康資訊'],['Experience',{person:content.people[0],dimension:0},'居家抗老'],
     ['Farewell',{},'依照您不同的生活型態，'],
   ]
