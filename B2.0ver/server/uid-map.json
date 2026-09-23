@@ -1,0 +1,62 @@
+{
+  "F2182180": {
+    "kind": "character",
+    "id": "anti-aging",
+    "label": "居家抗老"
+  },
+  "0AC02080": {
+    "kind": "character",
+    "id": "child",
+    "label": "兒童免疫"
+  },
+  "02C92180": {
+    "kind": "character",
+    "id": "elder",
+    "label": "在宅樂齡"
+  },
+  "25C04B41": {
+    "kind": "character",
+    "id": "pregnancy",
+    "label": "孕婦照護"
+  },
+  "7D7C4B41": {
+    "kind": "character",
+    "id": "nomad",
+    "label": "數位遊牧"
+  },
+  "B7F6401E": {
+    "id": "invite",
+    "kind": "card",
+    "label": "邀請卡"
+  },
+  "FE53411E": {
+    "id": "anti-aging",
+    "kind": "character",
+    "label": "生理逆齡"
+  },
+  "B00C411E": {
+    "id": "child",
+    "kind": "character",
+    "label": "原生健康"
+  },
+  "EEA1E43C": {
+    "id": "elder",
+    "kind": "character",
+    "label": "安全守護"
+  },
+  "FB9AE53C": {
+    "id": "pregnancy",
+    "kind": "character",
+    "label": "極致純淨"
+  },
+  "4F54E53C": {
+    "id": "nomad",
+    "kind": "character",
+    "label": "數位遊牧"
+  },
+  "BB231D80": {
+    "kind": "card",
+    "id": "invite",
+    "label": "邀請卡"
+  }
+}

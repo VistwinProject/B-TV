@@ -399,7 +399,7 @@
           ]
         }
       },
-      "goal": "補償視覺退化，預防心血管意外與跌倒"
+      "goal": "補償視覺退化，預防心血管意外與降低跌倒的可能性"
     },
     {
       "id": "pregnancy",
@@ -734,7 +734,7 @@
       "key": "weather",
       "icon": "weather",
       "label": "天氣預報",
-      "value": 28,
+      "value": "26 ~ 32",
       "unit": "°C",
       "status": "info",
       "text": "多雲時晴"

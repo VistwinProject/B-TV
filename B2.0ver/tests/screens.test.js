@@ -18,17 +18,13 @@ before(async () => {
 })
 after(async () => { if(output) await rm(output,{recursive:true,force:true}) })
 
-test('all six screen types render actual content without browser dependencies', () => {
+test('all five screen types render actual content without browser dependencies', () => {
   const screens = [
-    ['Welcome',{},'感應光寓'],['Choose',{people:content.people,choose:()=>{}},'選一個情境鑰匙圈'],
-    ['Overview',{metrics:content.house},'即時健康資訊'],['Experience',{person:content.people[0],dimension:0},'居家抗老'],
-    ['Narration',{state:{started:0}},'AI 聲紋'],['Farewell',{},'房子的健康，就是你的健康'],
+    ['Welcome',{},'感光公寓'],['Choose',{people:content.people,choose:()=>{}},'同一間房子，面對不同的人'],
+    ['Overview',{metrics:content.house},'房屋當前的健康資訊'],['Experience',{person:content.people[0],dimension:0},'居家抗老'],
+    ['Farewell',{},'依照您不同的生活型態，'],
   ]
   for(const [name,props,text] of screens) assert.ok(renderToStaticMarkup(createElement(views[name],props)).includes(text),name)
-})
-
-test('intro has no countdown overlay', () => {
-  assert.ok(!renderToStaticMarkup(createElement(views.Narration,{})).includes('countdown'))
 })
 
 test('each of 20 dimensions renders its own solution and accessible 3D scene', () => {
@@ -49,8 +45,30 @@ test('each of 20 dimensions renders its own solution and accessible 3D scene', (
 })
 
 test('the build entry cannot import first-attempt source', async () => {
-  const bundle=await build({entryPoints:['app/main.jsx'],bundle:true,format:'esm',write:false,metafile:true,loader:{'.otf':'file','.ttf':'file'},outdir:resolve(output,'bundle'),external:['/fonts/*','/icons/*','/bg/*'],jsx:'automatic'})
+  const bundle=await build({entryPoints:['app/main.jsx'],bundle:true,format:'esm',write:false,metafile:true,loader:{'.otf':'file','.ttf':'file'},outdir:resolve(output,'bundle'),external:['/fonts/*','/icons/*','/bg/*','/backgrounds/*'],jsx:'automatic'})
   for(const name of Object.keys(bundle.metafile.inputs)) assert.ok(!name.startsWith('src/') && !name.startsWith('archive/'),name)
   assert.ok(bundle.metafile.inputs['app/playback.js'])
   assert.ok(bundle.metafile.inputs['app/interface.css'])
+})
+
+test('overview uses visible 3D space instead of legacy photos and video',()=>{
+  const html=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house}))
+  assert.ok(!html.includes('<video'))
+  assert.ok(!html.includes('WALKTHROUGH'))
+  assert.ok(html.includes('home-scene'))
+  assert.ok(html.includes('未來居家空間線稿'))
+  assert.ok(!html.includes('<img'))
+  assert.equal((html.match(/class="symbol animated-symbol /g)||[]).length,content.house.length)
+})
+
+test('elder narration completion reveals the existing core goal',()=>{
+  const person=content.people.find(p=>p.id==='elder')
+  const html=renderToStaticMarkup(createElement(views.Experience,{person,dimension:0,audioTime:19.87,audioStatus:'ended'}))
+  assert.ok(html.includes(`<span class="goal-final" aria-hidden="false">${person.goal}</span>`))
+  assert.ok(html.includes('<span class="goal-spoken" aria-hidden="true">為長者打造智能的安全結界。</span>'))
+})
+
+test('overview narration ends on the updated health heading',()=>{
+  const html=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house,audioTime:12.57,audioStatus:'ended'}))
+  assert.ok(html.includes('<h2 class="overview-final-caption" aria-hidden="false">房屋當前的健康資訊</h2>'))
 })

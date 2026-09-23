@@ -24,3 +24,12 @@ images/
 dist-0830
 dist-blue
 dist-white
+
+# Published B2 narration assets required by the site and CI.
+!public/voice/intro.wav
+!public/voice/outro.wav
+!public/voice/scene-*.wav
+
+!public/voice/lead.wav
+
+!public/voice/choose.wav

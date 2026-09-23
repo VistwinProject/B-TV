@@ -25,3 +25,163 @@
 @media(max-width:900px){.note-content h3{font-size:19px}.note-content p{font-size:14px}.goal-copy{font-size:23px}.reading-number{font-size:40px}.reading-number--range{font-size:26px}.solution-text p{font-size:15px}}
 @media(orientation:portrait){.goal-card{min-height:240px}.goal-copy{font-size:28px}.reading-number{font-size:64px}.reading-number--range{font-size:38px}.note-content h3{font-size:26px}.note-content p{font-size:20px}}
 @media(prefers-reduced-motion:reduce){.animated-symbol *,.person-symbol--animated g{animation:none!important}.thermometer-column{fill:#72c6ff;transform:scaleY(.6)}.thermometer-bulb{fill:#72c6ff}.lamp-bulb{opacity:1}.water-vapor path{opacity:.5}}
+
+/* Approved ANLB canvas: sizing only, no filters or shader changes. */
+.anlb-orb{position:relative;width:min(42vh,420px);aspect-ratio:1;flex:none;margin:0 auto}
+.anlb-orb-slot,.anlb-orb-renderer{width:100%;height:100%}
+.anlb-orb>p{position:absolute;inset:35% 0 auto;font-size:13px;text-align:center}
+@media(orientation:portrait){.farewell .anlb-orb{width:min(65vw,340px)}}
+
+.outro-subtitle{font-size:clamp(24px,3.1vw,48px);font-weight:500;line-height:1.5;min-height:1.5em;text-align:center;max-width:90vw}
+
+/* Shared grid keeps the heading and spoken caption on the same left edge. */
+.goal-card{position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:38% minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+.goal-card>header{grid-column:2;grid-row:1;margin-bottom:clamp(10px,2vh,24px)}
+.goal-content{display:contents}
+.goal-content .anlb-orb{grid-column:1;grid-row:1 / span 2;position:relative;width:min(100%,32vh);aspect-ratio:1;align-self:center;justify-self:center;margin:0;pointer-events:none}
+.goal-content .goal-copy{grid-column:2;grid-row:2;align-self:center;min-width:0;margin:0;font-size:clamp(22px,2.3vw,38px)}
+.goal-card .narration-play{grid-column:2;position:relative;justify-self:start}
+@media(orientation:portrait){.goal-card{min-height:260px}.goal-content .goal-copy{font-size:24px}}
+
+.goal-content .anlb-orb{transform:translateX(-8%)}
+
+.goal-content .goal-copy{display:grid}
+.goal-copy>span{grid-area:1 / 1}
+.goal-copy .goal-final{opacity:0}
+.goal-copy--finished .goal-spoken{animation:goal-caption-out .4s ease .5s both}
+.goal-copy--finished .goal-final{animation:goal-caption-in .5s ease .9s both}
+@keyframes goal-caption-out{from{opacity:1}to{opacity:0;visibility:hidden}}
+@keyframes goal-caption-in{from{opacity:0}to{opacity:1}}
+
+
+
+.goal-card>header,.goal-content .goal-copy{transform:translateX(clamp(-24px,-1.2vw,-10px))}
+
+.weather-cloud{animation:weather-cloud 4s ease-in-out infinite alternate}.weather-sun{transform-origin:15px 15px;animation:weather-sun 12s linear infinite}
+@keyframes weather-cloud{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+@keyframes weather-sun{to{transform:rotate(360deg)}}
+
+.dust-specks circle{fill:currentColor;stroke-width:.6;animation:dust-float 3.4s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.31s)}
+@keyframes dust-float{from{transform:translate(-1px,2px);opacity:.5}to{transform:translate(1px,-2px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.dust-specks circle{animation:none}}
+
+.overview-weather header{display:flex;flex-direction:column;align-items:stretch;gap:clamp(8px,1.2vh,16px)}
+.overview-weather .weather-degrees{margin:0;padding-top:0;align-self:flex-end;white-space:nowrap;text-align:right;font-size:clamp(30px,4.5vw,87px);font-weight:400;line-height:.95;letter-spacing:-.025em}
+.overview-weather>.overview-number{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:clamp(8px,1.2vh,16px);flex:1;margin-top:0;padding-top:10px}
+.overview .overview-weather .weather-feature{width:clamp(64px,6.5vw,112px);height:clamp(68px,7vw,120px);stroke-width:1.1;color:#6287aa}
+.forecast-sun{animation:forecast-peek 9s ease-in-out infinite;transform-origin:30px 15px}
+.forecast-glow{fill:#ffe8b3;opacity:.24}
+.forecast-rays{transform-origin:30px 15px;animation:forecast-rays 18s linear infinite}
+.forecast-cloud--back{animation:forecast-back 9s ease-in-out infinite}
+.forecast-cloud--front{animation:forecast-front 9s ease-in-out infinite}
+.forecast-cloud--low{animation:forecast-low 6s ease-in-out infinite alternate}
+@keyframes forecast-peek{0%,25%,85%,100%{transform:translate(-5px,9px);opacity:.12}40%,60%{transform:translate(1px,-2px);opacity:1}}
+@keyframes forecast-back{0%,25%,85%,100%{transform:translate(1px,0)}40%,60%{transform:translate(-3px,1px)}}
+@keyframes forecast-front{0%,100%{transform:translate(0,0)}50%{transform:translate(-2px,1px)}}
+@keyframes forecast-low{from{transform:translate(-1px,0)}to{transform:translate(1px,-1px)}}
+@keyframes forecast-rays{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.forecast-sun{transform:translate(0,-2px);opacity:1}}
+
+.overview-claim .overview-voice-content{display:grid;grid-template-columns:38% minmax(0,1fr);align-items:center;flex:1;min-height:0;gap:0}
+.overview-claim .anlb-orb{width:min(100%,32vh);margin:0;transform:translateX(-8%)}
+.overview-spoken{transform:translateX(-12px);display:grid;width:100%;text-align:center;align-items:center;min-height:3.6em;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em}
+.overview-spoken>*{grid-area:1/1}
+.overview-spoken .overview-live-caption{margin:0;white-space:pre-line}
+.overview-claim .overview-spoken h2{margin:0;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:inherit}
+.overview-final-caption{opacity:0;visibility:hidden}
+.overview-spoken--finished .overview-live-caption{animation:goal-caption-out .5s ease forwards}
+.overview-spoken--finished .overview-final-caption{visibility:visible;animation:goal-caption-in .6s ease .6s both}
+@media(orientation:portrait){.overview-claim{min-height:260px}.overview-spoken{font-size:24px}}
+
+.overview-house-content{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(4px,1vh,12px)}
+.overview-intro .overview-house-content h1{margin:0}
+.overview-house-scan{width:clamp(84px,11.25vh,150px);max-height:37.5%;flex:none;color:var(--wall-title);transform:translateY(-10px)}
+.house-scan-building{animation:house-scan-illuminate 12s ease forwards}
+.house-scan-fill{fill:currentColor;fill-opacity:.03;animation:house-scan-fill 12s ease forwards}
+.house-scan-line{color:#fff;stroke:#fff;animation:house-scan-pass 7s ease-in-out forwards;filter:drop-shadow(0 0 3px #fff)}
+@keyframes house-scan-pass{0%,5%{transform:translateY(0);opacity:0}8%{transform:translateY(0);opacity:1}24%{transform:translateY(70px);opacity:1}40%{transform:translateY(0);opacity:1}56%{transform:translateY(70px);opacity:1}72%{transform:translateY(0);opacity:1}78%,100%{transform:translateY(0);opacity:0}}
+@keyframes house-scan-illuminate{0%,45.5%{color:var(--wall-title);opacity:.4;filter:none}58%,70%,82%{color:#fff;opacity:1;filter:drop-shadow(0 0 5px #ffffff99)}64%,76%,88%{color:#fff;opacity:.3;filter:none}100%{color:var(--wall-title);opacity:1;filter:none}}
+@keyframes house-scan-fill{0%,45.5%{fill-opacity:.03}58%,70%,82%{fill-opacity:.25}64%,76%,88%{fill-opacity:.06}100%{fill-opacity:0}}
+@media(prefers-reduced-motion:reduce){.house-scan-building,.house-scan-fill{animation:none;opacity:1;color:var(--wall-title)}.house-scan-fill{fill-opacity:0}.house-scan-line{animation:none;display:none}}
+
+.overview-intro h1,.overview .weather-description{font-size:clamp(17px,2.33vw,37px);font-weight:500}
+.overview .weather-description{line-height:1.42;letter-spacing:.025em}
+@media(max-width:900px){.overview-intro h1,.overview .weather-description{font-size:23px}}
+
+/* Preserve type sizes while keeping units beside their associated values. */
+.overview-number--stack{white-space:nowrap}
+.overview-number--stack small{display:inline-block;margin:0 0 0 5px}
+.reading-value-unit{display:inline-flex;align-items:baseline;white-space:nowrap;gap:4px}
+.reading-value-unit small{flex:none}
+
+@media(orientation:portrait){.overview-weather .weather-degrees{font-size:56px}}
+
+/* Align the forecast temperature with the bottom inset of dashboard row three. */
+.overview .overview-weather{display:grid;grid-template-rows:subgrid}
+.overview-weather header{grid-row:1;min-height:0;padding-bottom:clamp(14px,1.6vw,28px)}
+.overview-weather .weather-degrees{margin-top:auto}
+.overview-weather>.overview-number{grid-row:2;min-height:0}
+@media(max-width:900px){.overview-weather header{padding-bottom:12px}}
+@media(orientation:portrait){.overview .overview-weather{display:flex;flex-direction:column}.overview-weather header{padding-bottom:0}.overview-weather .weather-degrees{margin-top:12px}}
+
+/* Role selection uses the scene orb scale and caption typography. */
+.choices .choices-content{width:90vw;height:100%;box-sizing:border-box;padding:2vh 0 5vh;gap:25px;justify-content:center}
+.choices .anlb-orb{width:min(100%,32vh);flex:none;margin:0 auto -10px}
+.choices-spoken{position:relative;width:100%;min-height:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(22px,2.3vw,38px);font-weight:500;line-height:1.42;letter-spacing:.025em;color:#1b3f8f;flex:none}
+.choices-spoken p{margin:0;text-wrap:pretty}
+.choices .choices-spoken .narration-play{position:absolute;right:0;bottom:0;width:auto;display:block;padding:6px 12px;font-size:14px;letter-spacing:0;background:#ffffffb3;color:#1b3f8f}
+.choices ol{margin:0;gap:clamp(8px,1.3vh,16px)}
+.choices ol button{padding-top:clamp(10px,1.5vh,18px);padding-bottom:clamp(10px,1.5vh,18px)}
+@media(orientation:portrait){.choices .choices-content{height:auto;padding:0 0 32px;gap:25px}.choices-spoken{font-size:24px;min-height:0}.choices ol{margin:0}.choices ol button{padding:16px}}
+
+
+/* Exhibition typography: 1920px reference, 4/3 size at 2560px.
+   Retain the existing portrait layout and editor text multipliers. */
+@media(min-width:901px) and (orientation:landscape){
+  .choices,.experience,.overview,.welcome,.farewell{--type-px:calc(100vw / 1920)}
+  .choices-spoken{font-size:calc(38 * var(--type-px));height:2.84em;min-height:2.84em}
+  .choices button>b{font-size:calc(25.92 * var(--type-px))}
+  .choices button>span{font-size:calc(32.4 * var(--type-px))}
+  .choices button>small{font-size:calc(20.52 * var(--type-px))}
+  .experience .caption,
+  .experience .reading-note{font-size:calc(21 * var(--type-px))}
+  .experience .reading-number{font-size:calc(115.2 * var(--type-px))}
+  .experience .reading-number--range{font-size:calc(58 * var(--type-px))}
+  .experience .reading-number small{font-size:calc(18 * var(--type-px))}
+  .experience .note-content h3{font-size:calc(36 * var(--type-px))}
+  .experience .note-content p{font-size:calc(23 * var(--type-px))}
+  .experience .goal-content .goal-copy{font-size:calc(38 * var(--type-px))}
+  .experience .pain h1{font-size:calc(34 * var(--type-px))}
+  .experience .pain-subtitle{font-size:calc(20 * var(--type-px))}
+  .experience .pain-question p{font-size:calc(38 * var(--type-px))}
+  .experience .solution-text h2{font-size:calc(46 * var(--type-px))}
+  .experience .solution-text p{font-size:calc(27 * var(--type-px))}
+  .experience .symbol{width:calc(60 * var(--type-px));height:calc(60 * var(--type-px))}
+  .experience .solution .symbol{width:calc(58 * var(--type-px));height:calc(58 * var(--type-px))}
+  .experience .person-symbol{width:calc(104 * var(--type-px))}
+  .experience .readings-column .surface header .caption{max-width:calc(100% - 70 * var(--type-px))}
+  .experience .film-caption b{font-size:calc(19 * var(--type-px))}
+  .experience .film-caption span{font-size:calc(11 * var(--type-px))}
+}
+
+@media(min-width:901px) and (orientation:landscape){
+  .welcome-heading{--english-size:calc(29.16 * var(--type-px) * var(--subtitle-scale,1))}
+  .welcome-heading h1{font-size:calc(129.6 * var(--type-px) * var(--text-scale,1))}
+  .welcome-type>span{font-size:calc(23.76 * var(--type-px) * var(--text-scale,1))}
+  .welcome-logo{width:calc(230.4 * var(--type-px))}
+  .overview .caption{font-size:calc(16 * var(--type-px))}
+  .overview-claim .caption{font-size:calc(21 * var(--type-px))}
+  .overview .overview-number,.overview .weather-degrees{font-size:calc(86.4 * var(--type-px))}
+  .overview-intro h1,.overview .weather-description{font-size:calc(37 * var(--type-px))}
+  .overview .overview-spoken{font-size:calc(38 * var(--type-px))}
+  .overview-stat .symbol{width:calc(37 * var(--type-px));height:calc(37 * var(--type-px))}
+  .overview .overview-weather .weather-feature{width:calc(112 * var(--type-px));height:calc(120 * var(--type-px))}
+  .overview-house-scan{width:calc(121.5 * var(--type-px))}
+  .overview .film-caption b{font-size:calc(34 * var(--type-px))}
+  .overview .film-caption span{font-size:calc(18 * var(--type-px))}
+  .farewell .outro-subtitle{font-size:calc(48 * var(--type-px))}
+  .farewell .narration-eyebrow{font-size:calc(18.36 * var(--type-px))}
+  .farewell .farewell-caption{font-size:calc(19.44 * var(--type-px))}
+  .farewell .anlb-orb{width:calc(420 * var(--type-px))}
+}
+.overview-home{position:relative;width:100%;height:100%;overflow:hidden;border-radius:inherit}

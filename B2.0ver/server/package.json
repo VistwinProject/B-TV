@@ -1,0 +1,1 @@
+{"name":"b2-nfc-bridge","private":true,"type":"commonjs","scripts":{"start":"node index.cjs"},"dependencies":{"nfc-pcsc":"^0.8.1","ws":"^8.18.0"}}
