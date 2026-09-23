@@ -1,7 +1,7 @@
 // 2.0 playback engine. Pure state transitions; no React, DOM or legacy imports.
 export const PEOPLE = ['anti-aging', 'child', 'elder', 'pregnancy', 'nomad']
 export const DIMENSIONS = ['light', 'air', 'temp', 'sound']
-export const DURATION = { dimension: 5000, tour: 20000, overview:18000, scene:25000, endingHold:2000, fade:250, farewell: 9000, audioLimit: 120000 }
+export const DURATION = { dimension: 5000, tour: 20000, overview:18000, overviewHold:3000, scene:25000, endingHold:2000, fade:250, farewell: 9000, audioLimit: 120000 }
 
 export function begin(now = 0, revision = 0) {
   return { screen: 'welcome', person: null, seen: [], dimension: 0, loop: 0,
@@ -65,7 +65,7 @@ export function advancePlayback(state, event) {
       if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:now+DURATION.audioLimit}
       return event.revision===state.revision && ['farewell','experience'].includes(state.screen) ? (state.screen==='farewell'?{...state,awaitingAudio:true}:{...state,sceneAudioPending:true}) : state
     case 'audio-ended':
-      if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:now,overviewTourPending:false}
+      if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:now+DURATION.overviewHold,overviewTourPending:false}
       if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false,sceneAudioFinishedAt:now}
       if(event.revision===state.revision && state.screen==='farewell')return {...state,awaitingAudio:false}
       return state

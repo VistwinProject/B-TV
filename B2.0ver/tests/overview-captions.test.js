@@ -10,19 +10,21 @@ test('overview captions match the supplied narration and support media-time seek
  assert.equal(overviewCaptionAt(9.62),'以下是空間的詳細資訊。')
  assert.equal(overviewCaptionAt(0),'目前室溫26.2度，\n相對濕度58%，')
 })
-test('overview waits for narration then advances without an extra hold',()=>{
+test('overview waits for narration then holds the information for three seconds',()=>{
  let s=advancePlayback(begin(0),{action:'invite',now:0})
  s=advancePlayback(s,{action:'audio-waiting',revision:s.revision,now:0})
  assert.equal(advancePlayback(s,{action:'clock',now:21000}).screen,'overview')
  s=advancePlayback(s,{action:'audio-ended',revision:s.revision,now:22000})
- assert.equal(advancePlayback(s,{action:'clock',now:22000}).screen,'choose')
+ assert.equal(advancePlayback(s,{action:'clock',now:24999}).screen,'overview')
+ assert.equal(advancePlayback(s,{action:'clock',now:25000}).screen,'choose')
 })
 
 test('narration completion takes priority over the remaining overview animation',()=>{
  let s=advancePlayback(begin(0),{action:'invite',now:0})
  s=advancePlayback(s,{action:'overview-tour-started',revision:s.revision,now:0})
  s=advancePlayback(s,{action:'audio-ended',revision:s.revision,now:13000})
- assert.equal(advancePlayback(s,{action:'clock',now:13000}).screen,'choose')
+ assert.equal(advancePlayback(s,{action:'clock',now:15999}).screen,'overview')
+ assert.equal(advancePlayback(s,{action:'clock',now:16000}).screen,'choose')
  s=advancePlayback(s,{action:'overview-tour-ended',revision:s.revision,now:20500})
  assert.equal(advancePlayback(s,{action:'clock',now:20500}).screen,'choose')
 })
