@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
+import { createBrowserSync, isBrowserPreview } from './browserSync.js'
 import { createCaptionSync } from './captionSync.js'
 import { advancePresentation } from './pageTransitions.js'
 import { begin, nfcAction, PEOPLE, DURATION } from './playback.js'
 
+const browserPreview = isBrowserPreview(window.location)
 const query = new URLSearchParams(window.location.search)
 export const flags = {
   hardware: query.has('hardware') ? query.get('hardware') !== '0' : import.meta.env.VITE_NFC_ENABLED !== 'false',
@@ -15,10 +17,14 @@ export function useExhibition(people, suspended = false) {
   const [connection, setConnection] = useState(flags.hardware ? 'connecting' : 'local')
   const [reader, setReader] = useState(false)
   const socket = useRef(null)
+  const preview = useRef(null)
   const flow = useRef(null)
   const issue = useCallback((event) => dispatch({ ...event, now: performance.now(), hasAudio: flags.audio }), [])
   useLayoutEffect(() => { issue({ action: suspended ? 'pause' : 'resume', restart:!suspended }) }, [suspended, issue])
-  const accept = useCallback((message) => {
+  const accept = useCallback((message, meta) => {
+    if (meta?.replay && message.type === 'tv-phase' && ['choose','farewell'].includes(message.screen)) {
+      issue({action:message.screen === 'choose' ? 'intro' : 'outro'}); return
+    }
     if (message?.type === 'reader-connected') setReader(true)
     if (message?.type === 'reader-disconnected') { setReader(false); issue({ action: 'remove' }) }
     if(message?.type==='tag-present') flow.current=message.flowId
@@ -33,6 +39,12 @@ export function useExhibition(people, suspended = false) {
   }, [issue])
 
   useEffect(() => {
+    if (browserPreview) {
+      const transport = createBrowserSync(accept)
+      preview.current = transport
+      setConnection('local')
+      return () => { transport.close(); preview.current = null }
+    }
     if (!flags.hardware) return
     let closed = false, reconnect
     function connect() {
@@ -56,6 +68,7 @@ export function useExhibition(people, suspended = false) {
   }, [accept])
 
   const send = useCallback(message => {
+    if (preview.current) { preview.current.send(message); return }
     const ws = socket.current
     if (ws?.readyState === WebSocket.OPEN) {
       try { ws.send(JSON.stringify(message)); return } catch { /* local fallback */ }
@@ -65,6 +78,8 @@ export function useExhibition(people, suspended = false) {
   // TV owns narration timing; table follows the actual page commit.
   useEffect(() => {
     if(suspended || flow.current == null || !['overview','choose','farewell'].includes(state.screen)) return
+    const message={type:'tv-phase',screen:state.screen,flowId:flow.current}
+    if(preview.current) { preview.current.send(message); return }
     const ws=socket.current
     if(ws?.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:'tv-phase',screen:state.screen,flowId:flow.current}))
   }, [state.screen,state.revision,connection,suspended])
