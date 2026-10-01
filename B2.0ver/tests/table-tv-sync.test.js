@@ -96,8 +96,8 @@ test('automatic and operator TV endings synchronize table and a new card clears 
   tv=advancePresentation(tv,{...nfcAction(lastMessage),now:0})
  }
  const flowId=lastMessage.flowId
- tv=advancePresentation(tv,{action:'clock',now:27000})
- tv=advancePresentation(tv,{action:'clock',now:27250})
+ tv=advancePresentation(tv,{action:'clock',now:34000})
+ tv=advancePresentation(tv,{action:'clock',now:34250})
  assert.equal(tv.screen,'farewell')
  relay.receive({type:'tv-phase',screen:tv.screen,flowId})
  assert.equal(deriveStep(table),'farewell')

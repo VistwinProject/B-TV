@@ -20,7 +20,7 @@ test('held invitation cannot restart either the overview or choices', () => {
 
 test('dimension clock progresses at exact boundaries and keeps looping', () => {
   const scene = update(begin(), { action: 'person', id: 'child', now: 100 })
-  for (const [elapsed, dimension, loop] of [[0,0,0],[4999,0,0],[5000,1,0],[10000,2,0],[15000,3,0],[20000,0,1],[65000,1,3]]) {
+  for (const [elapsed, dimension, loop] of [[0,0,0],[7999,0,0],[8000,1,0],[16000,2,0],[24000,3,0],[32000,0,1],[104000,1,3]]) {
     const result = update(scene, { action: 'clock', now: 100 + elapsed })
     assert.equal(result.dimension, dimension)
     assert.equal(result.loop, loop)
@@ -35,15 +35,15 @@ test('all 120 encounter orders wait for the entire fifth cycle and outro', () =>
       checked++
       assert.equal(state.seen.length, 5)
       assert.equal(update(state, { action: 'clock', now: time + 19999 }).screen, 'experience')
-      assert.equal(update(state,{action:'clock',now:time+26999}).exitStartedAt,null)
-      const fading=update(state,{action:'clock',now:time+27000})
+      assert.equal(update(state,{action:'clock',now:time+33999}).exitStartedAt,null)
+      const fading=update(state,{action:'clock',now:time+34000})
       assert.equal(fading.screen,'experience')
-      assert.equal(fading.exitStartedAt,time+27000)
-      assert.equal(update(fading,{action:'clock',now:time+27249}).screen,'experience')
-      const ending = update(fading, { action: 'clock', now: time + 27250 })
+      assert.equal(fading.exitStartedAt,time+34000)
+      assert.equal(update(fading,{action:'clock',now:time+34249}).screen,'experience')
+      const ending = update(fading, { action: 'clock', now: time + 34250 })
       assert.equal(ending.screen, 'farewell')
-      assert.equal(update(ending, { action: 'clock', now: time + 28999 }).screen, 'farewell')
-      const home = update(ending, { action: 'clock', now: time + 29000 })
+      assert.equal(update(ending, { action: 'clock', now: time + 35999 }).screen, 'farewell')
+      const home = update(ending, { action: 'clock', now: time + 36000 })
       assert.equal(home.screen, 'farewell')
       assert.equal(home.seen.length, 5)
       return

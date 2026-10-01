@@ -188,7 +188,7 @@
         },
         "air": {
           "headline": "保護發育中的肺部",
-          "detail": "CO₂ ≤ 600 ppm，甲醛 ≤ 0.02 ppm；強化爬行層（0.1–0.5m）換氣",
+          "detail": "CO₂ ≤ 600 ppm，甲醛 ≤ 20 ppb；強化爬行層（0.1–0.5m）換氣",
           "metrics": [
             {
               "value": "600",
@@ -198,8 +198,8 @@
               "operator": "≤"
             },
             {
-              "value": "0.02",
-              "unit": "ppm",
+              "value": "20",
+              "unit": "ppb",
               "note": "甲醛",
               "icon": "air",
               "operator": "≤"
@@ -467,24 +467,24 @@
         },
         "air": {
           "headline": "零毒害微環境",
-          "detail": "甲醛 ≤ 0.0135 ppm（GFB進階標準），保護胎兒器官發育不受 VOCs 影響",
+          "detail": "甲醛 ≤ 13 ppb（本展設定目標），保護胎兒器官發育不受 VOCs 影響",
           "metrics": [
             {
-              "value": "0.0135",
-              "unit": "ppm",
+              "value": "13",
+              "unit": "ppb",
               "note": "甲醛",
               "icon": "air",
               "operator": "≤"
             },
             {
               "kind": "note",
-              "note": "GFB 進階標準",
-              "detail": "嚴格控制甲醛濃度",
+              "note": "本展設定目標",
+              "detail": "甲醛上限 13 ppb",
               "icon": "air"
             },
             {
               "kind": "note",
-              "note": "保護胎兒器官發育",
+              "note": "保護胎兒呼吸道發育",
               "detail": "不受 VOCs 影響",
               "icon": "air"
             }
@@ -672,7 +672,7 @@
             },
             {
               "kind": "note",
-              "note": "主動隔音／白噪音",
+              "note": "隔音降噪",
               "detail": "降低背景雜訊",
               "icon": "sound"
             },

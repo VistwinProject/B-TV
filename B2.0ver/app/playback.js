@@ -1,7 +1,7 @@
 // 2.0 playback engine. Pure state transitions; no React, DOM or legacy imports.
 export const PEOPLE = ['anti-aging', 'child', 'elder', 'pregnancy', 'nomad']
 export const DIMENSIONS = ['light', 'air', 'temp', 'sound']
-export const DURATION = { dimension: 5000, tour: 20000, overview:18000, overviewHold:3000, scene:25000, endingHold:2000, fade:250, farewell: 9000, audioLimit: 120000 }
+export const DURATION = { dimension: 8000, tour: 32000, overview:18000, overviewHold:3000, scene:32000, endingHold:2000, fade:250, farewell: 9000, audioLimit: 120000 }
 
 export function begin(now = 0, revision = 0) {
   return { screen: 'welcome', person: null, seen: [], dimension: 0, loop: 0,

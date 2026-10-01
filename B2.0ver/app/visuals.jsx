@@ -53,12 +53,12 @@ export function NumberText({ value, duration = 1300 }) {
 export function Voice() { return <VoiceOrb /> }
 
 
-// Keep both old and new panes during the 0.8 s reel transition.
+// Keep both old and new panes during the 1.4 s reel transition.
 export function VerticalReel({ identity, children }) {
   const [panes, setPanes] = useState({ identity, current: children, previous: null })
   if (panes.identity !== identity) setPanes({ identity, current: children, previous: panes.current })
   useEffect(() => {
-    const release = setTimeout(() => setPanes(value => ({ ...value, previous: null })), 820)
+    const release = setTimeout(() => setPanes(value => ({ ...value, previous: null })), 1420)
     return () => clearTimeout(release)
   }, [identity])
   return <div className="reel-window">

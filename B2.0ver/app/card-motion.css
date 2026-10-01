@@ -144,24 +144,24 @@
   .choices button>span{font-size:calc(32.4 * var(--type-px))}
   .choices button>small{font-size:calc(20.52 * var(--type-px))}
   .experience .caption,
-  .experience .reading-note{font-size:calc(21 * var(--type-px))}
-  .experience .reading-number{font-size:calc(115.2 * var(--type-px))}
-  .experience .reading-number--range{font-size:calc(58 * var(--type-px))}
-  .experience .reading-number small{font-size:calc(18 * var(--type-px))}
-  .experience .note-content h3{font-size:calc(36 * var(--type-px))}
+  .experience .reading-note{font-size:calc(25 * var(--type-px))}
+  .experience .reading-number{font-size:calc(128 * var(--type-px))}
+  .experience .reading-number--range{font-size:calc(68 * var(--type-px))}
+  .experience .reading-number small{font-size:calc(21 * var(--type-px))}
+  .experience .note-content h3{font-size:calc(40 * var(--type-px))}
   .experience .note-content p{font-size:calc(23 * var(--type-px))}
-  .experience .goal-content .goal-copy{font-size:calc(38 * var(--type-px))}
-  .experience .pain h1{font-size:calc(34 * var(--type-px))}
-  .experience .pain-subtitle{font-size:calc(20 * var(--type-px))}
-  .experience .pain-question p{font-size:calc(38 * var(--type-px))}
-  .experience .solution-text h2{font-size:calc(46 * var(--type-px))}
+  .experience .goal-content .goal-copy{font-size:calc(45 * var(--type-px))}
+  .experience .pain h1{font-size:calc(45 * var(--type-px))}
+  .experience .pain-subtitle{font-size:calc(25 * var(--type-px))}
+  .experience .pain-question p{font-size:calc(40 * var(--type-px))}
+  .experience .solution-text h2{font-size:calc(52 * var(--type-px))}
   .experience .solution-text p{font-size:calc(27 * var(--type-px))}
   .experience .symbol{width:calc(60 * var(--type-px));height:calc(60 * var(--type-px))}
   .experience .solution .symbol{width:calc(58 * var(--type-px));height:calc(58 * var(--type-px))}
   .experience .person-symbol{width:calc(104 * var(--type-px))}
   .experience .readings-column .surface header .caption{max-width:calc(100% - 70 * var(--type-px))}
-  .experience .film-caption b{font-size:calc(19 * var(--type-px))}
-  .experience .film-caption span{font-size:calc(11 * var(--type-px))}
+  .experience .film-caption b{font-size:calc(35 * var(--type-px))}
+  .experience .film-caption span{font-size:calc(25 * var(--type-px))}
 }
 
 @media(min-width:901px) and (orientation:landscape){
@@ -185,3 +185,81 @@
   .farewell .anlb-orb{width:calc(420 * var(--type-px))}
 }
 .overview-home{position:relative;width:100%;height:100%;overflow:hidden;border-radius:inherit}
+
+
+/* Three shared type sizes for data/solution cards only; 1920px reference. */
+.experience :is(.readings-column,.solution){
+  --info-title-size:18px;
+  --info-main-size:36px;
+  --info-detail-size:16px;
+}
+@media(min-width:901px) and (orientation:landscape){
+  .experience :is(.readings-column,.solution){
+    --info-title-size:calc(35 * var(--type-px));
+    --info-main-size:calc(40 * var(--type-px));
+    --info-detail-size:calc(25 * var(--type-px));
+  }
+}
+@media(orientation:portrait){
+  .experience :is(.readings-column,.solution){
+    --info-title-size:22px;
+    --info-main-size:44px;
+    --info-detail-size:20px;
+  }
+}
+.experience :is(.readings-column,.solution) .caption{font-size:var(--info-title-size)}
+.experience .readings-column :is(.reading-number,.reading-number--range,.note-content h3),
+.experience .solution-text h2{font-size:var(--info-main-size)}
+.experience .readings-column :is(.reading-note,.reading-number small,.reading-operator,.note-content p),
+.experience .solution-text p{font-size:var(--info-detail-size)}
+
+/* Numeric values use the numeric size in any card; text uses the shared main size. */
+.experience .readings-column .reading .reading-number{font-size:80px}
+@media(min-width:901px) and (orientation:landscape){
+  .experience .readings-column .reading .reading-number{font-size:calc(80 * var(--type-px))}
+  .experience .readings-column .reading--interval{padding:calc(18 * var(--type-px))}
+  .experience .reading--interval header .symbol{width:calc(35 * var(--type-px));height:calc(35 * var(--type-px))}
+}
+.experience .reading--interval .reading-number{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;row-gap:.03em;column-gap:.08em;line-height:.9;letter-spacing:0}
+.experience .reading--interval .reading-range-start,
+.experience .reading--interval .reading-value-unit{display:flex;align-items:baseline;white-space:nowrap;flex:none}
+.experience .reading--interval .reading-value-unit small{letter-spacing:0}
+@media(orientation:portrait),(max-width:900px){
+  .experience .readings-column .reading--interval{padding:12px}
+  .experience .reading--interval header .symbol{width:28px;height:28px}
+}
+@media(min-width:901px) and (orientation:landscape){
+  .experience .readings-column .reading{padding:calc(18 * var(--type-px))}
+  .experience .readings-column .reading header .symbol{width:calc(35 * var(--type-px));height:calc(35 * var(--type-px))}
+}
+@media(min-width:901px) and (orientation:landscape){
+  .experience .readings-column .reading--interval{padding:calc(14 * var(--type-px))}
+}
+.experience .reading-range-start .reading-operator{letter-spacing:0;margin:0 0 0 4px}
+
+/* All four dimensions: group the main reading and detail at the bottom left. */
+.experience .readings-column :is(.reading-content,.note-content){
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:stretch;
+  min-width:0;
+  gap:.55em;
+  text-align:left;
+}
+.experience .readings-column :is(.reading-number,.note-content h3,.reading-note,.note-content p){
+  margin:0;
+  text-align:left;
+}
+.experience .readings-column .reading-number{justify-content:flex-start}
+
+@media(min-width:901px) and (orientation:landscape){
+  .experience .goal-card > header .caption{font-size:calc(35 * var(--type-px))}
+}
+
+/* Scene labels sit at the top-left of the 3D view. */
+.experience .home-scene .film-caption{top:clamp(12px,1.4vh,18px);bottom:auto;left:clamp(12px,1.2vw,20px)}
+
+/* Supplementary copy uses a consistent regular weight across scene cards. */
+.experience :is(.reading-note,.note-content p,.reading-number small,.reading-operator,.solution-text p,.pain-subtitle){font-weight:400}

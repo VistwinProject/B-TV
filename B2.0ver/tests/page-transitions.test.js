@@ -40,10 +40,10 @@ test('automatic overview exit fades and late outgoing audio cannot alter the tar
 test('the final scenario keeps its two-second hold and only fades out once',()=>{
  for(const person of PEOPLE){
   let s={...begin(),screen:'experience',person,seen:PEOPLE,sceneAudioFinishedAt:30000}
-  assert.equal(update(s,{action:'clock',now:31999}).exitStartedAt,undefined)
-  s=update(s,{action:'clock',now:32000})
-  assert.equal(s.exitStartedAt,32000)
-  s=update(s,{action:'clock',now:32250})
+  assert.equal(update(s,{action:'clock',now:33999}).exitStartedAt,undefined)
+  s=update(s,{action:'clock',now:34000})
+  assert.equal(s.exitStartedAt,34000)
+  s=update(s,{action:'clock',now:34250})
   assert.equal(s.screen,'farewell');assert.equal(s.transition,null);assert.equal(s.fadeIn,true)
  }
 })

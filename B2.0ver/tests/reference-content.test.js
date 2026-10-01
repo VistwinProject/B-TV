@@ -10,9 +10,9 @@ test('reference thresholds preserve operators, precision and units', () => {
   // Independent transcription of the supplied table's numeric requirements.
   const expected = {
     'anti-aging': {light:['≥250EML','≤50EML'],air:['≤10µg/m³','≤0.30ppm'],temp:['22–23°C','50%'],sound:['≤30dB']},
-    child: {light:['≥500Lux','<5%'],air:['≤600ppm','≤0.02ppm','0.1–0.5m'],temp:['24–26°C','45–55%','<2°C'],sound:['≤40dB']},
+    child: {light:['≥500Lux','<5%'],air:['≤600ppm','≤20ppb','0.1–0.5m'],temp:['24–26°C','45–55%','<2°C'],sound:['≤40dB']},
     elder: {light:['≥800Lux','≥90CRI'],air:['≤800ppm','≤10µg/m³'],temp:['26–28°C'],sound:['≤45dB']},
-    pregnancy: {light:['1800–2700K','≤50EML'],air:['≤0.0135ppm'],temp:['25°C','50%'],sound:['~35dB']},
+    pregnancy: {light:['1800–2700K','≤50EML'],air:['≤13ppb'],temp:['25°C','50%'],sound:['~35dB']},
     nomad: {light:['500–1000Lux','5000–6500K'],air:['≤750ppm','2倍以上'],temp:['23–24°C'],sound:['≤35dB']},
   }
   for (const [id, dimensions] of Object.entries(expected)) for (const [dimension, targets] of Object.entries(dimensions)) {

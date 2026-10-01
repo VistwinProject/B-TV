@@ -81,14 +81,14 @@ function Reading({ metric, dimension, lighting }) {
   const icon = metric.icon || DIMENSIONS[dimension]
   const kelvin = metric.kelvin || lighting.kelvin
   const lightMode = metric.lightMode || lighting.lightMode
-  const lightRange = dimension === 0 && /^(lux|k)$/i.test(metric.unit) ? String(metric.value).match(/^(\d+)\s*([–—-])\s*(\d+)$/) : null
-  return <article className={`reading surface${metric.kind === 'note' ? ' reading--note' : ''}`}>
+  const valueRange = metric.kind !== 'note' ? String(metric.value).match(/^(\d+(?:\.\d+)?)\s*([–—~‐-])\s*(\d+(?:\.\d+)?)$/) : null
+  return <article className={`reading surface${metric.kind === 'note' ? ' reading--note' : ''}${valueRange ? ' reading--interval' : ''}`}>
     <header><p className="caption">{CIRCLES[dimension]} {metric.icon === 'humid' ? '濕度' : DIMENSION_LABELS[dimension]}</p><Symbol name={icon} animated kelvin={kelvin} lightMode={lightMode} /></header>
-    {metric.kind === 'note' ? <div className="note-content"><h3>{metric.note}</h3><p>{metric.detail}</p></div> : <>
+    {metric.kind === 'note' ? <div className="note-content"><h3>{metric.note}</h3><p>{metric.detail}</p></div> : <div className="reading-content">
       <div className={`reading-number ${dimension === 2 || String(metric.value).length >= 6 || metric.operator ? 'reading-number--range' : ''}`}>
-        {metric.operator && <span className="reading-operator">{metric.operator}</span>}{lightRange ? <><span><NumberText value={lightRange[1]} />{lightRange[2]}</span><span className="reading-value-unit"><NumberText value={lightRange[3]} /><small>{metric.unit}</small></span></> : <><NumberText value={metric.value} /><small>{metric.unit}</small></>}
+        {metric.operator && <span className="reading-operator">{metric.operator}</span>}{valueRange ? <><span className="reading-range-start"><NumberText value={valueRange[1]} /><span className="reading-operator">{valueRange[2]}</span></span><span className="reading-value-unit"><NumberText value={valueRange[3]} /><small>{metric.unit}</small></span></> : <><NumberText value={metric.value} /><small>{metric.unit}</small></>}
       </div><p className="reading-note">{metric.note}</p>
-    </>}
+    </div>}
   </article>
 }
 
