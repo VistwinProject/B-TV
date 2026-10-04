@@ -8,6 +8,10 @@
 
 預覽：http://127.0.0.1:5284/ 。預設連接 B 區共用 NFC bridge；獨立檢視不連動時加 `?hardware=0`，隱藏操作面板加 `kiosk=1`。NFC bridge 綁定 127.0.0.1:8788，設定見 `server/README.md`。
 
+靜音驗證使用 `http://127.0.0.1:5284/?mute=1`：畫面明確顯示靜音標籤，HTML 音訊靜音且不建立 Web Audio 輸出，保留原始媒體時間軸與自動轉場。`hardware=0` 僅停止 NFC 連線，並非靜音開關。
+
+本機多 repo checkout 的桌投來源是同層 `B-Table`，不是舊版 B-TV 根目錄（5274），也不是 B-TV-page 靜態發佈品。X 的 `intro` 在此新版代表「角色選擇／前言」；`lift` 是拿起卡片，不是升降設備。
+
 C 感應邀請卡；1–5 切換情境；N 從資訊牆進角色選擇；I／Enter 角色選擇；O 結語；R／Esc 回首頁；X／空白鍵拿起卡片。E 開啟／結束編輯；編輯中 Esc 結束編輯。
 
 ## 現行流程
@@ -57,8 +61,12 @@ E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動
 node server/index.cjs
 # B2.0ver 根目錄：TV
 npm run dev
-# B2.0ver/B-Table：桌面投影
+# 同層獨立 B-Table repo：桌面投影
 npm run dev
 ```
 
 先開啟兩邊網址，再於 table 按 C 模擬邀請卡、1–5 模擬角色卡、X 模擬拿起、R 重設。角色感應會立即切換 TV；拿起角色卡時 table 回到鑰匙圈提示，TV 保留情境繼續播放。TV 重新整理或斷線重連，會接收目前仍放在感應區的卡片；這會重新開始該情境，不會還原先前播放秒數。不要同時啟動 B-Table 的 Python server，兩個 bridge 共用 8788。
+
+bridge 現在也補送已拿走的最後卡片與移除事件、最近的 reset/intro/outro，以及 TV 已提交的 choose/farewell phase；補送事件標記 `replay: true`。TV 只以補送 phase 恢復畫面，正常 phase 回音不會重啟展演。這是記憶體中的畫面恢復，不包含完整已體驗角色清單、原播放秒數或 bridge 程序重啟後的持久化。
+
+隔離測試可設 `B_WS_PORT` 改 bridge 埠口，再以 `VITE_WS_URL` 同時指定 table、TV 的相同位址。預設仍為 loopback 8788。無 reader 測試另設 `NFC_SIM_ONLY=1`；不得將 WebSocket 已連線當作實體 reader 或畫面 ready。

@@ -51,6 +51,7 @@ test('refresh and later-opened tabs restore the current selection and completion
  const reset=[];createBrowserSync(m=>reset.push(m),env).close()
  assert.deepEqual(reset.map(m=>m.type),['reset']);a.close()
 })
-test('table and TV ship the identical channel protocol',{skip:!existsSync(new URL('../B-Table/src/browserSync.js',import.meta.url))},()=>{
- assert.equal(readFileSync(new URL('../app/browserSync.js',import.meta.url),'utf8'),readFileSync(new URL('../B-Table/src/browserSync.js',import.meta.url),'utf8'))
+const tableProtocol = [new URL('../B-Table/src/browserSync.js',import.meta.url),new URL('../../../B-Table/src/browserSync.js',import.meta.url)].find(existsSync)
+test('table and TV ship the identical channel protocol',{skip:!tableProtocol},()=>{
+ assert.equal(readFileSync(new URL('../app/browserSync.js',import.meta.url),'utf8'),readFileSync(tableProtocol,'utf8'))
 })
