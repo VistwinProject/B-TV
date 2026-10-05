@@ -14,6 +14,12 @@ ACR122U（位於 table 投影桌面下）→ 本機 WebSocket `ws://127.0.0.1:87
 
 啟動時也讀取 `../B-Table/server/uid-map.json`，接受 table 既有邀請卡與五種角色卡；若 UID 重複，以本資料夾既有配對為準，不覆寫原本的 table 配對檔。兩種來源的實體卡與 table 鍵盤模擬使用同一廣播路徑。
 
+若沒有上述內嵌目錄，會尋找同層獨立 repo 的 `../../../B-Table/server/uid-map.json`。兩種路徑都只讀取，不改寫桌投配對檔。
+
+`B_WS_PORT` 可指定隔離測試埠口（例如 18788），未指定仍使用 8788；host 固定 127.0.0.1。X 和兩個顯示端都需使用同一個 bridge。Mac 現場應在 Mac 上重新安裝 server 原生依賴，不可複製 Windows node_modules。TV 的 `.command` 僅開 TV，仍需另外啟動 bridge 與獨立 B-Table。
+
 `NFC_SIM_ONLY=1 node server/index.cjs` 可在無 PC/SC 的環境只開同步服務（仍需 ws 套件）。一般啟動會正常偵測實體 reader；未接 reader 時，table 顯示「等待讀卡機」，但鍵盤模擬仍會同步。連線中的顯示端重新整理後可恢復目前卡片。
 
 邀請卡配對：先拿起讀卡機上的卡，再輸入 `pair invite`，最後放上欲登錄的邀請卡。允許新增多張邀請卡並保留既有對照；已配對成角色的卡不會被覆寫。邀請卡事件使用 `kind: card`。
+
+本機離線啟動器使用的 `NFC_WS_PORT` 仍受支援；同時設定時以 `B_WS_PORT` 優先，皆未設定時為 8788。

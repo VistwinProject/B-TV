@@ -10,6 +10,7 @@ export const flags = {
   hardware: query.has('hardware') ? query.get('hardware') !== '0' : import.meta.env.VITE_NFC_ENABLED !== 'false',
   audio: import.meta.env.VITE_AUDIO_ENABLED === 'true',
   kiosk: query.get('kiosk') === '1',
+  muted: query.get('mute') === '1',
 }
 
 export function useExhibition(people, suspended = false) {
@@ -19,9 +20,11 @@ export function useExhibition(people, suspended = false) {
   const socket = useRef(null)
   const preview = useRef(null)
   const flow = useRef(null)
+  const [command,setCommand] = useState(null)
   const issue = useCallback((event) => dispatch({ ...event, now: performance.now(), hasAudio: flags.audio }), [])
   useLayoutEffect(() => { issue({ action: suspended ? 'pause' : 'resume', restart:!suspended }) }, [suspended, issue])
   const accept = useCallback((message, meta) => {
+    if(message?.reqId && !message.replay) setCommand(message)
     if (meta?.replay && message.type === 'tv-phase' && ['choose','farewell'].includes(message.screen)) {
       issue({action:message.screen === 'choose' ? 'intro' : 'outro'}); return
     }
@@ -104,7 +107,7 @@ export function useExhibition(people, suspended = false) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [operate, suspended])
-  return { state, connection, reader, operate, issue }
+  return { state, connection, reader, operate, issue, socket, command }
 }
 
 // One sound session per screen revision; cleanup invalidates late promises.
@@ -122,6 +125,7 @@ export function useNarration(state, issue, suspended = false) {
     const player = new Audio(`${import.meta.env.BASE_URL}voice/${cue}.${(cue.startsWith('scene-')||['choose','lead','outro'].includes(cue)) ? 'wav' : 'mp3'}${cue==='scene-elder'?'?v=3':['scene-anti-aging','lead','choose'].includes(cue)?'?v=2':''}`)
     if(['overview','farewell','experience'].includes(state.screen))issue({action:'audio-waiting',revision:state.revision})
     const captions=createCaptionSync(player,setAudioTime)
+    player.muted = flags.muted
     player.ontimeupdate=()=>{if(active&&!settled)captions.sync()}
 
     function fail() {
@@ -138,7 +142,9 @@ export function useNarration(state, issue, suspended = false) {
     }
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext
-      if (AudioContext) {
+      // Muted preview keeps the real media clock without a suspended Web Audio
+      // context waiting for a user gesture. No audio graph is opened in this mode.
+      if (AudioContext && !flags.muted) {
         context = new AudioContext()
         analyser.current = context.createAnalyser()
         analyser.current.fftSize = 1024

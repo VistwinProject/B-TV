@@ -10,7 +10,7 @@ export function begin(now = 0, revision = 0) {
 
 function screen(state, name, now, extra = {}) {
   return { ...state, screen: name, started: now, revision: state.revision + 1,
-    deadline: null, confirmation: null, exitStartedAt:null, ...extra }
+    deadline: null, confirmation: null, exitStartedAt:null, completedRevision:null, ...extra }
 }
 
 export function advancePlayback(state, event) {
@@ -67,7 +67,7 @@ export function advancePlayback(state, event) {
     case 'audio-ended':
       if(event.revision===state.revision && state.screen==='overview')return {...state,deadline:now+DURATION.overviewHold,overviewTourPending:false}
       if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false,sceneAudioFinishedAt:now}
-      if(event.revision===state.revision && state.screen==='farewell')return {...state,awaitingAudio:false}
+      if(event.revision===state.revision && state.screen==='farewell')return {...state,awaitingAudio:false,completedRevision:state.revision}
       return state
     case 'audio-failed':
       if(event.revision===state.revision && state.screen==='experience')return {...state,sceneAudioPending:false}
@@ -97,6 +97,10 @@ export function advancePlayback(state, event) {
 
 export function nfcAction(message) {
   if (!message || typeof message !== 'object') return null
+  if (message.type === 'tv-phase' && message.replay === true) {
+    if (message.screen === 'choose') return { action: 'intro' }
+    if (message.screen === 'farewell') return { action: 'outro' }
+  }
   if (message.type === 'tag-remove') return { action: 'remove' }
   if (['reset', 'intro', 'outro'].includes(message.type)) return { action: message.type }
   if (message.type !== 'tag-present') return null

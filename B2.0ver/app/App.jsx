@@ -6,6 +6,7 @@ import { useExhibition, useNarration, flags } from './useExhibition.js'
 import { Choose, Experience, Farewell, Overview, Welcome } from './screens.jsx'
 
 import { useDesign } from './editor/DesignContext.jsx'
+import { useDisplayReport } from './displayReport.js'
 import Editor from './editor/Editor.jsx'
 
 
@@ -34,7 +35,7 @@ function Operator({ state, operate }) {
 
 export default function App() {
   const { design, editing, setEditing } = useDesign()
-  const { state: playback, operate, issue } = useExhibition(content.people, editing)
+  const { state: playback, operate, issue, socket, command, connection } = useExhibition(content.people, editing)
   const [preview, setPreview] = useState({ screen: 'welcome', person: content.people[0].id, dimension: 0, started: 0 })
   useLayoutEffect(() => { if (editing) setPreview({ ...playback, person: playback.person || content.people[0].id }) }, [editing])
   const state = editing ? preview : playback
@@ -45,6 +46,11 @@ export default function App() {
     return ()=>fade?.cancel()
   },[state.person,state.screen,editing])
   const { analyser, audioStatus, audioTime, play } = useNarration(playback, issue, editing||playback.pausedAt!=null)
+  const completed = playback.screen==='farewell' && playback.completedRevision===playback.revision
+  useDisplayReport(socket, {displayId:'tv',ready:!editing && playback.pausedAt==null && connection==='connected',
+    screen:playback.screen,person:playback.person,held:playback.held,
+    activity:playback.screen==='welcome'?'idle':completed?'complete':'active',
+    completionEvidence:completed?'narration-ended':null, visible:document.visibilityState==='visible'}, command)
   const theme = Object.fromEntries(Object.entries(design.theme).map(([key,value]) => [`--edit-${key}`,value]))
   let view
   switch (state.screen) {
@@ -57,6 +63,7 @@ export default function App() {
   return <VoiceOrbProvider enabled={['choose','overview','experience','farewell'].includes(state.screen)} analyser={analyser} active={playback.screen !== 'welcome'} paused={editing}><main className="exhibition" data-screen={state.screen} data-editing={editing} style={theme}>
     <div ref={stage} className={`stage-screen${state.exitStartedAt!=null||state.transition?' stage-screen--exit':state.fadeIn?' stage-screen--enter':''}`} style={{'--screen-fade':`${DURATION.fade}ms`,animationPlayState:editing?'paused':'running'}} key={state.screen === 'experience' ? `experience-${state.restartEpoch||0}` : `${state.screen}-${state.revision}`}>{view}</div>
     {!editing && <Operator state={state} operate={operate} />}
+    {flags.muted && <div role="status" style={{position:'fixed',top:8,left:8,zIndex:1000,padding:'6px 10px',background:'#10213d',color:'#fff',fontSize:14}}>靜音測試 · 音訊輸出已關閉</div>}
     {!editing && !flags.kiosk && <button className="editor-launch" onClick={() => setEditing(true)}>E · 編輯畫面</button>}
     {editing && <Editor preview={preview} setPreview={setPreview} />}
   </main></VoiceOrbProvider>

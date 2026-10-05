@@ -8,6 +8,10 @@
 
 預覽：http://127.0.0.1:5284/ 。預設連接 B 區共用 NFC bridge；獨立檢視不連動時加 `?hardware=0`，隱藏操作面板加 `kiosk=1`。NFC bridge 綁定 127.0.0.1:8788，設定見 `server/README.md`。
 
+靜音驗證使用 `http://127.0.0.1:5284/?mute=1`：畫面明確顯示靜音標籤，HTML 音訊靜音且不建立 Web Audio 輸出，保留原始媒體時間軸與自動轉場。`hardware=0` 僅停止 NFC 連線，並非靜音開關。
+
+本機多 repo checkout 的桌投來源是`B-Table` 子目錄（或同層獨立 checkout），不是舊版 B-TV 根目錄（5274），也不是 B-TV-page 靜態發佈品。X 的 `intro` 在此新版代表「角色選擇／前言」；`lift` 是拿起卡片，不是升降設備。
+
 C 感應邀請卡；1–5 切換情境；N 從資訊牆進角色選擇；I／Enter 角色選擇；O 結語；R／Esc 回首頁；X／空白鍵拿起卡片。E 開啟／結束編輯；編輯中 Esc 結束編輯。
 
 ## 現行流程
@@ -25,7 +29,7 @@ C 感應邀請卡；1–5 切換情境；N 從資訊牆進角色選擇；I／Ent
 
 ## 編輯與播放
 
-E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動保存在目前瀏覽器，可匯出／匯入 JSON；正式預設為 `B2.0-design.json`，目前採用 `B2.0-design (4).json`。
+E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動保存在目前瀏覽器，可匯出／匯入 JSON；正式預設為 `B2.0-design.json`，目前採用 `B2.0-design (6).json`。
 
 編輯時停止語音並暫停展演計時、NFC 換頁；退出編輯回到原展演頁，語音、房屋動畫和頁面計時一起重新開始，保留已體驗情境紀錄。編輯預覽直接顯示，避免淡入動畫暫停造成白畫面。
 
@@ -57,8 +61,18 @@ E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動
 node server/index.cjs
 # B2.0ver 根目錄：TV
 npm run dev
-# B2.0ver/B-Table：桌面投影
+# B-Table repo：桌面投影（本工作目錄為 B2.0ver/B-Table）
 npm run dev
 ```
 
 先開啟兩邊網址，再於 table 按 C 模擬邀請卡、1–5 模擬角色卡、X 模擬拿起、R 重設。角色感應會立即切換 TV；拿起角色卡時 table 回到鑰匙圈提示，TV 保留情境繼續播放。TV 重新整理或斷線重連，會接收目前仍放在感應區的卡片；這會重新開始該情境，不會還原先前播放秒數。不要同時啟動 B-Table 的 Python server，兩個 bridge 共用 8788。
+
+bridge 現在也補送已拿走的最後卡片與移除事件、最近的 reset/intro/outro，以及 TV 已提交的 choose/farewell phase；補送事件標記 `replay: true`。TV 只以補送 phase 恢復畫面，正常 phase 回音不會重啟展演。這是記憶體中的畫面恢復，不包含完整已體驗角色清單、原播放秒數或 bridge 程序重啟後的持久化。
+
+隔離測試可設 `B_WS_PORT` 改 bridge 埠口，再以 `VITE_WS_URL` 同時指定 table、TV 的相同位址。預設仍為 loopback 8788。無 reader 測試另設 `NFC_SIM_ONLY=1`；不得將 WebSocket 已連線當作實體 reader 或畫面 ready。
+
+## Mac mini 離線安裝包
+
+交付目錄為 `releases/B-Zone-Offline-Mac-AppleSilicon-2026-10-01/`，對應 ZIP 可搬到 Apple 晶片 Mac mini（macOS 13.5+）。內含 Node、NFC 原生依賴、Chrome、TV/Table production build 與卡片 UID 配對。雙擊 `Start.command` 開兩個畫面與唯一一個 NFC bridge，`Stop.command` 關閉本包所擁有的視窗及服務。安裝、配對及讀卡驗證步驟見包內 `README.txt`。
+
+啟停程式位於 `offline/`。`npm run test:offline` 驗證媒體 Range 與檔案服務。重建兩份前端後，執行 `NFC_MODULE_ROOT=/path/to/server npm run package:offline -- /new/output/folder`，會打包本機 Apple Silicon Node、相容 NFC 模組及已安裝的 Chrome；輸出目錄必須尚不存在。`node offline/verify-package.cjs /package/folder` 使用隔離埠口測試啟停及雙端同步。實體 USB reader 驗收仍需在目標 Mac 上進行。

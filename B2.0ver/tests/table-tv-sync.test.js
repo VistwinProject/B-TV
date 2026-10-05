@@ -5,6 +5,7 @@ import {createRequire} from 'node:module'
 import {begin,nfcAction,PEOPLE} from '../app/playback.js'
 import {advancePresentation} from '../app/pageTransitions.js'
 const {createRelay}=createRequire(import.meta.url)('../server/relay.cjs')
+const tableSource = [new URL('../B-Table/src/session.js',import.meta.url),new URL('../../../B-Table/src/session.js',import.meta.url)].find(existsSync)
 
 test('table scans broadcast the invitation and all five roles to TV',()=>{
  let tv=begin(),now=0
@@ -66,8 +67,8 @@ test('narration completion fades to choices and rejects an older invitation comp
 })
 
 
-test('table holds the connected prompt until TV chooses, including card removal and stale messages',{skip:!existsSync(new URL('../B-Table/src/session.js',import.meta.url))},async()=>{
- const {initial,reducer,deriveStep}=await import('../B-Table/src/session.js')
+test('table holds the connected prompt until TV chooses, including card removal and stale messages',{skip:!tableSource},async()=>{
+ const {initial,reducer,deriveStep}=await import(tableSource.href)
  let table=reducer(initial,{type:'tag-present',data:{kind:'card'},flowId:1})
  assert.equal(deriveStep(table),'connected')
  table=reducer(table,{type:'tag-remove'})
@@ -86,8 +87,8 @@ test('table holds the connected prompt until TV chooses, including card removal 
  assert.equal(deriveStep(reducer(table,{type:'reset'})),'place-card')
 })
 
-test('automatic and operator TV endings synchronize table and a new card clears the ending',{skip:!existsSync(new URL('../B-Table/src/session.js',import.meta.url))},async()=>{
- const {initial,reducer,deriveStep}=await import('../B-Table/src/session.js')
+test('automatic and operator TV endings synchronize table and a new card clears the ending',{skip:!tableSource},async()=>{
+ const {initial,reducer,deriveStep}=await import(tableSource.href)
  let table=initial,lastMessage
  const relay=createRelay(m=>{lastMessage=m;table=reducer(table,m)})
  let tv=begin()
@@ -111,4 +112,27 @@ test('automatic and operator TV endings synchronize table and a new card clears 
  assert.equal(deriveStep(table),'farewell')
  relay.receive({type:'reset'})
  assert.equal(deriveStep(table),'place-card')
+})
+
+test('reconnect replays removed cards, completed TV phases and operator overrides',()=>{
+ const relay=createRelay(()=>{})
+ relay.receive({type:'tag-present',data:{kind:'card'}})
+ const flowId=relay.current().flowId
+ relay.receive({type:'tag-remove'})
+ relay.receive({type:'tv-phase',flowId,screen:'choose'})
+ let restored=begin()
+ for(const message of relay.snapshot())restored=advancePresentation(restored,{...nfcAction(message),now:1})
+ assert.equal(restored.screen,'choose')
+ assert.equal(nfcAction({type:'tv-phase',screen:'choose',flowId}),null,'live phase echo must not restart TV')
+ relay.receive({type:'tag-present',data:{kind:'character',id:'child'}})
+ relay.receive({type:'tag-remove'})
+ restored=begin()
+ for(const message of relay.snapshot())restored=advancePresentation(restored,{...nfcAction(message),now:2})
+ assert.equal(restored.screen,'experience');assert.equal(restored.person,'child');assert.equal(restored.held,null)
+ for(const [type,screen] of [['intro','choose'],['outro','farewell'],['reset','welcome']]){
+  relay.receive({type})
+  const snapshot=relay.snapshot()
+  assert.equal(snapshot.length,1)
+  assert.equal(advancePresentation(begin(),{...nfcAction(snapshot[0]),now:3}).screen,screen)
+ }
 })

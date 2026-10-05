@@ -4,29 +4,39 @@ const {createRequire}=require('node:module');
 const dependency=process.env.NFC_MODULE_ROOT?createRequire(path.join(process.env.NFC_MODULE_ROOT,'package.json')):require;
 const {WebSocketServer}=dependency('ws');
 const {createRelay}=require('./relay.cjs');
+const {createDisplayControl}=require('./display-control.cjs');
 const file=path.join(__dirname,'uid-map.json');
 let mappings=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')):{},armed=null;
 const roles={invite:'邀請卡','anti-aging':'居家抗老',child:'兒童免疫',elder:'在宅樂齡',pregnancy:'孕婦照護',nomad:'數位遊牧'};
 // Keep current B-TV pairings authoritative; also accept the table's registered cards.
-const tableMapFile=path.join(__dirname,'../B-Table/server/uid-map.json');
-if(fs.existsSync(tableMapFile)){
+const tableMapFile=[path.join(__dirname,'../B-Table/server/uid-map.json'),path.join(__dirname,'../../../B-Table/server/uid-map.json')].find(file=>fs.existsSync(file));
+if(tableMapFile){
  const tableMappings=JSON.parse(fs.readFileSync(tableMapFile,'utf8'));
  for(const [uid,card] of Object.entries(tableMappings)){
   if(card&&typeof card==='object'&&(card.kind==='card'||(card.kind==='character'&&roles[card.id]))&&!mappings[uid])mappings[uid]=card;
  }
 }
 const readers=new Map();
-const wss=new WebSocketServer({host:'127.0.0.1',port:8788});
+const port=Number(process.env.B_WS_PORT || process.env.NFC_WS_PORT || 8788);
+const wss=new WebSocketServer({host:'127.0.0.1',port});
 const send=(ws,data)=>{if(ws.readyState===1)ws.send(JSON.stringify(data))};
-const relay=createRelay(data=>{for(const ws of wss.clients)send(ws,data)});
+const emit=data=>{for(const ws of wss.clients)send(ws,data)};
+let control;
+const relay=createRelay(data=>{control?.onEvent(data);emit(data)});
+control=createDisplayControl({publish:relay.receive,send,broadcast:emit});
+const healthTimer=setInterval(()=>control.tick(),1000);
+wss.on('close',()=>clearInterval(healthTimer));
 const broadcast=relay.publish;
-wss.on('listening',()=>console.log('[WS] Ready ws://127.0.0.1:8788'));
+wss.on('listening',()=>console.log(`[WS] Ready ws://127.0.0.1:${port}`));
 wss.on('error',e=>{console.error(e.message);process.exit(1)});
 wss.on('connection',ws=>{
+ console.log('[DISPLAY CONNECTED]',wss.clients.size);
+ ws.on('close',()=>console.log('[DISPLAY DISCONNECTED]',wss.clients.size));
  for(const name of readers.keys())send(ws,{type:'reader-connected',reader:name});
- const current=relay.current();if(current)send(ws,current);
- const phase=relay.phase();if(phase)send(ws,phase);
- ws.on('message',raw=>{try{relay.receive(JSON.parse(raw))}catch{ /* invalid JSON */ }});
+ for(const message of relay.snapshot())send(ws,message);
+ send(ws,control.snapshot());
+ ws.on('message',raw=>{try{const message=JSON.parse(raw);if(!control.receive(ws,message))relay.receive(message)}catch{ /* invalid JSON */ }});
+ ws.on('close',()=>control.close(ws));
 });
 if(process.env.NFC_SIM_ONLY!=='1'){
 const {NFC}=dependency('nfc-pcsc');

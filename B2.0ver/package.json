@@ -9,6 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test tests/*.test.js",
+    "test:offline": "node --test tests/offline-package.test.cjs",
+    "package:offline": "node scripts/package-offline.mjs",
     "model:wireframe": "node scripts/build-home-wireframe.mjs"
   },
   "dependencies": {
