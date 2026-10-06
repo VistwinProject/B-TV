@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 
 test('wireframe is derived from the current GLB and contains complete finite model-space edges', () => {
-  const sourceURL=new URL('../3d.glb',import.meta.url)
+  const sourceURL=new URL('../materials/models/3d.glb',import.meta.url)
   const source=existsSync(sourceURL)?readFileSync(sourceURL):null
   const metadata=JSON.parse(readFileSync(new URL('../public/models/home-wireframe.json',import.meta.url)))
   const binary=readFileSync(new URL('../public/models/home-wireframe.bin',import.meta.url))

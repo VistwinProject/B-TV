@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import {createOrbAudioDriver} from '../app/orbAudio.js'
 test('approved orb and shader are copied without changes',()=>{
- for(const file of ['orb.js','restored-orb.js','LICENSE','UPSTREAM.txt'])assert.deepEqual(readFileSync(new URL(`../public/anlb-orb/${file}`,import.meta.url)),readFileSync(new URL(`../ANLB語音球-v1/${file}`,import.meta.url)))
+ for(const file of ['orb.js','restored-orb.js','LICENSE','UPSTREAM.txt'])assert.deepEqual(readFileSync(new URL(`../public/anlb-orb/${file}`,import.meta.url)),readFileSync(new URL(`../materials/anlb-orb/${file}`,import.meta.url)))
 })
 test('speech, silence, pause and cue changes keep thinking until the whole show ends',()=>{
  const calls=[];const drive=createOrbAudioDriver({start:()=>calls.push('start'),end:()=>calls.push('end'),setLevel:v=>calls.push(v)})

@@ -22,9 +22,9 @@ test('all five screen types render actual content without browser dependencies',
   const screens = [
     ['Welcome',{},'感應光寓'],['Choose',{people:content.people,choose:()=>{}},'同一間房子，面對不同的人'],
     ['Overview',{metrics:content.house},'房屋當前的健康資訊'],['Experience',{person:content.people[0],dimension:0},'居家抗老'],
-    ['Farewell',{},'依照您不同的生活型態，'],
+    ['Farewell',{},'依照您與家人不同的生活型態，'],
   ]
-  for(const [name,props,text] of screens) assert.ok(renderToStaticMarkup(createElement(views[name],props)).includes(text),name)
+  for(const [name,props,text] of screens) assert.ok(renderToStaticMarkup(createElement(views[name],props)).replace(/<[^>]*>/g,'').includes(text),name)
 })
 
 test('each of 20 dimensions renders its own solution and accessible 3D scene', () => {
@@ -64,11 +64,25 @@ test('overview uses visible 3D space instead of legacy photos and video',()=>{
 test('elder narration completion reveals the existing core goal',()=>{
   const person=content.people.find(p=>p.id==='elder')
   const html=renderToStaticMarkup(createElement(views.Experience,{person,dimension:0,audioTime:19.87,audioStatus:'ended'}))
-  assert.ok(html.includes(`<span class="goal-final" aria-hidden="false">${person.goal}</span>`))
-  assert.ok(html.includes('<span class="goal-spoken" aria-hidden="true">為長者打造智能的安全結界。</span>'))
+  assert.ok(html.includes(`<span class="goal-final">${person.goal}</span>`))
+  assert.ok(!html.includes('class="goal-spoken"'))
 })
 
 test('overview narration ends on the updated health heading',()=>{
   const html=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house,audioTime:12.57,audioStatus:'ended'}))
-  assert.ok(html.includes('<h2 class="overview-final-caption" aria-hidden="false">房屋當前的健康資訊</h2>'))
+  assert.ok(html.includes('<h2 class="overview-final-caption">房屋當前的健康資訊</h2>'))
+})
+
+test('active narration mounts only its visible copy, without hidden goal or final heading',()=>{
+  for(const person of content.people){
+    const html=renderToStaticMarkup(createElement(views.Experience,{person,dimension:0,audioTime:1,audioStatus:'playing'}))
+    assert.ok(html.includes('class="goal-spoken"'))
+    assert.ok(!html.includes('class="goal-final"'))
+    assert.ok(!html.includes(person.goal))
+  }
+  const html=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house,audioTime:1,audioStatus:'playing'}))
+  assert.ok(html.includes('class="overview-live-caption"'))
+  assert.ok(!html.includes('class="overview-final-caption"'))
+  const ended=renderToStaticMarkup(createElement(views.Overview,{metrics:content.house,audioTime:13,audioStatus:'ended'}))
+  assert.ok(!ended.includes('class="overview-live-caption"'))
 })

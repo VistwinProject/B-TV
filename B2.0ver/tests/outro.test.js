@@ -3,9 +3,9 @@ import assert from 'node:assert/strict'
 import {OUTRO_CAPTIONS,outroCaptionAt} from '../app/outroCaptions.js'
 import {begin,advancePlayback as update} from '../app/playback.js'
 test('outro captions follow media time including seeks and pauses',()=>{
- assert.equal(OUTRO_CAPTIONS.map(c=>c.text).join(''),'依照您不同的生活型態，感知空間的變化，做出即時的系統回應，房屋的健康，就是您的健康。')
+ assert.equal(OUTRO_CAPTIONS.map(c=>c.text).join(''),'依照您與家人不同的生活型態，感知空間的變化，做出即時回應調整，房屋的健康，就是您與家人的健康。')
  for(const c of OUTRO_CAPTIONS)assert.equal(outroCaptionAt(c.start),c.text)
- assert.equal(outroCaptionAt(7),'房屋的健康，就是您的健康。');assert.equal(outroCaptionAt(9.9),'房屋的健康，就是您的健康。')
+ assert.equal(outroCaptionAt(7.06),'房屋的健康，就是您與家人的健康。');assert.equal(outroCaptionAt(9.9),'房屋的健康，就是您與家人的健康。')
 })
 test('outro waits beyond nine seconds for its own audio completion',()=>{
  let s=update(begin(),{action:'outro',now:0})

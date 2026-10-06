@@ -1,8 +1,10 @@
 # 感光公寓 2.0 · B 區展演
 
-正式程式在 `app/`，入口為 `app/main.jsx`。封存的 `archive/first-attempt/` 不參與正式建置；歷史進度保留於 `notes/` 與 `docs/SESSION-*`。
+正式程式在 `app/`，入口為 `app/main.jsx`。歷史進度統一保留於 `notes/history/`；檔案分類見下方說明。
 
 ## 啟動
+
+資料分類：原始素材在 `materials/`，語音與 Excel 原稿在 `語音檔/`；現行技術文件在 `docs/`，確認版與整理紀錄在 `notes/`，舊進度在 `notes/history/`。最新離線包在 `releases/`，上一版 ZIP 在 `releases/previous/`，確認版原始碼與合併備份在 `snapshots/`。詳細移動與清除項目見 [整理紀錄](notes/資料夾整理-2026-10-06.md)。
 
 雙擊 `啟動-B2.0.command`，或執行 `npm ci`、`npm run dev`。
 
@@ -29,7 +31,7 @@ C 感應邀請卡；1–5 切換情境；N 從資訊牆進角色選擇；I／Ent
 
 ## 編輯與播放
 
-E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動保存在目前瀏覽器，可匯出／匯入 JSON；正式預設為 `B2.0-design.json`，目前採用 `B2.0-design (6).json`。
+E 編輯器可調整版面、文字、玻璃材質與房屋構圖。設定自動保存在目前瀏覽器，可匯出／匯入 JSON；正式預設為 `B2.0-design.json`，採用 design7。內容相同的匯入副本已清理。
 
 編輯時停止語音並暫停展演計時、NFC 換頁；退出編輯回到原展演頁，語音、房屋動畫和頁面計時一起重新開始，保留已體驗情境紀錄。編輯預覽直接顯示，避免淡入動畫暫停造成白畫面。
 
@@ -73,6 +75,6 @@ bridge 現在也補送已拿走的最後卡片與移除事件、最近的 reset/
 
 ## Mac mini 離線安裝包
 
-交付目錄為 `releases/B-Zone-Offline-Mac-AppleSilicon-2026-10-01/`，對應 ZIP 可搬到 Apple 晶片 Mac mini（macOS 13.5+）。內含 Node、NFC 原生依賴、Chrome、TV/Table production build 與卡片 UID 配對。雙擊 `Start.command` 開兩個畫面與唯一一個 NFC bridge，`Stop.command` 關閉本包所擁有的視窗及服務。安裝、配對及讀卡驗證步驟見包內 `README.txt`。
+交付目錄為 `releases/B-Zone-Offline-Mac-AppleSilicon-2026-10-06/`，對應 ZIP 可搬到 Apple 晶片 Mac mini（macOS 13.5+）。內含 Node、NFC 原生依賴、Chrome、TV/Table production build 與卡片 UID 配對。雙擊 `Start.command` 開兩個畫面與唯一一個 NFC bridge，`Stop.command` 關閉本包所擁有的視窗及服務。安裝、配對及讀卡驗證步驟見包內 `README.txt`。
 
 啟停程式位於 `offline/`。`npm run test:offline` 驗證媒體 Range 與檔案服務。重建兩份前端後，執行 `NFC_MODULE_ROOT=/path/to/server npm run package:offline -- /new/output/folder`，會打包本機 Apple Silicon Node、相容 NFC 模組及已安裝的 Chrome；輸出目錄必須尚不存在。`node offline/verify-package.cjs /package/folder` 使用隔離埠口測試啟停及雙端同步。實體 USB reader 驗收仍需在目標 Mac 上進行。

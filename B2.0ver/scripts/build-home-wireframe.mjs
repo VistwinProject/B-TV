@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto'
 import * as THREE from 'three'
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-const input = await readFile(new URL('../3d.glb', import.meta.url))
+const input = await readFile(new URL('../materials/models/3d.glb', import.meta.url))
 if (input.readUInt32LE(0) !== 0x46546c67) throw new Error('Expected a GLB file')
 const jsonLength = input.readUInt32LE(12)
 const json = JSON.parse(input.subarray(20,20+jsonLength).toString())

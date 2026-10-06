@@ -1,3 +1,4 @@
+import CaptionText from './CaptionText.jsx'
 import OverviewHome from './OverviewHome.jsx'
 import {chooseCaptionAt} from './chooseCaptions.js'
 import {overviewCaptionAt} from './overviewCaptions.js'
@@ -38,7 +39,7 @@ export function Choose({ people, choose, audioTime=0, audioStatus='idle', onPlay
     <svg width="0" height="0" aria-hidden="true" style={{position:'absolute'}}><defs><filter id="choices-glass-distortion"><feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale={material.refract==='strong'?25:8} xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
     <div className="experience-light" /><div className="choices-content">
     <Voice />
-    <div className="choices-spoken" aria-live="polite" aria-atomic="true"><p>{chooseCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放角色選擇語音</button>}</div>
+    <div className="choices-spoken" aria-live="polite" aria-atomic="true"><p><CaptionText text={chooseCaptionAt(audioTime)} /></p>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放角色選擇語音</button>}</div>
     <ol>{people.map((person, i) => <li key={person.id} style={{ '--delay': `${.15 + i * .09}s` }}>
       <button className="surface" style={{ '--person-color': person.color, '--paint': design.scenes[person.id].colors[0] || 'transparent', '--paint-alpha': design.scenes[person.id].colors[0] === null ? 0 : material.alpha }} onClick={() => choose(person.id)}>
         <b>{String(i + 1).padStart(2, '0')}</b><span>{person.question}</span><small>{person.shortName}</small>
@@ -73,7 +74,7 @@ export function Overview({ metrics, audioTime=0, audioStatus='idle', onPlay, onT
       </div>
     </article>)}
     <div className="overview-image surface" aria-label="未來居家空間線稿"><OverviewHome onTourStart={onTourStart} onTourComplete={onTourComplete} /></div>
-    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR</p><div className="overview-voice-content"><Voice /><div className={`overview-spoken${audioStatus==='ended'?' overview-spoken--finished':''}`} aria-live="polite">{['idle','error'].includes(audioStatus)?<h2>房屋當前的健康資訊</h2>:<><p className="overview-live-caption" aria-hidden={audioStatus==='ended'}>{overviewCaptionAt(audioTime)}</p><h2 className="overview-final-caption" aria-hidden={audioStatus!=='ended'}>房屋當前的健康資訊</h2></>}</div></div>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放資訊牆語音</button>}</article>
+    <article className="overview-claim surface" style={panel("claim")}><p className="caption">12-IN-1 SENSOR</p><div className="overview-voice-content"><Voice /><div className={`overview-spoken${audioStatus==='ended'?' overview-spoken--finished':''}`} aria-live="polite">{['idle','error','ended'].includes(audioStatus)?<h2 className="overview-final-caption">房屋當前的健康資訊</h2>:<p className="overview-live-caption"><CaptionText text={overviewCaptionAt(audioTime)} /></p>}</div></div>{['blocked','error'].includes(audioStatus)&&<button className="narration-play" onClick={onPlay}>播放資訊牆語音</button>}</article>
   </section>
 }
 
@@ -99,12 +100,9 @@ function DimensionReadings({ person, dimension }) {
 
 function GoalCaption({person,audioTime,audioStatus}) {
   const finished=audioStatus==='ended'
-  const staticGoal=!audioStatus || ['idle','error'].includes(audioStatus)
-  return <p key={`${person.id}-${finished}`} className={`goal-copy${finished?' goal-copy--finished':''}`} aria-live="polite">
-    {staticGoal ? person.goal : <>
-      <span className="goal-spoken" aria-hidden={finished}>{sceneCaptionAt(person.id,audioTime)}</span>
-      <span className="goal-final" aria-hidden={!finished}>{person.goal}</span>
-    </>}
+  const showGoal=finished || !audioStatus || ['idle','error'].includes(audioStatus)
+  return <p key={`${person.id}-${showGoal}`} className={`goal-copy${finished?' goal-copy--finished':''}`} aria-live="polite">
+    {showGoal ? <span className="goal-final">{person.goal}</span> : <span className="goal-spoken"><CaptionText text={sceneCaptionAt(person.id,audioTime)} /></span>}
   </p>
 }
 
@@ -128,13 +126,13 @@ export function Experience({ person, dimension, audioTime=0, audioStatus, onPlay
       </div>
       <div className="story-column">
         <Guides tracks={[layout.painHeight,100-layout.painHeight]} path={['scenes',person.id,'painHeight']} axis="y" percent />
-        <article className="pain surface enter-panel" style={{ '--delay': '.08s' }}><h1>{person.title}</h1><p className="pain-subtitle">{person.subtitle}</p><div className="pain-question"><p>{person.pain}</p><PersonSymbol id={person.id} animated /></div></article>
-        <div className="solution-reel enter-panel" style={{ '--delay': '.26s' }}><VerticalReel identity={dimension}><article className="solution surface"><header><Symbol name={DIMENSIONS[dimension]} animated kelvin={solution.kelvin} lightMode={solution.lightMode} /><p className="caption">{CIRCLES[dimension]} {DIMENSION_LABELS[dimension]}解方</p></header><div className="solution-text"><h2>{solution.headline}</h2><p>{solution.detail}</p></div></article></VerticalReel></div>
+        <article className="pain surface enter-panel" style={{ '--delay': '.08s' }}><h1>{person.title}</h1><p className="pain-subtitle">{person.subtitle}</p><div className="pain-question"><p>{person.id === 'child' ? <>{person.pain.split('少生病、')[0]}<span className="pain-keep-phrase">少生病<span className="pain-hanging-comma">、</span></span>{person.pain.split('少生病、')[1]}</> : person.pain}</p><PersonSymbol id={person.id} animated /></div></article>
+        <div className="solution-reel enter-panel" style={{ '--delay': '.26s' }}><VerticalReel identity={dimension}><article className="solution surface"><header><p className="caption">{CIRCLES[dimension]} {DIMENSION_LABELS[dimension]}解方</p><Symbol name={DIMENSIONS[dimension]} animated kelvin={solution.kelvin} lightMode={solution.lightMode} /></header><div className="solution-text"><h2>{solution.headline}</h2><p>{solution.detail}</p></div></article></VerticalReel></div>
       </div>
     </div>
   </section>
 }
 
 export function Farewell({ analyser, audioTime=0, audioStatus, onPlay }) {
-  return <section className="farewell screen-center" style={{'--person-color':'#7ba9df'}}><div className="experience-light" /><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><p className="outro-subtitle" aria-live="polite" aria-atomic="true">{outroCaptionAt(audioTime)}</p>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus==='blocked' ? '點此播放結語語音' : '重新播放結語語音'}</button>}<p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
+  return <section className="farewell screen-center" style={{'--person-color':'#7ba9df'}}><div className="experience-light" /><p className="narration-eyebrow">結語 · OUTRO</p><Voice analyser={analyser} /><p className="outro-subtitle" aria-live="polite" aria-atomic="true"><CaptionText text={outroCaptionAt(audioTime)} /></p>{['blocked','error'].includes(audioStatus) && <button className="narration-play" onClick={onPlay}>{audioStatus==='blocked' ? '點此播放結語語音' : '重新播放結語語音'}</button>}<p className="farewell-caption">房子的健康，我有解方　·　請往下個展區體驗</p></section>
 }

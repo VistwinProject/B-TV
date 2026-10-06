@@ -92,10 +92,10 @@ test('overview opacity migrates its old shared value then stays independent',()=
   assert.equal(normalizeDesign(changeAt(changed,['house','alpha'],5),defaults).house.alpha,1)
 })
 
-test('the shipped preset retains every supplied design-6 setting',()=>{
+test('the shipped preset retains every supplied design-7 setting',()=>{
  const preset=JSON.parse(readFileSync(new URL('../B2.0-design.json',import.meta.url)))
  assert.deepEqual(normalizeDesign(preset,defaults),preset)
- assert.deepEqual(preset.scenes.child.columns,[0.9055650089427663,2.8339527392364867,1.300482251820747])
+ assert.deepEqual(preset.scenes.child.columns,[0.9055650089427663,2.8124443080311856,1.3219906830260477])
  assert.equal(preset.material.blur,3)
  assert.equal(preset.house.alpha,.45)
 })

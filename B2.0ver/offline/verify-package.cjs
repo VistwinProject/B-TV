@@ -9,7 +9,12 @@ const env={...process.env,NFC_SIM_ONLY:'1',B_TEST_NO_BROWSER:process.env.B_VERIF
 const {WebSocket}=require(path.join(root,'server/node_modules/ws'));
 const run=action=>execFile(node,[path.join(root,'launcher.cjs'),action],{env,timeout:25000});
 async function client(){ const ws=new WebSocket('ws://127.0.0.1:18788');await new Promise((resolve,reject)=>{ws.once('open',resolve);ws.once('error',reject)});return ws; }
-function next(ws){return new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('sync timeout')),3000);ws.once('message',raw=>{clearTimeout(timer);resolve(JSON.parse(raw))});});}
+function next(ws,type,id){return new Promise((resolve,reject)=>{
+ const cleanup=()=>{clearTimeout(timer);ws.off('message',receive)};
+ const receive=raw=>{const message=JSON.parse(raw);if(message.type!==type || (id!==undefined && message.data?.id!==id))return;cleanup();resolve(message)};
+ const timer=setTimeout(()=>{cleanup();reject(Error(`sync timeout: ${type} ${id||''}`))},3000);
+ ws.on('message',receive);
+});}
 (async()=>{
  let a,b;
  try {
@@ -18,8 +23,8 @@ function next(ws){return new Promise((resolve,reject)=>{const timer=setTimeout((
   for(const port of [15273,15284]) { const response=await fetch(`http://127.0.0.1:${port}/`);assert.equal(response.status,200);assert.match(await response.text(),/assets\/index/); }
   a=await client();b=await client();
   const roles=['invite','anti-aging','child','elder','pregnancy','nomad'];
-  for(const id of roles){ const ra=next(a),rb=next(b);a.send(JSON.stringify({type:'tag-present',data:{id,kind:id==='invite'?'card':'character'}}));const [left,right]=await Promise.all([ra,rb]);assert.equal(right.data.id,id);assert.deepEqual(left,right); }
-  let ra=next(a),rb=next(b);a.send(JSON.stringify({type:'tag-remove'}));assert.equal((await ra).type,'tag-remove');assert.equal((await rb).type,'tag-remove');
+  for(const id of roles){ const ra=next(a,'tag-present',id),rb=next(b,'tag-present',id);a.send(JSON.stringify({type:'tag-present',data:{id,kind:id==='invite'?'card':'character'}}));const [left,right]=await Promise.all([ra,rb]);assert.equal(right.data.id,id);assert.deepEqual(left,right); }
+  let ra=next(a,'tag-remove'),rb=next(b,'tag-remove');a.send(JSON.stringify({type:'tag-remove'}));assert.equal((await ra).type,'tag-remove');assert.equal((await rb).type,'tag-remove');
   a.close();b.close();
   console.log('PASS: both web pages; duplicate start; invitation + all five roles broadcast identically; removal sync.');
  } finally { a?.terminate();b?.terminate();console.log((await run('stop')).stdout.trim()); }

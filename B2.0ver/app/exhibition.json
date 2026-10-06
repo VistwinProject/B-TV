@@ -27,10 +27,10 @@
       "dimensions": {
         "light": {
           "headline": "校正晝夜節律",
-          "detail": "日間 EML ≥ 250（抑制褪黑激素）；晚間 EML ≤ 50（暖橘光誘導睡眠）",
+          "detail": "日間 EML ≥ 240（抑制褪黑激素）；晚間 EML ≤ 50（暖橘光誘導睡眠）",
           "metrics": [
             {
-              "value": "250",
+              "value": "240",
               "unit": "EML",
               "note": "日間 · 抑制褪黑激素",
               "icon": "light",
@@ -56,7 +56,7 @@
         },
         "air": {
           "headline": "降低氧化與發炎",
-          "detail": "PM2.5 ≤ 10 µg/m³ 且 TVOC ≤ 0.30 ppm，保護心血管、降低系統性發炎",
+          "detail": "PM2.5 ≤ 10 µg/m³ 且 TVOC ≤ 200µg/m³，保護心血管、降低系統性發炎",
           "metrics": [
             {
               "value": "10",
@@ -66,8 +66,8 @@
               "operator": "≤"
             },
             {
-              "value": "0.30",
-              "unit": "ppm",
+              "value": "200",
+              "unit": "µg/m³",
               "note": "TVOC",
               "icon": "air",
               "operator": "≤"
@@ -82,7 +82,7 @@
         },
         "temp": {
           "headline": "睡眠深層修復",
-          "detail": "睡眠時 22–23°C，相對濕度 50%，助核心體溫下降啟動深層修復",
+          "detail": "睡眠時 22–23°C，相對濕度 40-60%，助核心體溫下降啟動深層修復",
           "metrics": [
             {
               "value": "22–23",
@@ -92,7 +92,7 @@
               "operator": ""
             },
             {
-              "value": "50",
+              "value": "40-60",
               "unit": "%",
               "note": "相對濕度",
               "icon": "humid",
@@ -108,10 +108,10 @@
         },
         "sound": {
           "headline": "NREM 深睡環境",
-          "detail": "睡眠背景噪音 ≤ 30 dB，確保 NREM 深睡，促進生長激素正常分泌",
+          "detail": "睡眠背景噪音 ≤ 35 dB，確保 NREM 深睡，促進生長激素正常分泌",
           "metrics": [
             {
-              "value": "30",
+              "value": "35",
               "unit": "dB",
               "note": "睡眠背景噪音",
               "icon": "sound",
@@ -132,7 +132,7 @@
           ]
         }
       },
-      "goal": "校正晝夜節律，透過極致環境減少身體氧化應激與慢性發炎"
+      "goal": "校正晝夜節律，透過優化居住環境，減少身體氧化壓力與慢性發炎"
     },
     {
       "id": "child",
@@ -188,7 +188,7 @@
         },
         "air": {
           "headline": "保護發育中的肺部",
-          "detail": "CO₂ ≤ 600 ppm，甲醛 ≤ 20 ppb；強化爬行層（0.1–0.5m）換氣",
+          "detail": "CO₂ ≤ 600 ppm，甲醛 ≤ 7.3 ppb；強化爬行層（0.1–0.5m）換氣",
           "metrics": [
             {
               "value": "600",
@@ -198,7 +198,7 @@
               "operator": "≤"
             },
             {
-              "value": "20",
+              "value": "7.3",
               "unit": "ppb",
               "note": "甲醛",
               "icon": "air",
@@ -215,7 +215,7 @@
         },
         "temp": {
           "headline": "恆溫恆濕防敏",
-          "detail": "恆溫 24–26°C，垂直溫差 < 2°C；相對濕度 45–55% 抑制塵蟎與病毒",
+          "detail": "恆溫 24–26°C，垂直溫差 < 2°C；相對濕度 40–50% 抑制塵蟎與病毒",
           "metrics": [
             {
               "value": "24–26",
@@ -225,7 +225,7 @@
               "operator": ""
             },
             {
-              "value": "45–55",
+              "value": "40–50",
               "unit": "%",
               "note": "相對濕度 · 抑制塵蟎與病毒",
               "icon": "humid",
@@ -266,15 +266,15 @@
           ]
         }
       },
-      "goal": "保護發育中肺部與視力，減少過敏原干擾"
+      "goal": "保護發育中肺部與視力，並減少過敏原干擾"
     },
     {
       "id": "elder",
       "title": "在宅樂齡",
       "shortName": "安全守護",
       "question": "老年的安全守護？",
-      "pain": "怎麼讓長輩在家安全、安心地終老？",
-      "subtitle": "老人「安全守護」在宅終老",
+      "pain": "怎麼讓長輩在家健康又安全？",
+      "subtitle": "老人「安全守護」原居安老",
       "color": "#c47f75",
       "image": "scene/elder.jpg",
       "columns": [
@@ -295,12 +295,12 @@
       "dimensions": {
         "light": {
           "headline": "視覺補償照明",
-          "detail": "全區照度 ≥ 800 Lux，CRI ≥ 90，補償水晶體黃化；高色溫預防認知退化",
+          "detail": "主要活動區照度 ≥ 800 Lux，CRI ≥ 90，補償水晶體黃化；高色溫預防認知退化",
           "metrics": [
             {
               "value": "800",
               "unit": "Lux",
-              "note": "全區照度",
+              "note": "主要活動區",
               "icon": "light",
               "operator": "≥",
               "lightMode": "cool"
@@ -315,7 +315,7 @@
             },
             {
               "kind": "note",
-              "note": "高色溫",
+              "note": "日間高色溫",
               "detail": "預防認知退化",
               "icon": "light"
             }
@@ -350,26 +350,28 @@
         },
         "temp": {
           "headline": "穩定末梢循環",
-          "detail": "室溫 26–28°C，穩定末梢循環，預防夜間血壓劇烈波動",
+          "detail": "室溫 24–26°C，穩定末梢循環，預防夜間血壓劇烈波動",
           "metrics": [
             {
-              "value": "26–28",
+              "value": "24–26",
               "unit": "°C",
               "note": "室溫",
               "icon": "temp",
               "operator": ""
             },
             {
-              "kind": "note",
-              "note": "末梢循環",
-              "detail": "穩定末梢循環",
-              "icon": "temp"
+              "value": "20",
+              "unit": "°C",
+              "note": "冬季下限",
+              "icon": "temp",
+              "operator": "≥"
             },
             {
-              "kind": "note",
-              "note": "夜間血壓",
-              "detail": "預防劇烈波動",
-              "icon": "temp"
+              "value": "3",
+              "unit": "°C",
+              "note": "室間溫差 · 預防夜間血壓劇烈波動",
+              "icon": "temp",
+              "operator": "≤"
             }
           ]
         },
@@ -404,10 +406,10 @@
     {
       "id": "pregnancy",
       "title": "孕婦照護",
-      "shortName": "極致純淨",
+      "shortName": "安心純淨",
       "question": "孕婦的安心休養？",
-      "pain": "怎麼給孕媽咪一個零毒害、能好好休養的家？",
-      "subtitle": "孕婦「極致純淨」在家休養",
+      "pain": "怎麼給孕媽咪一個健康純淨、能好好休養的家？",
+      "subtitle": "孕婦「安心純淨」在家休養",
       "color": "#c5b192",
       "image": null,
       "columns": [
@@ -466,11 +468,11 @@
           "lightMode": "warm"
         },
         "air": {
-          "headline": "零毒害微環境",
-          "detail": "甲醛 ≤ 13 ppb（本展設定目標），保護胎兒器官發育不受 VOCs 影響",
+          "headline": "大幅降低有毒物質",
+          "detail": "甲醛：≤ 7.3 ppb（GFB進階標準），保護胎兒器官發育不受 VOCs 影響",
           "metrics": [
             {
-              "value": "13",
+              "value": "7.3",
               "unit": "ppb",
               "note": "甲醛",
               "icon": "air",
@@ -478,13 +480,13 @@
             },
             {
               "kind": "note",
-              "note": "本展設定目標",
-              "detail": "甲醛上限 13 ppb",
+              "note": "GFB 進階標準",
+              "detail": "嚴格控制甲醛濃度",
               "icon": "air"
             },
             {
               "kind": "note",
-              "note": "保護胎兒呼吸道發育",
+              "note": "保護胎兒器官發育",
               "detail": "不受 VOCs 影響",
               "icon": "air"
             }
@@ -542,15 +544,15 @@
           ]
         }
       },
-      "goal": "零毒害微環境，緩解懷孕後期的身心壓力"
+      "goal": "健康純淨環境，緩解懷孕期間的身心壓力"
     },
     {
       "id": "nomad",
       "title": "數位遊牧",
       "shortName": "數位遊牧",
       "question": "高效的在宅工作？",
-      "pain": "在家怎麼維持專注，不被環境拖累效率？",
-      "subtitle": "高效「數位遊牧」在家辦公",
+      "pain": "在家工作怎麼維持專注，不被環境拖累效率？",
+      "subtitle": "高效「數位遊牧」居家辦公",
       "color": "#3a446f",
       "image": "scene/nomad.jpg",
       "columns": [
@@ -685,7 +687,7 @@
           ]
         }
       },
-      "goal": "啟動認知潛能，維持長時間高強度專注"
+      "goal": "啟動認知潛能，維持長時間高效專注"
     }
   ],
   "house": [

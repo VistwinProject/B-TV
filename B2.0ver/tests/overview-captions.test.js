@@ -3,11 +3,11 @@ import assert from 'node:assert/strict'
 import {overviewCaptionAt,OVERVIEW_CAPTIONS} from '../app/overviewCaptions.js'
 import {begin,advancePlayback} from '../app/playback.js'
 test('overview captions match the supplied narration and support media-time seeks',()=>{
- assert.equal(OVERVIEW_CAPTIONS.map(c=>c.text).join('').replace(/\n/g,''),'目前室溫26.2度，相對濕度58%，正在透過12合1感測器偵測空間的數據，以下是空間的詳細資訊。')
+ assert.equal(OVERVIEW_CAPTIONS.map(c=>c.text).join('').replace(/\n/g,''),'目前室溫26.2度，相對濕度58%，正在透過環境感測器偵測空間的數據，以下是空間的詳細資訊。')
  assert.equal(overviewCaptionAt(3),'目前室溫26.2度，\n相對濕度58%，')
- assert.equal(overviewCaptionAt(5.22),'正在透過12合1感測器偵測空間的數據，')
- assert.equal(overviewCaptionAt(9.61),overviewCaptionAt(5.22))
- assert.equal(overviewCaptionAt(9.62),'以下是空間的詳細資訊。')
+ assert.equal(overviewCaptionAt(4.91),'正在透過環境感測器偵測空間的數據，')
+ assert.equal(overviewCaptionAt(9.40),overviewCaptionAt(4.91))
+ assert.equal(overviewCaptionAt(9.41),'以下是空間的詳細資訊。')
  assert.equal(overviewCaptionAt(0),'目前室溫26.2度，\n相對濕度58%，')
 })
 test('overview waits for narration then holds the information for three seconds',()=>{

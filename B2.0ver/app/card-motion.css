@@ -45,12 +45,9 @@
 
 .goal-content .anlb-orb{transform:translateX(-8%)}
 
-.goal-content .goal-copy{display:grid}
+.goal-content .goal-copy{display:grid;align-items:center}
 .goal-copy>span{grid-area:1 / 1}
-.goal-copy .goal-final{opacity:0}
-.goal-copy--finished .goal-spoken{animation:goal-caption-out .4s ease .5s both}
-.goal-copy--finished .goal-final{animation:goal-caption-in .5s ease .9s both}
-@keyframes goal-caption-out{from{opacity:1}to{opacity:0;visibility:hidden}}
+.goal-copy--finished .goal-final{animation:goal-caption-in .5s ease both}
 @keyframes goal-caption-in{from{opacity:0}to{opacity:1}}
 
 
@@ -88,9 +85,7 @@
 .overview-spoken>*{grid-area:1/1}
 .overview-spoken .overview-live-caption{margin:0;white-space:pre-line}
 .overview-claim .overview-spoken h2{margin:0;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:inherit}
-.overview-final-caption{opacity:0;visibility:hidden}
-.overview-spoken--finished .overview-live-caption{animation:goal-caption-out .5s ease forwards}
-.overview-spoken--finished .overview-final-caption{visibility:visible;animation:goal-caption-in .6s ease .6s both}
+.overview-spoken--finished .overview-final-caption{animation:goal-caption-in .6s ease both}
 @media(orientation:portrait){.overview-claim{min-height:260px}.overview-spoken{font-size:24px}}
 
 .overview-house-content{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(4px,1vh,12px)}
@@ -218,7 +213,6 @@
 @media(min-width:901px) and (orientation:landscape){
   .experience .readings-column .reading .reading-number{font-size:calc(80 * var(--type-px))}
   .experience .readings-column .reading--interval{padding:calc(18 * var(--type-px))}
-  .experience .reading--interval header .symbol{width:calc(35 * var(--type-px));height:calc(35 * var(--type-px))}
 }
 .experience .reading--interval .reading-number{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;row-gap:.03em;column-gap:.08em;line-height:.9;letter-spacing:0}
 .experience .reading--interval .reading-range-start,
@@ -226,11 +220,9 @@
 .experience .reading--interval .reading-value-unit small{letter-spacing:0}
 @media(orientation:portrait),(max-width:900px){
   .experience .readings-column .reading--interval{padding:12px}
-  .experience .reading--interval header .symbol{width:28px;height:28px}
 }
 @media(min-width:901px) and (orientation:landscape){
   .experience .readings-column .reading{padding:calc(18 * var(--type-px))}
-  .experience .readings-column .reading header .symbol{width:calc(35 * var(--type-px));height:calc(35 * var(--type-px))}
 }
 @media(min-width:901px) and (orientation:landscape){
   .experience .readings-column .reading--interval{padding:calc(14 * var(--type-px))}
@@ -263,3 +255,18 @@
 
 /* Supplementary copy uses a consistent regular weight across scene cards. */
 .experience :is(.reading-note,.note-content p,.reading-number small,.reading-operator,.solution-text p,.pain-subtitle){font-weight:400}
+
+/* Do not strand the last Chinese character on a subtitle line. */
+.caption-tail{white-space:nowrap}
+
+/* Hang the child-card comma in the icon gap so 病 stays on the preceding line. */
+.pain-keep-phrase{white-space:nowrap}
+.pain-hanging-comma{display:inline-block;width:0;overflow:visible}
+
+/* Information and solution cards share one animated icon size at every viewport. */
+.experience{--info-icon-size:clamp(32px,3.2vw,58px)}
+.experience :is(.reading,.solution) header .symbol{width:var(--info-icon-size);height:var(--info-icon-size)}
+.experience .solution header{justify-content:space-between}
+@media(min-width:901px) and (orientation:landscape){
+  .experience{--info-icon-size:calc(58 * var(--type-px))}
+}
